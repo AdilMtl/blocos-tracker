@@ -1185,6 +1185,26 @@ tr:active { background: var(--surface2); }
 .comp-table .comp-exname { text-align: left; font-weight: 700; font-size: 11px; white-space: nowrap; }
 .comp-best { color: var(--warn); font-weight: 800; }
 
+/* ════════════════════ HISTORY MODAL ════════════════════ */
+.hist-list { display: flex; flex-direction: column; gap: 10px; }
+.hist-entry { background: var(--surface2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.hist-entry-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.hist-date { font-size: 13px; font-weight: 700; color: var(--text); }
+.hist-right { display: flex; align-items: center; gap: 8px; }
+.hist-tag { font-size: 10px; background: rgba(251,191,36,.15); color: var(--warn); border-radius: 6px; padding: 2px 6px; font-weight: 700; }
+.hist-kcal { font-size: 13px; font-weight: 800; color: var(--text2); }
+.hist-macros { display: flex; flex-direction: column; gap: 5px; }
+.hist-macro-item { display: flex; align-items: center; gap: 8px; }
+.hist-macro-lbl { font-size: 10px; font-weight: 700; color: var(--text3); width: 14px; flex-shrink: 0; }
+.hist-macro-val { font-size: 11px; color: var(--text2); width: 36px; flex-shrink: 0; text-align: right; }
+.hist-mini-bar-wrap { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.hist-mini-bar-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+.hist-mini-bar-fill.bar-p { background: var(--pColor); }
+.hist-mini-bar-fill.bar-c { background: var(--cColor); }
+.hist-mini-bar-fill.bar-g { background: var(--gColor); }
+.hist-pct { font-size: 10px; color: var(--text3); width: 32px; text-align: right; flex-shrink: 0; }
+.hist-empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 14px; line-height: 1.6; }
+
 /* ════════════════════ DESKTOP ════════════════════ */
 @media(min-width: 720px) {
   .kpi-grid { gap: 12px; }
@@ -1260,6 +1280,7 @@ tr:active { background: var(--surface2); }
           <b>📈 Progresso</b>
           <span id="metaLine">Meta: —</span>
         </div>
+        <button class="btn sm ghost" id="btnHistModal" type="button" style="flex-shrink:0;">📋 Histórico</button>
       </div>
       <div class="card-body">
         <div class="kpi-grid">
@@ -1669,7 +1690,7 @@ tr:active { background: var(--surface2); }
       <!-- Cardio default -->
       <div style="display:flex;gap:8px;margin-bottom:14px;">
         <div class="form-row" style="flex:1;"><label>Cardio padrão</label>
-          <select id="tmplEditCardioType" style="width:100%;border:1px solid var(--line);background:rgba(0,0,0,.15);color:var(--text);font-family:var(--font);font-size:13px;font-weight:700;padding:6px;border-radius:var(--radius-xs);outline:none;-webkit-appearance:none;"></select>
+          <select id="tmplEditCardioType" style="width:100%;border:1px solid var(--line);background:rgba(0,0,0,.15);color:var(--text);font-family:var(--font);font-size:13px;font-weight:700;padding:6px;border-radius:var(--radius-xs);outline:none;-webkit-appearance:none;appearance:none;"></select>
         </div>
         <div class="form-row" style="width:80px;"><label>Minutos</label>
           <input id="tmplEditCardioMin" inputmode="numeric" placeholder="15" />
@@ -1799,6 +1820,19 @@ tr:active { background: var(--surface2); }
       <button class="btn sm primary" id="btnSave" type="button">Salvar</button>
       <button class="btn sm" id="btnDone" type="button">📸 Snap</button>
     </div>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div class="modal-overlay" id="histModalOverlay"></div>
+<div class="modal-sheet modal-full" id="histModal">
+  <div class="modal-handle"></div>
+  <div class="modal-header">
+    <b>📋 Histórico de dias</b>
+    <button class="modal-close" id="histModalClose" type="button">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="hist-list" id="histList"></div>
   </div>
 </div>
 
@@ -2674,6 +2708,75 @@ tr:active { background: var(--surface2); }
     data.history.push({ date: currentDate(), totals: t, preset: data.days[currentDate()].preset || null, at: new Date().toISOString(), settingsSnapshot: settings });
     saveJSON(STORAGE_KEY, data);
     showToast("Snapshot salvo 📸");
+  };
+
+  // ══════════ HISTORY MODAL ══════════
+  const openHistModal = () => {
+    renderHistList();
+    $("#histModalOverlay").classList.add("open");
+    $("#histModal").classList.add("open");
+  };
+  const closeHistModal = () => {
+    $("#histModalOverlay").classList.remove("open");
+    $("#histModal").classList.remove("open");
+  };
+  const renderHistList = () => {
+    const el = $("#histList");
+    const dates = Object.keys(data.days || {}).filter(d => {
+      const day = data.days[d];
+      if(!day || !day.meals) return false;
+      return day.meals.some(m => (m.p||0) + (m.c||0) + (m.g||0) > 0);
+    }).sort((a,b) => b.localeCompare(a));
+    if(!dates.length){
+      el.innerHTML = `<div class="hist-empty">Nenhum dia registrado ainda.<br>Registre refeições e use 📸 Snap para fechar o dia.</div>`;
+      return;
+    }
+    const snapMap = {};
+    (data.history || []).forEach(h => { snapMap[h.date] = h; });
+    const kcalPB = settings.kcalPerBlock || {};
+    const gB = goalsInBlocks();
+    el.innerHTML = dates.map(d => {
+      const day = data.days[d];
+      let p = 0, c = 0, g = 0;
+      day.meals.forEach(m => { p += m.p||0; c += m.c||0; g += m.g||0; });
+      p = Math.round(p*10)/10; c = Math.round(c*10)/10; g = Math.round(g*10)/10;
+      const kcal = Math.round(p*(kcalPB.p||0) + c*(kcalPB.c||0) + g*(kcalPB.g||0));
+      const hasSnap = !!snapMap[d];
+      const pp = gB.p > 0 ? Math.min(Math.round(p/gB.p*100), 100) : 0;
+      const cp = gB.c > 0 ? Math.min(Math.round(c/gB.c*100), 100) : 0;
+      const gp = gB.g > 0 ? Math.min(Math.round(g/gB.g*100), 100) : 0;
+      const [y, mo, dy] = d.split('-');
+      const label = new Date(+y, +mo-1, +dy).toLocaleDateString('pt-BR', { weekday:'short', day:'numeric', month:'short' });
+      return `<div class="hist-entry">
+  <div class="hist-entry-header">
+    <span class="hist-date">${label}</span>
+    <div class="hist-right">
+      ${hasSnap ? `<span class="hist-tag">📸 snap</span>` : ''}
+      ${kcal > 0 ? `<span class="hist-kcal">~${kcal} kcal</span>` : ''}
+    </div>
+  </div>
+  <div class="hist-macros">
+    <div class="hist-macro-item">
+      <span class="hist-macro-lbl">P</span>
+      <span class="hist-macro-val">${p.toFixed(1)}</span>
+      <div class="hist-mini-bar-wrap"><div class="hist-mini-bar-fill bar-p" style="width:${pp}%"></div></div>
+      <span class="hist-pct">${pp}%</span>
+    </div>
+    <div class="hist-macro-item">
+      <span class="hist-macro-lbl">C</span>
+      <span class="hist-macro-val">${c.toFixed(1)}</span>
+      <div class="hist-mini-bar-wrap"><div class="hist-mini-bar-fill bar-c" style="width:${cp}%"></div></div>
+      <span class="hist-pct">${cp}%</span>
+    </div>
+    <div class="hist-macro-item">
+      <span class="hist-macro-lbl">G</span>
+      <span class="hist-macro-val">${g.toFixed(1)}</span>
+      <div class="hist-mini-bar-wrap"><div class="hist-mini-bar-fill bar-g" style="width:${gp}%"></div></div>
+      <span class="hist-pct">${gp}%</span>
+    </div>
+  </div>
+</div>`;
+    }).join('');
   };
 
   // ══════════ FOOD PANEL ══════════
@@ -3708,6 +3811,11 @@ tr:active { background: var(--surface2); }
 
     // snapshot
     $("#btnDone").addEventListener("click", closeDaySnapshot);
+
+    // history modal
+    $("#btnHistModal").addEventListener("click", openHistModal);
+    $("#histModalClose").addEventListener("click", closeHistModal);
+    $("#histModalOverlay").addEventListener("click", closeHistModal);
 
     // tabs
     $("#tabTracker").addEventListener("click", () => openTab("tracker"));

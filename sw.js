@@ -1,4 +1,4 @@
-const CACHE_NAME = 'blocos-v1';
+const CACHE_NAME = 'blocos-v2';
 const ASSETS = [
   './',
   './index.html',
