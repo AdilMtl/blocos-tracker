@@ -1185,6 +1185,47 @@ tr:active { background: var(--surface2); }
 .comp-table .comp-exname { text-align: left; font-weight: 700; font-size: 11px; white-space: nowrap; }
 .comp-best { color: var(--warn); font-weight: 800; }
 
+/* ════════════════════ DAY NAVIGATION ════════════════════ */
+.date-nav-btn {
+  background: transparent;
+  border: 0;
+  color: var(--text3);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 3px;
+  cursor: pointer;
+  min-width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.date-nav-btn:active { color: var(--text); }
+.day-edit-banner {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: rgba(124,92,255,.10);
+  border: 1px solid rgba(124,92,255,.20);
+  border-radius: var(--radius-xs);
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--accent2);
+}
+.day-edit-banner.visible { display: flex; }
+.banner-today-btn {
+  background: transparent;
+  border: 0;
+  color: var(--accent2);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+  font-family: var(--font);
+}
+
 /* ════════════════════ HISTORY MODAL ════════════════════ */
 .hist-list { display: flex; flex-direction: column; gap: 10px; }
 .hist-entry { background: var(--surface2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
@@ -1224,9 +1265,10 @@ tr:active { background: var(--surface2); }
     </div>
     <div class="header-right">
       <div class="date-pill">
+        <button class="date-nav-btn" id="btnPrevDay" type="button">‹</button>
         <input id="datePick" type="date" />
+        <button class="date-nav-btn" id="btnNextDay" type="button">›</button>
       </div>
-      <button class="btn sm ghost" id="btnToday" type="button">Hoje</button>
     </div>
   </div>
 
@@ -1283,6 +1325,7 @@ tr:active { background: var(--surface2); }
         <button class="btn sm ghost" id="btnHistModal" type="button" style="flex-shrink:0;">📋 Histórico</button>
       </div>
       <div class="card-body">
+        <div id="dayEditBanner" class="day-edit-banner"></div>
         <div class="kpi-grid">
           <div class="kpi kpi-p" style="--kpi-fill:0%">
             <div class="kpi-label">🥩 Proteína</div>
@@ -3762,6 +3805,50 @@ tr:active { background: var(--surface2); }
     showToast(`"${nome.split("—")[0].trim()}" excluído 🗑️`);
   };
 
+  // ══════════ DAY NAVIGATION ══════════
+  const shiftDate = (delta) => {
+    const cur = new Date(currentDate() + 'T12:00:00');
+    cur.setDate(cur.getDate() + delta);
+    const tz = cur.getTimezoneOffset();
+    const newISO = new Date(cur.getTime() - tz*60000).toISOString().slice(0, 10);
+    const mkBound = (d) => { const tz = d.getTimezoneOffset(); return new Date(d.getTime() - tz*60000).toISOString().slice(0,10); };
+    const minISO = mkBound(new Date(Date.now() - 90*864e5));
+    const maxISO = mkBound(new Date(Date.now() + 1*864e5));
+    if(newISO < minISO || newISO > maxISO) return;
+    datePick.value = newISO;
+    ensureDay(currentDate());
+    fillInputsFromState();
+    updateUI();
+    treinoLoaded = false;
+    if($("#viewMeasure").classList.contains("active")) fillMeasureFormForDate(currentDate());
+    if($("#viewTreino").classList.contains("active")) renderTreinoPanel();
+    updateDayBanner();
+  };
+  const updateDayBanner = () => {
+    const today = todayISO();
+    const cur = currentDate();
+    const banner = $("#dayEditBanner");
+    if(!banner) return;
+    if(cur === today) { banner.classList.remove("visible"); return; }
+    const [y, mo, dy] = cur.split('-');
+    const sameYear = cur.slice(0,4) === today.slice(0,4);
+    const label = new Date(+y, +mo-1, +dy).toLocaleDateString('pt-BR', {
+      weekday: 'short', day: 'numeric', month: 'short',
+      ...(sameYear ? {} : { year: 'numeric' })
+    });
+    banner.innerHTML = `<span>📅 Editando: <b>${label}</b></span><button class="banner-today-btn" id="bannerBtnToday" type="button">→ Hoje</button>`;
+    banner.classList.add("visible");
+    $("#bannerBtnToday").addEventListener("click", () => {
+      datePick.value = todayISO();
+      ensureDay(currentDate());
+      fillInputsFromState();
+      updateUI();
+      treinoLoaded = false;
+      updateDayBanner();
+      showToast("Hoje 📅");
+    });
+  };
+
   // ══════════ INIT ══════════
   try {
     datePick.value = todayISO();
@@ -3769,16 +3856,12 @@ tr:active { background: var(--surface2); }
     buildMeals();
     fillInputsFromState();
     updateUI();
+    updateDayBanner();
     saveAutosave(loadAutosave());
 
-    // header
-    $("#btnToday").addEventListener("click", () => {
-      datePick.value = todayISO();
-      ensureDay(currentDate());
-      fillInputsFromState();
-      updateUI();
-      showToast("Hoje 📅");
-    });
+    // day navigation
+    $("#btnPrevDay").addEventListener("click", () => shiftDate(-1));
+    $("#btnNextDay").addEventListener("click", () => shiftDate(+1));
 
     $("#btnSave").addEventListener("click", () => {
       syncFromInputsToState();
@@ -3798,6 +3881,7 @@ tr:active { background: var(--surface2); }
       if($("#viewTreino").classList.contains("active")){
         renderTreinoPanel();
       }
+      updateDayBanner();
     });
 
     // presets
