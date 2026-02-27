@@ -2,7 +2,7 @@
 
 ## Visão geral
 
-App single-page (PWA) de tracking nutricional, treino e composição corporal. Tudo em **um único arquivo `index.html`** (~3800 linhas) com CSS + HTML + JS inline. Sem frameworks, sem build, sem dependências externas além da fonte Google (DM Sans).
+App single-page (PWA) de tracking nutricional, treino e composição corporal. Tudo em **um único arquivo `index.html`** (~4000 linhas) com CSS + HTML + JS inline. Sem frameworks, sem build, sem dependências externas além da fonte Google (DM Sans).
 
 Hospedado no GitHub Pages. Funciona 100% offline via Service Worker. Dados persistem no localStorage do navegador.
 
@@ -43,9 +43,11 @@ Organizado por seções com comentários `════`:
 | FOOD PANEL | ~680 | Grid de alimentos, modal de seleção |
 | EXERCISE / TREINO | ~1005 | Templates, exercícios, séries, summary |
 | MODAL | ~794 | Bottom sheet modals (food, template edit, progressão, histórico) |
-| DESKTOP | ~1188 | Media query para telas >= 720px |
+| DAY NAVIGATION | ~1188 | `.date-nav-btn`, `.day-edit-banner`, `.banner-today-btn` |
+| HISTORY MODAL | ~1210 | `.hist-entry`, `.hist-mini-bar-*`, `.hist-empty` |
+| DESKTOP | ~1235 | Media query para telas >= 720px |
 
-### 2. HTML (~linhas 1195-1835)
+### 2. HTML (~linhas 1195-1880)
 
 6 views (abas), apenas uma visível por vez via classe `.active`:
 
@@ -63,8 +65,13 @@ Modais (bottom sheets que abrem sobre as views):
 - **Template Edit Modal** (`tmplModal`) — Editar/criar/excluir templates de treino
 - **Exercise Progression Modal** (`exProgModal`) — Histórico e gráfico de um exercício
 - **Template History Modal** (`tmplHistModal`) — Comparação entre sessões de treino
+- **History Modal** (`histModal`) — Histórico de todos os dias registrados (P/C/G, kcal, snap)
 
-### 3. JavaScript (~linhas 1837-3822)
+Elementos de navegação:
+- **`#btnPrevDay` / `#btnNextDay`** — botões ‹ › dentro do `.date-pill` no header
+- **`#dayEditBanner`** — banner contextual no card de Progresso ao editar dias passados
+
+### 3. JavaScript (~linhas 1837-4015)
 
 Tudo dentro de uma IIFE `(() => { ... })()`. Seções:
 
@@ -87,12 +94,14 @@ Tudo dentro de uma IIFE `(() => { ... })()`. Seções:
 | CALC (JP7) | ~2457 | Calculadora Jackson-Pollock 7 dobras + Siri |
 | MEASURE | ~2565 | Registro e histórico de medidas corporais |
 | SNAPSHOT | ~2669 | Fechar dia e salvar snapshot |
-| FOOD PANEL | ~2689 | Busca, seleção, modal de alimentos |
+| HISTORY MODAL | ~2679 | `openHistModal`, `closeHistModal`, `renderHistList` |
+| FOOD PANEL | ~2745 | Busca, seleção, modal de alimentos |
 | TREINO PANEL | ~2967 | Estado do treino, load/save, render exercícios |
 | EXERCISE PROGRESSION MODAL | ~3292 | Modal com gráfico e tabela de evolução |
 | TEMPLATE HISTORY MODAL | ~3352 | Modal com comparação entre sessões |
 | TEMPLATE EDITOR | ~3472 | CRUD de templates de treino |
-| INIT | ~3662 | Event listeners, bootstrap inicial |
+| DAY NAVIGATION | ~3808 | `shiftDate`, `updateDayBanner` — navegação ‹ › e banner |
+| INIT | ~3852 | Event listeners, bootstrap inicial |
 
 ## Modelo de dados (localStorage)
 
