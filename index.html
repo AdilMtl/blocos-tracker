@@ -426,28 +426,64 @@ body::after {
 
 /* ════════════════════ PRESETS ════════════════════ */
 .preset-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
 }
 .preset-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 6px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--line);
   background: var(--surface2);
   color: var(--text);
   font-family: var(--font);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all .15s;
   -webkit-tap-highlight-color: transparent;
   min-height: 44px;
+  text-align: center;
 }
 .preset-btn:active { transform: scale(.96); }
+.preset-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(124,92,255,.15); }
+.preset-bar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: rgba(124,92,255,.10);
+  border: 1px solid rgba(124,92,255,.20);
+  border-radius: var(--radius-xs);
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--accent2);
+}
+.preset-bar.visible { display: flex; }
+.preset-bar-btns { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.preset-bar-apply { background: var(--accent); border: 0; color: #fff; font-size: 11px; font-weight: 700; border-radius: 6px; padding: 5px 10px; cursor: pointer; font-family: var(--font); -webkit-tap-highlight-color: transparent; }
+.preset-bar-dismiss { background: transparent; border: 0; color: var(--text3); font-size: 16px; cursor: pointer; padding: 0 2px; font-family: var(--font); line-height: 1; }
+.preset-hint {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(124,92,255,.12);
+  border-radius: 4px;
+  padding: 2px 5px;
+  cursor: pointer;
+  border: 1px solid rgba(124,92,255,.28);
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  display: none;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+.preset-hint.visible { display: block; }
 
 /* ════════════════════ MEALS ════════════════════ */
 .meal-list { display: flex; flex-direction: column; gap: 8px; }
@@ -1237,13 +1273,14 @@ tr:active { background: var(--surface2); }
 .hist-macros { display: flex; flex-direction: column; gap: 5px; }
 .hist-macro-item { display: flex; align-items: center; gap: 8px; }
 .hist-macro-lbl { font-size: 10px; font-weight: 700; color: var(--text3); width: 14px; flex-shrink: 0; }
-.hist-macro-val { font-size: 11px; color: var(--text2); width: 36px; flex-shrink: 0; text-align: right; }
+.hist-macro-val { font-size: 11px; color: var(--text2); width: 40px; flex-shrink: 0; text-align: right; }
 .hist-mini-bar-wrap { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
 .hist-mini-bar-fill { height: 100%; border-radius: 3px; transition: width .3s; }
 .hist-mini-bar-fill.bar-p { background: var(--pColor); }
 .hist-mini-bar-fill.bar-c { background: var(--cColor); }
 .hist-mini-bar-fill.bar-g { background: var(--gColor); }
-.hist-pct { font-size: 10px; color: var(--text3); width: 32px; text-align: right; flex-shrink: 0; }
+.hist-pct { font-size: 10px; color: var(--text3); width: 36px; text-align: right; flex-shrink: 0; }
+.hist-pct.over { color: var(--warn); font-weight: 700; }
 .hist-empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 14px; line-height: 1.6; }
 
 /* ════════════════════ DESKTOP ════════════════════ */
@@ -1278,20 +1315,24 @@ tr:active { background: var(--surface2); }
     <!-- Presets -->
     <div class="card">
       <div class="card-body" style="padding-top:12px;">
-        <div class="accordion open" id="accPresets">
+        <div class="accordion" id="accPresets">
           <button class="acc-trigger" type="button" onclick="toggleAcc('accPresets')">
             🧩 Presets por dia
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-content">
             <div class="acc-inner">
-              <div class="hint" style="margin-bottom:8px;">Carrega estrutura inicial. Ajuste durante o dia.</div>
+              <div class="hint" style="margin-bottom:8px;">Toque em um dia para ver sugestão de blocos.</div>
               <div class="preset-grid">
-                <button class="preset-btn" data-preset="segsex" type="button">🟢 Seg/Sex</button>
-                <button class="preset-btn" data-preset="ter" type="button">🔴 Terça</button>
-                <button class="preset-btn" data-preset="qua" type="button">🟡 Quarta</button>
-                <button class="preset-btn" data-preset="qui" type="button">🟠 Quinta</button>
+                <button class="preset-btn" data-preset="seg" type="button">🟢 Seg</button>
+                <button class="preset-btn" data-preset="ter" type="button">🔴 Ter</button>
+                <button class="preset-btn" data-preset="qua" type="button">🟡 Qua</button>
+                <button class="preset-btn" data-preset="qui" type="button">🟠 Qui</button>
+                <button class="preset-btn" data-preset="sex" type="button">🟢 Sex</button>
                 <button class="preset-btn" data-preset="fds" type="button">🟣 FDS</button>
+              </div>
+              <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+                <button class="btn sm ghost" type="button" onclick="window._openPresetEdit()" style="font-size:12px;padding:0 12px;min-height:32px;border-radius:8px;">✏️ Editar presets</button>
               </div>
             </div>
           </div>
@@ -1312,6 +1353,15 @@ tr:active { background: var(--surface2); }
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Preset suggestion bar -->
+    <div id="presetBar" class="preset-bar">
+      <span id="presetBarLabel" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      <div class="preset-bar-btns">
+        <button class="preset-bar-apply" type="button" onclick="window._applyPresetAll()">Aplicar tudo</button>
+        <button class="preset-bar-dismiss" type="button" onclick="window._clearPreset()">✕</button>
       </div>
     </div>
 
@@ -1866,6 +1916,26 @@ tr:active { background: var(--surface2); }
   </div>
 </div>
 
+<!-- PRESET EDIT MODAL -->
+<div class="modal-overlay" id="presetEditOverlay"></div>
+<div class="modal-sheet modal-full" id="presetEditModal">
+  <div class="modal-handle"></div>
+  <div class="modal-header">
+    <div style="flex:1;min-width:0;"><b>✏️ Editar presets</b></div>
+    <button class="modal-close" id="presetEditClose" type="button">✕</button>
+  </div>
+  <div class="modal-body">
+    <div id="presetEditRef" class="ref-list" style="margin-bottom:14px;"></div>
+    <div id="presetEditTabs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px;"></div>
+    <div id="presetEditForm"></div>
+    <div style="height:80px;"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" id="presetEditReset" type="button" style="flex:1;font-size:12px;">↩ Restaurar padrão</button>
+    <button class="btn primary" id="presetEditSave" type="button" style="flex:2;">✅ Salvar</button>
+  </div>
+</div>
+
 <!-- HISTORY MODAL -->
 <div class="modal-overlay" id="histModalOverlay"></div>
 <div class="modal-sheet modal-full" id="histModal">
@@ -1934,6 +2004,7 @@ tr:active { background: var(--surface2); }
   const FOOD_LOG_KEY = "blocos_tracker_food_log_v1";
   const TREINO_KEY   = "blocos_tracker_treino_v1";
   const TREINO_TMPL_KEY = "blocos_tracker_treino_templates_v1";
+  const PRESETS_KEY     = "blocos_tracker_presets_v1";
 
   // ══════════ EXERCISE DATABASE ══════════
   const EXERCISE_DB = {
@@ -2147,13 +2218,27 @@ tr:active { background: var(--surface2); }
     { id:"ceia", name:"🌙 Ceia" },
   ];
 
-  const PRESETS = {
-    segsex: { label:"🟢 Seg/Sex", meals: { cafe:{p:1,c:1,g:0}, lanche1:{p:0,c:0,g:0}, almoco:{p:2,c:2,g:0.5}, lanche2:{p:1,c:1,g:0}, jantar:{p:2,c:2,g:0.5}, ceia:{p:0,c:0,g:0} } },
+  const DEFAULT_PRESETS = {
+    seg:    { label:"🟢 Segunda", meals: { cafe:{p:1,c:1,g:0}, lanche1:{p:0,c:0,g:0}, almoco:{p:2,c:2,g:0.5}, lanche2:{p:1,c:1,g:0}, jantar:{p:2,c:2,g:0.5}, ceia:{p:0,c:0,g:0} } },
     ter:    { label:"🔴 Terça",   meals: { cafe:{p:0.5,c:1,g:0}, lanche1:{p:0.5,c:1,g:0}, almoco:{p:1.5,c:2,g:0.5}, lanche2:{p:1,c:0,g:1}, jantar:{p:2,c:1.5,g:0.5}, ceia:{p:0,c:0,g:0} } },
-    qua:    { label:"🟡 Quarta",  meals:{ cafe:{p:0.5,c:1,g:0}, lanche1:{p:0,c:0,g:0}, almoco:{p:2,c:2,g:0.5}, lanche2:{p:1,c:1,g:0}, jantar:{p:2,c:1.5,g:0.5}, ceia:{p:0,c:0,g:0} } },
+    qua:    { label:"🟡 Quarta",  meals: { cafe:{p:0.5,c:1,g:0}, lanche1:{p:0,c:0,g:0}, almoco:{p:2,c:2,g:0.5}, lanche2:{p:1,c:1,g:0}, jantar:{p:2,c:1.5,g:0.5}, ceia:{p:0,c:0,g:0} } },
     qui:    { label:"🟠 Quinta",  meals: { cafe:{p:0.5,c:1,g:0}, lanche1:{p:0,c:0,g:0}, almoco:{p:2,c:2,g:2}, lanche2:{p:1,c:0,g:0}, jantar:{p:2,c:1,g:0.5}, ceia:{p:0,c:0,g:0} } },
+    sex:    { label:"🟢 Sexta",   meals: { cafe:{p:1,c:1,g:0}, lanche1:{p:0,c:0,g:0}, almoco:{p:2,c:2,g:0.5}, lanche2:{p:1,c:1,g:0}, jantar:{p:2,c:2,g:0.5}, ceia:{p:0,c:0,g:0} } },
     fds:    { label:"🟣 FDS",     meals: { cafe:{p:1,c:1,g:0}, lanche1:{p:0,c:0,g:0}, almoco:{p:2,c:2,g:0.5}, lanche2:{p:1,c:0,g:1}, jantar:{p:2,c:2,g:0.5}, ceia:{p:0,c:0,g:0} } },
   };
+  let PRESETS = (() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem(PRESETS_KEY) || "null");
+      if(stored && typeof stored === "object") {
+        const merged = clone(DEFAULT_PRESETS);
+        for(const k of Object.keys(merged)){
+          if(stored[k]?.meals) merged[k].meals = stored[k].meals;
+        }
+        return merged;
+      }
+    } catch(e) {}
+    return clone(DEFAULT_PRESETS);
+  })();
 
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
@@ -2236,6 +2321,7 @@ tr:active { background: var(--surface2); }
   const mealList = $("#mealList");
   // Track which meal is open
   let openMealId = null;
+  let activePreset = null;
 
   const toggleMeal = (id) => {
     if(openMealId === id) {
@@ -2270,14 +2356,17 @@ tr:active { background: var(--surface2); }
               <div class="macro-field pf">
                 <label>P</label>
                 <input inputmode="decimal" placeholder="0" id="p-${m.id}" />
+                <span class="preset-hint" id="ph-p-${m.id}" onclick="window._applyPresetMacro('${m.id}','p')"></span>
               </div>
               <div class="macro-field cf">
                 <label>C</label>
                 <input inputmode="decimal" placeholder="0" id="c-${m.id}" />
+                <span class="preset-hint" id="ph-c-${m.id}" onclick="window._applyPresetMacro('${m.id}','c')"></span>
               </div>
               <div class="macro-field gf">
                 <label>G</label>
                 <input inputmode="decimal" placeholder="0" id="g-${m.id}" />
+                <span class="preset-hint" id="ph-g-${m.id}" onclick="window._applyPresetMacro('${m.id}','g')"></span>
               </div>
             </div>
             <div class="quick-row">
@@ -2296,6 +2385,7 @@ tr:active { background: var(--surface2); }
     }
 
     window._toggleMeal = toggleMeal;
+    window._applyPresetMacro = applyPresetMacro;
 
     // input listeners
     for(const m of MEALS){
@@ -2460,6 +2550,152 @@ tr:active { background: var(--surface2); }
     updateUI();
     if(autosave) saveJSON(STORAGE_KEY, data);
     showToast(`Preset: ${preset.label}`);
+  };
+
+  // ══════════ PRESET EDIT MODAL ══════════
+  let editingPresetKey = null;
+
+  const openPresetEditModal = (key) => {
+    editingPresetKey = key || Object.keys(PRESETS)[0];
+    const ref = $("#presetEditRef");
+    if(ref) ref.innerHTML =
+      `<div class="ref-item"><b>1P</b> = <b>${settings.blocks.pG}g</b> proteína</div>` +
+      `<div class="ref-item"><b>1C</b> = <b>${settings.blocks.cG}g</b> carbo</div>` +
+      `<div class="ref-item"><b>1G</b> = <b>${settings.blocks.gG}g</b> gordura</div>`;
+    renderPresetEditTabs();
+    renderPresetEditForm(editingPresetKey);
+    $("#presetEditOverlay").classList.add("open");
+    $("#presetEditModal").classList.add("open");
+  };
+
+  const closePresetEditModal = () => {
+    $("#presetEditOverlay").classList.remove("open");
+    $("#presetEditModal").classList.remove("open");
+  };
+
+  const renderPresetEditTabs = () => {
+    const el = $("#presetEditTabs");
+    if(!el) return;
+    el.innerHTML = Object.entries(PRESETS).map(([k, p]) =>
+      `<button class="preset-btn${k === editingPresetKey ? ' active' : ''}"
+        style="flex:1;min-width:calc(33% - 4px);font-size:11px;padding:6px 4px;min-height:36px;"
+        onclick="window._switchPresetTab('${k}')" type="button">${p.label}</button>`
+    ).join('');
+  };
+
+  const renderPresetEditForm = (key) => {
+    const preset = PRESETS[key];
+    const el = $("#presetEditForm");
+    if(!el || !preset) return;
+    el.innerHTML = MEALS.map(m => {
+      const v = preset.meals[m.id] || {p:0,c:0,g:0};
+      return `<div style="margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;">${m.name}</div>
+        <div class="macro-row">
+          <div class="macro-field pf">
+            <label>P</label>
+            <input inputmode="decimal" id="pe-p-${m.id}" value="${v.p ?? 0}" />
+          </div>
+          <div class="macro-field cf">
+            <label>C</label>
+            <input inputmode="decimal" id="pe-c-${m.id}" value="${v.c ?? 0}" />
+          </div>
+          <div class="macro-field gf">
+            <label>G</label>
+            <input inputmode="decimal" id="pe-g-${m.id}" value="${v.g ?? 0}" />
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  };
+
+  const switchPresetTab = (key) => {
+    editingPresetKey = key;
+    renderPresetEditTabs();
+    renderPresetEditForm(key);
+  };
+
+  const savePresetEdit = () => {
+    const meals = {};
+    for(const m of MEALS){
+      meals[m.id] = {
+        p: clampNum($("#pe-p-"+m.id).value) ?? 0,
+        c: clampNum($("#pe-c-"+m.id).value) ?? 0,
+        g: clampNum($("#pe-g-"+m.id).value) ?? 0,
+      };
+    }
+    PRESETS[editingPresetKey] = { ...PRESETS[editingPresetKey], meals };
+    saveJSON(PRESETS_KEY, PRESETS);
+    showToast(`${PRESETS[editingPresetKey].label} salvo ✅`);
+    closePresetEditModal();
+  };
+
+  const resetPresetToDefault = () => {
+    if(!confirm(`Restaurar "${PRESETS[editingPresetKey].label}" para o padrão?`)) return;
+    PRESETS[editingPresetKey] = clone(DEFAULT_PRESETS[editingPresetKey]);
+    saveJSON(PRESETS_KEY, PRESETS);
+    renderPresetEditForm(editingPresetKey);
+    showToast("Restaurado ↩");
+  };
+
+  const renderPresetHints = () => {
+    const preset = activePreset ? PRESETS[activePreset] : null;
+    const bar = $("#presetBar");
+    if(bar) {
+      if(preset) {
+        bar.classList.add("visible");
+        const lbl = $("#presetBarLabel");
+        if(lbl) lbl.textContent = `Sugestão ativa: ${preset.label}`;
+      } else {
+        bar.classList.remove("visible");
+      }
+    }
+    for(const m of MEALS) {
+      ["p","c","g"].forEach(k => {
+        const hint = $(`#ph-${k}-${m.id}`);
+        if(!hint) return;
+        const val = preset?.meals[m.id]?.[k] ?? 0;
+        if(preset && val > 0) {
+          const display = Number.isInteger(val) ? String(val) : val.toFixed(1);
+          hint.textContent = `→${display}`;
+          hint.classList.add("visible");
+        } else {
+          hint.textContent = "";
+          hint.classList.remove("visible");
+        }
+      });
+    }
+  };
+
+  const previewPreset = (key) => {
+    const preset = PRESETS[key];
+    if(!preset) return;
+    activePreset = key;
+    renderPresetHints();
+    showToast(`Sugestão: ${preset.label}`);
+  };
+
+  const applyPresetMacro = (mealId, macro) => {
+    if(!activePreset) return;
+    const preset = PRESETS[activePreset];
+    if(!preset?.meals[mealId]) return;
+    ensureDay(currentDate());
+    data.days[currentDate()].meals[mealId][macro] = preset.meals[mealId][macro] || 0;
+    fillInputsFromState();
+    updateUI();
+    if(autosave) saveJSON(STORAGE_KEY, data);
+  };
+
+  const applyPresetAll = () => {
+    if(!activePreset) return;
+    setPreset(activePreset);
+    activePreset = null;
+    renderPresetHints();
+  };
+
+  const clearActivePreset = () => {
+    activePreset = null;
+    renderPresetHints();
   };
 
   // ══════════ TABS ══════════
@@ -2785,9 +3021,12 @@ tr:active { background: var(--surface2); }
       p = Math.round(p*10)/10; c = Math.round(c*10)/10; g = Math.round(g*10)/10;
       const kcal = Math.round(p*(kcalPB.p||0) + c*(kcalPB.c||0) + g*(kcalPB.g||0));
       const hasSnap = !!snapMap[d];
-      const pp = gB.p > 0 ? Math.min(Math.round(p/gB.p*100), 100) : 0;
-      const cp = gB.c > 0 ? Math.min(Math.round(c/gB.c*100), 100) : 0;
-      const gp = gB.g > 0 ? Math.min(Math.round(g/gB.g*100), 100) : 0;
+      const pp = gB.p > 0 ? Math.round(p/gB.p*100) : 0;
+      const cp = gB.c > 0 ? Math.round(c/gB.c*100) : 0;
+      const gp = gB.g > 0 ? Math.round(g/gB.g*100) : 0;
+      const pGrams = Math.round(p * (settings.blocks.pG || 0));
+      const cGrams = Math.round(c * (settings.blocks.cG || 0));
+      const gGrams = Math.round(g * (settings.blocks.gG || 0));
       const [y, mo, dy] = d.split('-');
       const label = new Date(+y, +mo-1, +dy).toLocaleDateString('pt-BR', { weekday:'short', day:'numeric', month:'short' });
       return `<div class="hist-entry">
@@ -2801,21 +3040,21 @@ tr:active { background: var(--surface2); }
   <div class="hist-macros">
     <div class="hist-macro-item">
       <span class="hist-macro-lbl">P</span>
-      <span class="hist-macro-val">${p.toFixed(1)}</span>
-      <div class="hist-mini-bar-wrap"><div class="hist-mini-bar-fill bar-p" style="width:${pp}%"></div></div>
-      <span class="hist-pct">${pp}%</span>
+      <span class="hist-macro-val">${pGrams}g</span>
+      <div class="hist-mini-bar-wrap"><div class="hist-mini-bar-fill bar-p" style="width:${Math.min(pp,100)}%"></div></div>
+      <span class="hist-pct${pp > 100 ? ' over' : ''}">${pp}%</span>
     </div>
     <div class="hist-macro-item">
       <span class="hist-macro-lbl">C</span>
-      <span class="hist-macro-val">${c.toFixed(1)}</span>
-      <div class="hist-mini-bar-wrap"><div class="hist-mini-bar-fill bar-c" style="width:${cp}%"></div></div>
-      <span class="hist-pct">${cp}%</span>
+      <span class="hist-macro-val">${cGrams}g</span>
+      <div class="hist-mini-bar-wrap"><div class="hist-mini-bar-fill bar-c" style="width:${Math.min(cp,100)}%"></div></div>
+      <span class="hist-pct${cp > 100 ? ' over' : ''}">${cp}%</span>
     </div>
     <div class="hist-macro-item">
       <span class="hist-macro-lbl">G</span>
-      <span class="hist-macro-val">${g.toFixed(1)}</span>
-      <div class="hist-mini-bar-wrap"><div class="hist-mini-bar-fill bar-g" style="width:${gp}%"></div></div>
-      <span class="hist-pct">${gp}%</span>
+      <span class="hist-macro-val">${gGrams}g</span>
+      <div class="hist-mini-bar-wrap"><div class="hist-mini-bar-fill bar-g" style="width:${Math.min(gp,100)}%"></div></div>
+      <span class="hist-pct${gp > 100 ? ' over' : ''}">${gp}%</span>
     </div>
   </div>
 </div>`;
@@ -3885,7 +4124,17 @@ tr:active { background: var(--surface2); }
     });
 
     // presets
-    $$("[data-preset]").forEach(b => b.addEventListener("click", () => setPreset(b.dataset.preset)));
+    $$("[data-preset]").forEach(b => b.addEventListener("click", () => previewPreset(b.dataset.preset)));
+    window._applyPresetAll = applyPresetAll;
+    window._clearPreset = clearActivePreset;
+    window._openPresetEdit = openPresetEditModal;
+    window._switchPresetTab = switchPresetTab;
+
+    // preset edit modal
+    $("#presetEditClose").addEventListener("click", closePresetEditModal);
+    $("#presetEditOverlay").addEventListener("click", closePresetEditModal);
+    $("#presetEditSave").addEventListener("click", savePresetEdit);
+    $("#presetEditReset").addEventListener("click", resetPresetToDefault);
 
     // autosave
     $("#btnAutoSave").addEventListener("click", () => {

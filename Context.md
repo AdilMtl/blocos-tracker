@@ -38,7 +38,7 @@ Organizado por seções com comentários `════`:
 | CARDS | ~272 | `.card`, `.card-header`, `.card-body` |
 | ACCORDION | ~293 | Expandir/colapsar seções |
 | KPI / PROGRESS | ~332 | Cards de indicadores, barras de progresso |
-| PRESETS | ~427 | Botões de preset de refeição |
+| PRESETS | ~427 | Botões de preset de refeição; `.preset-btn.active`, `.preset-bar`, `.preset-hint` |
 | MEALS | ~452 | Grid de refeições e inputs de macros |
 | FOOD PANEL | ~680 | Grid de alimentos, modal de seleção |
 | EXERCISE / TREINO | ~1005 | Templates, exercícios, séries, summary |
@@ -65,7 +65,8 @@ Modais (bottom sheets que abrem sobre as views):
 - **Template Edit Modal** (`tmplModal`) — Editar/criar/excluir templates de treino
 - **Exercise Progression Modal** (`exProgModal`) — Histórico e gráfico de um exercício
 - **Template History Modal** (`tmplHistModal`) — Comparação entre sessões de treino
-- **History Modal** (`histModal`) — Histórico de todos os dias registrados (P/C/G, kcal, snap)
+- **History Modal** (`histModal`) — Histórico de todos os dias registrados (gramas reais, % real sem cap, aviso se >100%)
+- **Preset Edit Modal** (`presetEditModal`) — Editar P/C/G por refeição de cada preset; persiste em `blocos_tracker_presets_v1`
 
 Elementos de navegação:
 - **`#btnPrevDay` / `#btnNextDay`** — botões ‹ › dentro do `.date-pill` no header
@@ -158,6 +159,19 @@ Dados da calculadora (sexo, idade, peso, altura, dobras cutâneas, atividade).
   }
 }
 ```
+
+### `blocos_tracker_presets_v1` (PRESETS_KEY)
+```json
+{
+  "seg": { "meals": { "cafe": {"p":1,"c":1,"g":0}, "almoco": {"p":2,"c":2,"g":0.5}, "..." } },
+  "ter": { "..." },
+  "qua": { "..." },
+  "qui": { "..." },
+  "sex": { "..." },
+  "fds": { "..." }
+}
+```
+Apenas `meals` é sobrescrito; `label` vem sempre de `DEFAULT_PRESETS`. Se o key não existir, usa os defaults hardcoded.
 
 ### `blocos_tracker_treino_templates_v1` (TREINO_TMPL_KEY)
 ```json
