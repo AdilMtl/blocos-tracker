@@ -219,7 +219,9 @@ Apenas `meals` é sobrescrito; `label` vem sempre de `DEFAULT_PRESETS`. Se o key
 
 ## Exercícios disponíveis (EXERCISE_DB)
 
-63 exercícios em 7 grupos: Peito (9), Costas (9), Pernas (15), Ombros (9), Bíceps (7), Tríceps (7), Core (7).
+70 exercícios em 8 grupos: Peito (9), Costas (9), Pernas (15), Glúteos (7), Ombros (9), Bíceps (7), Tríceps (7), Core (7).
+
+Grupo Glúteos: Hip thrust (barra/máquina), Máquina de glúteos (kickback), Glúteo no cabo, Elevação pélvica, Stiff romeno/RDL, Agachamento sumô.
 
 12 tipos de cardio com kcal/min: bicicleta (7-10), caminhada (4-4.5), corrida (10-11), elíptico (8), escada (9), corda (12), remo (8.5), natação (9).
 
@@ -230,7 +232,7 @@ Apenas `meals` é sobrescrito; `label` vem sempre de `DEFAULT_PRESETS`. Se o key
 ## Roadmap planejado
 
 1. Dashboard diário com saldo calórico (meta - consumido + gasto treino)
-2. Gráficos de tendência (peso, medidas ao longo das semanas)
+2. Gráficos de tendência de treino (volume total por template ao longo do tempo) ← próximo
 3. Refeições favoritas (salvar combinações, adicionar com 1 toque)
 4. Export/import JSON (backup dos dados)
 5. Coach IA contextual (análise dos dados com feedback)
