@@ -1318,7 +1318,109 @@ tr:active { background: var(--surface2); }
 .ai-export-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .ai-export-status { font-size: 12px; color: var(--accent); margin-top: 8px; min-height: 18px; transition: opacity .3s; }
 
+/* ════════════════════ HABIT TRACKER ════════════════════ */
+.habit-card {
+  background: rgba(0,0,0,.35);
+  border: 1px solid rgba(124,92,255,.22);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.habit-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(124,92,255,.7), rgba(34,211,238,.7), transparent);
+}
+.habit-trigger {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 11px 14px;
+  background: none; border: none; color: var(--text); font-family: var(--font);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.habit-trigger-left { display: flex; align-items: center; gap: 6px; }
+.habit-title { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: .3px; }
+.habit-trigger-right { display: flex; align-items: center; gap: 6px; }
+.habit-chevron { color: var(--text3); font-size: 12px; transition: transform .25s ease; flex-shrink: 0; }
+.habit-card.open .habit-chevron { transform: rotate(180deg); }
+.habit-body { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
+.habit-card.open .habit-body { max-height: 600px; }
+.habit-body-inner { padding: 0 12px 12px; }
+.habit-week-lbl { font-size: 10px; color: var(--text3); margin-bottom: 8px; }
+.habit-grid-head {
+  display: grid;
+  grid-template-columns: 68px repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 6px;
+}
+.habit-day-lbl {
+  font-size: 8.5px; font-weight: 700; text-align: center;
+  color: var(--text3); text-transform: uppercase; letter-spacing: .4px;
+}
+.habit-day-lbl.today-lbl { color: var(--accent2); }
+.habit-row {
+  display: grid;
+  grid-template-columns: 68px repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 5px;
+  align-items: center;
+}
+.habit-lbl { display: flex; align-items: center; gap: 4px; overflow: hidden; }
+.habit-lbl-icon { font-size: 12px; flex-shrink: 0; }
+.habit-lbl-text { font-size: 10px; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.habit-dot-wrap { display: flex; align-items: center; justify-content: center; }
+.habit-dot {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,.10);
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all .15s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 900;
+  color: transparent;
+  padding: 0;
+}
+.habit-dot.today-dot { border-color: rgba(255,255,255,.24); }
+.habit-dot.checked {
+  background: var(--h-color);
+  border-color: var(--h-color);
+  box-shadow: 0 0 10px var(--h-color), 0 0 3px var(--h-color);
+  color: rgba(0,0,0,.85);
+}
+.habit-dot.future-dot { opacity: .2; cursor: default; pointer-events: none; }
+.habit-dot:active:not(.future-dot) { transform: scale(.82); }
+.habit-divider { height: 1px; background: var(--line); margin: 8px 0 7px; }
+.habit-score { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.habit-score-lbl { font-size: 10px; color: var(--text3); white-space: nowrap; }
+.habit-score-dots { display: flex; gap: 4px; align-items: center; }
+.habit-score-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  transition: background .2s, box-shadow .2s;
+}
+.habit-score-dot.lit { background: var(--h-color); box-shadow: 0 0 5px var(--h-color); }
+.habit-score-num { font-size: 11px; font-weight: 700; color: var(--text2); white-space: nowrap; }
+
 /* ════════════════════ DESKTOP ════════════════════ */
+/* btn hoje */
+.btn-hoje {
+  font-size: 10px; font-weight: 700; font-family: var(--font);
+  color: var(--accent2);
+  background: rgba(167,139,250,.08);
+  border: 1px solid rgba(167,139,250,.18);
+  border-radius: 999px;
+  padding: 4px 9px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s;
+  white-space: nowrap;
+}
+.btn-hoje.visible { opacity: 1; pointer-events: auto; }
+.btn-hoje:active { opacity: .6; }
 @media(min-width: 720px) {
   .kpi-grid { gap: 12px; }
   .app { padding: 24px 24px 180px; }
@@ -1336,6 +1438,7 @@ tr:active { background: var(--surface2); }
       <div class="sub">Offline • Salva localmente</div>
     </div>
     <div class="header-right">
+      <button id="btnGoToday" class="btn-hoje" type="button">hoje</button>
       <div class="date-pill">
         <button class="date-nav-btn" id="btnPrevDay" type="button">‹</button>
         <input id="datePick" type="date" />
@@ -1346,6 +1449,9 @@ tr:active { background: var(--surface2); }
 
   <!-- ═══════════════ VIEW: TRACKER ═══════════════ -->
   <div id="viewTracker" class="view active">
+
+    <!-- Habit Tracker -->
+    <div id="habitTracker" class="habit-card"></div>
 
     <!-- Presets -->
     <div class="card">
@@ -4522,6 +4628,8 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
   const updateDayBanner = () => {
     const today = todayISO();
     const cur = currentDate();
+    const goTodayBtn = $("#btnGoToday");
+    if(goTodayBtn) goTodayBtn.classList.toggle("visible", cur !== today);
     const banner = $("#dayEditBanner");
     if(!banner) return;
     if(cur === today) { banner.classList.remove("visible"); return; }
@@ -4544,6 +4652,109 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     });
   };
 
+  // ══════════ HABIT TRACKER ══════════
+  const HABITS_KEY = 'blocos_tracker_habits_v1';
+  const HABITS_DEF = [
+    { id: 'dieta',   icon: '🥗', label: 'Dieta',   color: '#22d3ee' },
+    { id: 'log',     icon: '🍽️', label: 'Log',     color: '#a78bfa' },
+    { id: 'treino',  icon: '🏋️', label: 'Treino',  color: '#f472b6' },
+    { id: 'cardio',  icon: '🏃', label: 'Cardio',  color: '#fb923c' },
+    { id: 'medidas', icon: '📏', label: 'Medidas', color: '#fbbf24' },
+  ];
+  const HABIT_DAY_LBLS = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+
+  const getWeekDates = (isoDate) => {
+    const ref = new Date(isoDate + 'T12:00:00');
+    const dow = ref.getDay();
+    const monday = new Date(ref);
+    monday.setDate(ref.getDate() - (dow === 0 ? 6 : dow - 1));
+    return Array.from({length: 7}, (_, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return d.toISOString().slice(0, 10);
+    });
+  };
+
+  const renderHabitTracker = () => {
+    const container = $('#habitTracker');
+    if (!container) return;
+    const todayStr = todayISO();
+    const weekDates = getWeekDates(todayStr);
+    const hData = loadJSON(HABITS_KEY, {});
+    const todayHabits = hData[todayStr] || {};
+    const score = HABITS_DEF.filter(h => todayHabits[h.id]).length;
+    const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const fmtD = (iso) => { const [,m,d] = iso.split('-'); return `${+d} ${MONTHS[+m-1]}`; };
+    const weekLbl = `${fmtD(weekDates[0])} – ${fmtD(weekDates[6])}`;
+    const isOpen = localStorage.getItem('blocos_habit_open') !== '0';
+
+    const scoreDots = HABITS_DEF.map(h =>
+      `<div class="habit-score-dot${todayHabits[h.id] ? ' lit' : ''}" style="--h-color:${h.color}"></div>`
+    ).join('');
+
+    let bodyHtml = `<div class="habit-week-lbl">${weekLbl}</div>`;
+    bodyHtml += `<div class="habit-grid-head"><div></div>${weekDates.map((d,i) => `<div class="habit-day-lbl${d===todayStr?' today-lbl':''}">${HABIT_DAY_LBLS[i]}</div>`).join('')}</div>`;
+
+    HABITS_DEF.forEach(habit => {
+      bodyHtml += `<div class="habit-row"><div class="habit-lbl"><span class="habit-lbl-icon">${habit.icon}</span><span class="habit-lbl-text">${habit.label}</span></div>`;
+      weekDates.forEach(date => {
+        const checked = !!(hData[date] && hData[date][habit.id]);
+        const isFuture = date > todayStr;
+        const isToday = date === todayStr;
+        let cls = 'habit-dot';
+        if (checked) cls += ' checked';
+        if (isFuture) cls += ' future-dot';
+        else if (isToday) cls += ' today-dot';
+        bodyHtml += `<div class="habit-dot-wrap"><button type="button" class="${cls}" style="--h-color:${habit.color}" data-date="${date}" data-habit="${habit.id}">${checked ? '✓' : ''}</button></div>`;
+      });
+      bodyHtml += `</div>`;
+    });
+
+    bodyHtml += `
+      <div class="habit-divider"></div>
+      <div class="habit-score">
+        <span class="habit-score-lbl">Hoje</span>
+        <div class="habit-score-dots">${scoreDots}</div>
+        <span class="habit-score-num">${score}/${HABITS_DEF.length}</span>
+      </div>`;
+
+    container.innerHTML = `
+      <button type="button" class="habit-trigger">
+        <div class="habit-trigger-left">
+          <span class="habit-title">⚡ Hábitos</span>
+        </div>
+        <div class="habit-trigger-right">
+          <div class="habit-score-dots">${scoreDots}</div>
+          <span class="habit-score-num">${score}/${HABITS_DEF.length}</span>
+          <span class="habit-chevron">▾</span>
+        </div>
+      </button>
+      <div class="habit-body">
+        <div class="habit-body-inner">${bodyHtml}</div>
+      </div>`;
+
+    if (isOpen) container.classList.add('open');
+    else container.classList.remove('open');
+
+    container.querySelector('.habit-trigger').addEventListener('click', () => {
+      const nowOpen = container.classList.toggle('open');
+      localStorage.setItem('blocos_habit_open', nowOpen ? '1' : '0');
+    });
+
+    container.querySelectorAll('.habit-dot:not(.future-dot)').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const stored = loadJSON(HABITS_KEY, {});
+        const date = btn.dataset.date;
+        const habitId = btn.dataset.habit;
+        if (!stored[date]) stored[date] = {};
+        stored[date][habitId] = !stored[date][habitId];
+        saveJSON(HABITS_KEY, stored);
+        renderHabitTracker();
+      });
+    });
+  };
+
   // ══════════ INIT ══════════
   try {
     datePick.value = todayISO();
@@ -4557,6 +4768,16 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     // day navigation
     $("#btnPrevDay").addEventListener("click", () => shiftDate(-1));
     $("#btnNextDay").addEventListener("click", () => shiftDate(+1));
+    $("#btnGoToday").addEventListener("click", () => {
+      datePick.value = todayISO();
+      ensureDay(currentDate());
+      fillInputsFromState();
+      updateUI();
+      treinoLoaded = false;
+      if($("#viewMeasure").classList.contains("active")) fillMeasureFormForDate(currentDate());
+      if($("#viewTreino").classList.contains("active")) renderTreinoPanel();
+      updateDayBanner();
+    });
 
     $("#btnSave").addEventListener("click", () => {
       syncFromInputsToState();
@@ -4709,6 +4930,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     renderFoodPanel();
     treinoLoaded = false;
     renderTreinoPanel();
+    renderHabitTracker();
 
     showToast("Pronto ✅");
   } catch(err) {
