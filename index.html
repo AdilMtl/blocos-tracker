@@ -2156,129 +2156,134 @@ tr:active { background: var(--surface2); }
     {id:"treino_alt",nome:"Treino Alt — Peito + Costas + Braços",cor:"#fbbf24",exercicios:["supino_reto","supino_inclinado","puxada_frontal","remada_curvada","triceps_pulley","rosca_direta"],cardio:{tipo:"bicicleta",min:15}},
   ];
 
-  // ══════════ FOOD DATABASE ══════════
+  // ══════════ FOOD DATABASE (REVISADO TACO & ATWATER) ══════════
   const FOOD_DB = {
-    "🍞 Pães & Cereais": [
-      { id:"pao_frances", nome:"Pão francês", porcao:"1 un (50g)", porcaoG:50, p:4.0, c:28.0, g:1.5, kcal:142 },
+    "🍞 Pães, Cereais & Raízes": [
+      { id:"pao_frances", nome:"Pão francês", porcao:"1 un (50g)", porcaoG:50, p:4.0, c:29.0, g:1.5, kcal:146 },
       { id:"pao_caseiro", nome:"Pão caseiro", porcao:"1 fatia (50g)", porcaoG:50, p:4.5, c:26.0, g:2.5, kcal:145 },
       { id:"pao_integral", nome:"Pão integral", porcao:"2 fatias (50g)", porcaoG:50, p:5.0, c:23.0, g:1.8, kcal:128 },
-      { id:"pao_forma", nome:"Pão de forma branco", porcao:"2 fatias (50g)", porcaoG:50, p:4.2, c:25.0, g:1.5, kcal:131 },
+      { id:"pao_forma", nome:"Pão de forma branco", porcao:"2 fatias (50g)", porcaoG:50, p:4.2, c:25.0, g:1.5, kcal:130 },
       { id:"arroz_branco", nome:"Arroz branco cozido", porcao:"50g", porcaoG:50, p:1.3, c:14.0, g:0.1, kcal:62 },
-      { id:"arroz_integral", nome:"Arroz integral cozido", porcao:"50g", porcaoG:50, p:1.4, c:12.5, g:0.5, kcal:58 },
-      { id:"milho_cozido", nome:"Milho verde cozido", porcao:"1 espiga (100g)", porcaoG:100, p:3.2, c:19.0, g:1.2, kcal:96 },
-      { id:"milho_lata", nome:"Milho em conserva", porcao:"3 col sopa (60g)", porcaoG:60, p:1.5, c:13.0, g:0.5, kcal:62 },
-      { id:"tapioca", nome:"Tapioca (goma)", porcao:"2 col sopa (30g)", porcaoG:30, p:0.1, c:26.0, g:0.1, kcal:105 },
-      { id:"aveia", nome:"Aveia em flocos", porcao:"3 col sopa (30g)", porcaoG:30, p:4.0, c:18.0, g:2.5, kcal:110 },
-      { id:"granola", nome:"Granola", porcao:"40g", porcaoG:40, p:3.5, c:28.0, g:5.0, kcal:172 },
+      { id:"arroz_integral", nome:"Arroz integral cozido", porcao:"50g", porcaoG:50, p:1.5, c:13.0, g:0.5, kcal:63 },
+      { id:"macarrao_cozido", nome:"Macarrão cozido", porcao:"1 escumadeira (80g)", porcaoG:80, p:4.5, c:24.0, g:0.5, kcal:119 },
+      { id:"batata_doce", nome:"Batata doce cozida", porcao:"100g", porcaoG:100, p:0.6, c:18.4, g:0.1, kcal:77 },
+      { id:"mandioca", nome:"Mandioca cozida", porcao:"100g", porcaoG:100, p:0.6, c:30.0, g:0.1, kcal:123 },
+      { id:"milho_cozido", nome:"Milho verde cozido", porcao:"1 espiga (100g)", porcaoG:100, p:3.2, c:19.0, g:1.2, kcal:100 },
+      { id:"milho_lata", nome:"Milho em conserva", porcao:"3 col sopa (60g)", porcaoG:60, p:1.5, c:13.0, g:0.5, kcal:63 },
+      { id:"tapioca", nome:"Tapioca (goma)", porcao:"3 col sopa (50g)", porcaoG:50, p:0.2, c:27.0, g:0.1, kcal:110 },
+      { id:"aveia", nome:"Aveia em flocos", porcao:"3 col sopa (30g)", porcaoG:30, p:4.0, c:18.0, g:2.5, kcal:111 },
+      { id:"granola", nome:"Granola", porcao:"40g", porcaoG:40, p:3.5, c:28.0, g:5.0, kcal:171 },
       { id:"cuscuz", nome:"Cuscuz de milho", porcao:"100g", porcaoG:100, p:2.0, c:25.0, g:0.5, kcal:113 },
     ],
     "🥩 Carnes & Proteínas": [
-      { id:"frango_grelhado", nome:"Frango grelhado (peito)", porcao:"100g", porcaoG:100, p:31.0, c:0.0, g:3.5, kcal:159 },
-      { id:"frango_desfiado", nome:"Frango desfiado", porcao:"100g", porcaoG:100, p:28.0, c:0.0, g:4.0, kcal:148 },
-      { id:"carne_moida", nome:"Carne moída (patinho)", porcao:"100g", porcaoG:100, p:26.0, c:0.0, g:8.0, kcal:176 },
-      { id:"carne_moida_gorda", nome:"Carne moída (acém)", porcao:"100g", porcaoG:100, p:24.0, c:0.0, g:12.0, kcal:204 },
-      { id:"bife_grelhado", nome:"Bife grelhado (alcatra)", porcao:"100g", porcaoG:100, p:29.0, c:0.0, g:7.0, kcal:180 },
-      { id:"bife_contra", nome:"Bife contrafilé", porcao:"100g", porcaoG:100, p:27.0, c:0.0, g:10.0, kcal:198 },
-      { id:"ovo_inteiro", nome:"Ovo inteiro cozido", porcao:"1 un (50g)", porcaoG:50, p:6.5, c:0.6, g:5.0, kcal:74 },
+      { id:"frango_grelhado", nome:"Frango grelhado (peito)", porcao:"100g", porcaoG:100, p:32.0, c:0.0, g:2.5, kcal:151 },
+      { id:"frango_desfiado", nome:"Frango desfiado cozido", porcao:"100g", porcaoG:100, p:28.0, c:0.0, g:4.0, kcal:148 },
+      { id:"carne_moida", nome:"Carne moída (patinho cozido)", porcao:"100g", porcaoG:100, p:35.0, c:0.0, g:7.0, kcal:203 },
+      { id:"carne_moida_gorda", nome:"Carne moída (acém cozido)", porcao:"100g", porcaoG:100, p:26.0, c:0.0, g:15.0, kcal:239 },
+      { id:"bife_grelhado", nome:"Bife grelhado (alcatra)", porcao:"100g", porcaoG:100, p:31.0, c:0.0, g:9.0, kcal:205 },
+      { id:"bife_contra", nome:"Bife contrafilé grelhado", porcao:"100g", porcaoG:100, p:35.0, c:0.0, g:13.0, kcal:257 },
+      { id:"lombo_suino", nome:"Lombo suíno assado", porcao:"100g", porcaoG:100, p:28.5, c:0.0, g:9.5, kcal:200 },
+      { id:"tilapia", nome:"Tilápia grelhada", porcao:"100g", porcaoG:100, p:26.0, c:0.0, g:2.5, kcal:127 },
+      { id:"salmao", nome:"Salmão grelhado", porcao:"100g", porcaoG:100, p:24.0, c:0.0, g:12.0, kcal:204 },
+      { id:"ovo_inteiro", nome:"Ovo inteiro cozido", porcao:"1 un (50g)", porcaoG:50, p:6.5, c:0.6, g:5.0, kcal:73 },
       { id:"ovo_mexido", nome:"Ovo mexido (c/ óleo)", porcao:"1 un (55g)", porcaoG:55, p:6.0, c:0.8, g:7.0, kcal:90 },
-      { id:"ovo_frito", nome:"Ovo frito", porcao:"1 un (60g)", porcaoG:60, p:6.0, c:0.5, g:8.5, kcal:101 },
+      { id:"ovo_frito", nome:"Ovo frito", porcao:"1 un (60g)", porcaoG:60, p:6.0, c:0.5, g:8.5, kcal:103 },
       { id:"linguica", nome:"Linguiça calabresa", porcao:"1 gomo (60g)", porcaoG:60, p:10.0, c:1.0, g:14.0, kcal:170 },
-      { id:"atum_lata", nome:"Atum em lata (água)", porcao:"1 lata (120g)", porcaoG:120, p:30.0, c:0.0, g:1.5, kcal:134 },
-      { id:"sardinha_lata", nome:"Sardinha em lata", porcao:"1 lata (125g)", porcaoG:125, p:24.0, c:0.0, g:12.0, kcal:206 },
+      { id:"atum_lata", nome:"Atum em lata (água)", porcao:"1 lata (120g)", porcaoG:120, p:30.0, c:0.0, g:1.0, kcal:129 },
+      { id:"sardinha_lata", nome:"Sardinha em lata (óleo)", porcao:"1 lata (125g)", porcaoG:125, p:24.0, c:0.0, g:12.0, kcal:204 },
     ],
     "🥤 Proteicos & Laticínios": [
       { id:"bebida_proteica_vegana", nome:"Bebida proteica vegana", porcao:"1 un (250ml)", porcaoG:250, p:15.0, c:5.0, g:2.0, kcal:98 },
-      { id:"danotico", nome:"Danótico", porcao:"1 un (170g)", porcaoG:170, p:10.0, c:16.0, g:3.5, kcal:135 },
-      { id:"whey_scoop", nome:"Whey protein (scoop)", porcao:"1 scoop (30g)", porcaoG:30, p:24.0, c:3.0, g:1.5, kcal:120 },
-      { id:"leite_integral", nome:"Leite integral", porcao:"200ml", porcaoG:200, p:6.0, c:10.0, g:6.0, kcal:120 },
-      { id:"leite_desnatado", nome:"Leite desnatado", porcao:"200ml", porcaoG:200, p:6.5, c:10.0, g:0.5, kcal:70 },
-      { id:"iogurte_natural", nome:"Iogurte natural", porcao:"170g", porcaoG:170, p:6.0, c:8.0, g:5.5, kcal:105 },
-      { id:"iogurte_grego", nome:"Iogurte grego", porcao:"120g", porcaoG:120, p:6.5, c:14.0, g:5.0, kcal:130 },
-      { id:"requeijao", nome:"Requeijão cremoso", porcao:"1 col sopa (30g)", porcaoG:30, p:2.0, c:1.0, g:6.0, kcal:66 },
-      { id:"queijo_minas", nome:"Queijo minas frescal", porcao:"1 fatia (30g)", porcaoG:30, p:5.5, c:0.5, g:5.0, kcal:68 },
-      { id:"queijo_mussarela", nome:"Queijo mussarela", porcao:"1 fatia (20g)", porcaoG:20, p:4.5, c:0.5, g:4.5, kcal:60 },
+      { id:"danotico", nome:"Iogurte Proteico (tipo YoPro)", porcao:"1 un (160g)", porcaoG:160, p:15.0, c:10.0, g:0.0, kcal:100 },
+      { id:"whey_scoop", nome:"Whey protein (scoop)", porcao:"1 scoop (30g)", porcaoG:30, p:24.0, c:3.0, g:1.5, kcal:122 },
+      { id:"leite_integral", nome:"Leite integral", porcao:"200ml", porcaoG:200, p:6.0, c:10.0, g:6.0, kcal:118 },
+      { id:"leite_desnatado", nome:"Leite desnatado", porcao:"200ml", porcaoG:200, p:6.5, c:10.0, g:0.5, kcal:71 },
+      { id:"iogurte_natural", nome:"Iogurte natural integral", porcao:"170g", porcaoG:170, p:6.0, c:8.0, g:5.5, kcal:106 },
+      { id:"iogurte_grego", nome:"Iogurte grego tradicional", porcao:"120g", porcaoG:120, p:6.5, c:14.0, g:5.0, kcal:127 },
+      { id:"requeijao", nome:"Requeijão cremoso", porcao:"1 col sopa (30g)", porcaoG:30, p:3.0, c:1.0, g:7.0, kcal:79 },
+      { id:"queijo_minas", nome:"Queijo minas frescal", porcao:"1 fatia (30g)", porcaoG:30, p:4.5, c:1.0, g:5.0, kcal:67 },
+      { id:"queijo_mussarela", nome:"Queijo mussarela", porcao:"1 fatia (20g)", porcaoG:20, p:4.5, c:0.5, g:4.5, kcal:61 },
     ],
     "🥬 Legumes & Vegetais": [
       { id:"cenoura_refogada", nome:"Cenoura refogada", porcao:"100g", porcaoG:100, p:1.0, c:7.5, g:2.0, kcal:52 },
-      { id:"chuchu_refogado", nome:"Chuchu refogado", porcao:"100g", porcaoG:100, p:0.8, c:4.0, g:2.0, kcal:36 },
-      { id:"abobrinha_refogada", nome:"Abobrinha refogada", porcao:"100g", porcaoG:100, p:1.2, c:3.5, g:2.5, kcal:40 },
-      { id:"berinjela_refogada", nome:"Berinjela refogada", porcao:"100g", porcaoG:100, p:1.0, c:5.0, g:2.5, kcal:46 },
+      { id:"chuchu_refogado", nome:"Chuchu refogado", porcao:"100g", porcaoG:100, p:0.8, c:4.0, g:2.0, kcal:37 },
+      { id:"abobrinha_refogada", nome:"Abobrinha refogada", porcao:"100g", porcaoG:100, p:1.2, c:3.5, g:2.5, kcal:41 },
+      { id:"berinjela_refogada", nome:"Berinjela refogada", porcao:"100g", porcaoG:100, p:1.0, c:5.0, g:2.5, kcal:47 },
+      { id:"abobora_cozida", nome:"Abóbora cozida", porcao:"100g", porcaoG:100, p:1.4, c:10.8, g:0.5, kcal:53 },
       { id:"brocolis", nome:"Brócolis cozido", porcao:"100g", porcaoG:100, p:3.5, c:4.0, g:0.5, kcal:35 },
-      { id:"vagem_refogada", nome:"Vagem refogada", porcao:"100g", porcaoG:100, p:2.0, c:5.0, g:2.0, kcal:45 },
-      { id:"quiabo_refogado", nome:"Quiabo refogado", porcao:"100g", porcaoG:100, p:2.0, c:5.0, g:2.5, kcal:50 },
+      { id:"couve_flor", nome:"Couve-flor cozida", porcao:"100g", porcaoG:100, p:1.2, c:4.1, g:0.2, kcal:23 },
+      { id:"espinafre", nome:"Espinafre refogado", porcao:"50g", porcaoG:50, p:1.5, c:2.0, g:1.0, kcal:23 },
+      { id:"vagem_refogada", nome:"Vagem refogada", porcao:"100g", porcaoG:100, p:2.0, c:5.0, g:2.0, kcal:46 },
+      { id:"quiabo_refogado", nome:"Quiabo refogado", porcao:"100g", porcaoG:100, p:2.0, c:5.0, g:2.5, kcal:51 },
       { id:"legumes_mistura", nome:"Legumes mistos refog.", porcao:"100g", porcaoG:100, p:1.5, c:5.0, g:2.0, kcal:44 },
-      { id:"salada_verde", nome:"Salada verde", porcao:"50g", porcaoG:50, p:0.8, c:1.5, g:0.1, kcal:8 },
-      { id:"tomate", nome:"Tomate", porcao:"1 un (100g)", porcaoG:100, p:1.0, c:3.5, g:0.2, kcal:18 },
-      { id:"feijao_carioca", nome:"Feijão carioca cozido", porcao:"1 concha (86g)", porcaoG:86, p:5.0, c:14.0, g:0.5, kcal:77 },
-      { id:"feijao_preto", nome:"Feijão preto cozido", porcao:"1 concha (86g)", porcaoG:86, p:5.5, c:13.5, g:0.5, kcal:78 },
+      { id:"salada_verde", nome:"Salada verde mix", porcao:"50g", porcaoG:50, p:0.8, c:1.5, g:0.1, kcal:10 },
+      { id:"tomate", nome:"Tomate", porcao:"1 un (100g)", porcaoG:100, p:1.0, c:3.5, g:0.2, kcal:20 },
+      { id:"feijao_carioca", nome:"Feijão carioca cozido", porcao:"1 concha (86g)", porcaoG:86, p:4.1, c:11.7, g:0.4, kcal:67 },
+      { id:"feijao_preto", nome:"Feijão preto cozido", porcao:"1 concha (86g)", porcaoG:86, p:4.5, c:12.0, g:0.5, kcal:71 },
     ],
     "🥜 Oleaginosas": [
-      { id:"amendoa", nome:"Amêndoas", porcao:"10 un (15g)", porcaoG:15, p:3.2, c:1.5, g:7.5, kcal:87 },
-      { id:"castanha_caju", nome:"Castanha de caju", porcao:"10 un (15g)", porcaoG:15, p:2.7, c:4.5, g:6.5, kcal:86 },
-      { id:"amendoim", nome:"Amendoim torrado", porcao:"20g", porcaoG:20, p:5.0, c:3.5, g:10.0, kcal:115 },
-      { id:"castanha_para", nome:"Castanha-do-pará", porcao:"2 un (8g)", porcaoG:8, p:1.2, c:0.5, g:5.5, kcal:55 },
-      { id:"pasta_amendoim", nome:"Pasta de amendoim", porcao:"1 col sopa (20g)", porcaoG:20, p:4.5, c:3.0, g:10.0, kcal:118 },
+      { id:"amendoa", nome:"Amêndoas", porcao:"10 un (15g)", porcaoG:15, p:3.2, c:3.0, g:7.5, kcal:92 },
+      { id:"castanha_caju", nome:"Castanha de caju", porcao:"10 un (15g)", porcaoG:15, p:2.7, c:4.5, g:6.5, kcal:87 },
+      { id:"amendoim", nome:"Amendoim torrado", porcao:"20g", porcaoG:20, p:5.0, c:3.5, g:10.0, kcal:124 },
+      { id:"castanha_para", nome:"Castanha-do-pará", porcao:"2 un (8g)", porcaoG:8, p:1.2, c:0.5, g:5.5, kcal:56 },
+      { id:"pasta_amendoim", nome:"Pasta de amendoim", porcao:"1 col sopa (20g)", porcaoG:20, p:4.5, c:3.0, g:10.0, kcal:120 },
       { id:"azeite", nome:"Azeite de oliva", porcao:"1 col sopa (13ml)", porcaoG:13, p:0.0, c:0.0, g:13.0, kcal:117 },
       { id:"manteiga", nome:"Manteiga", porcao:"1 col chá (5g)", porcaoG:5, p:0.0, c:0.0, g:4.0, kcal:36 },
-      { id:"abacate", nome:"Abacate", porcao:"3 col sopa (80g)", porcaoG:80, p:1.2, c:5.0, g:12.0, kcal:128 },
+      { id:"abacate", nome:"Abacate", porcao:"3 col sopa (80g)", porcaoG:80, p:1.0, c:5.0, g:7.0, kcal:87 },
     ],
     "🍫 Doces & Snacks": [
-      { id:"choc_amargo", nome:"Chocolate amargo 70%", porcao:"25g", porcaoG:25, p:2.5, c:11.0, g:9.0, kcal:135 },
-      { id:"choc_leite", nome:"Chocolate ao leite", porcao:"25g", porcaoG:25, p:2.0, c:14.0, g:7.5, kcal:132 },
-      { id:"chocolicia", nome:"Bolacha Chocolícia", porcao:"3 un (30g)", porcaoG:30, p:1.5, c:19.0, g:6.0, kcal:135 },
-      { id:"doritos", nome:"Doritos", porcao:"25g", porcaoG:25, p:1.5, c:15.0, g:6.5, kcal:126 },
-      { id:"cheetos", nome:"Cheetos", porcao:"25g", porcaoG:25, p:1.2, c:14.5, g:7.0, kcal:125 },
-      { id:"pringles_queijo", nome:"Pringles queijo", porcao:"25g", porcaoG:25, p:1.0, c:14.0, g:8.5, kcal:135 },
-      { id:"bolo_cenoura", nome:"Bolo de cenoura", porcao:"1 fatia (80g)", porcaoG:80, p:3.5, c:38.0, g:12.0, kcal:272 },
-      { id:"bolo_chocolate", nome:"Bolo de chocolate", porcao:"1 fatia (80g)", porcaoG:80, p:4.0, c:42.0, g:14.0, kcal:306 },
-      { id:"pudim", nome:"Pudim de leite", porcao:"1 fatia (100g)", porcaoG:100, p:4.0, c:32.0, g:6.0, kcal:196 },
-      { id:"pamonha", nome:"Pamonha", porcao:"1 un (150g)", porcaoG:150, p:5.0, c:45.0, g:8.0, kcal:272 },
-      { id:"panetone_fatia", nome:"Panetone (fatia)", porcao:"1 fatia (80g)", porcaoG:80, p:4.5, c:40.0, g:10.0, kcal:268 },
-      { id:"biscoito_maisena", nome:"Biscoito maisena", porcao:"5 un (30g)", porcaoG:30, p:1.5, c:21.0, g:3.5, kcal:120 },
-      { id:"biscoito_integral", nome:"Biscoito integral", porcao:"4 un (30g)", porcaoG:30, p:2.0, c:20.0, g:4.0, kcal:125 },
-      { id:"biscoito_soja", nome:"Biscoito de soja", porcao:"4 un (30g)", porcaoG:30, p:3.5, c:18.0, g:5.0, kcal:130 },
-      { id:"sorvete_creme", nome:"Sorvete de creme", porcao:"1 bola (60g)", porcaoG:60, p:2.0, c:14.0, g:5.5, kcal:115 },
-      { id:"brigadeiro", nome:"Brigadeiro", porcao:"2 un (30g)", porcaoG:30, p:1.5, c:18.0, g:4.5, kcal:118 },
-      { id:"pe_de_moleque", nome:"Pé de moleque", porcao:"1 un (30g)", porcaoG:30, p:2.5, c:18.0, g:5.0, kcal:126 },
+      { id:"choc_amargo", nome:"Chocolate amargo 70%", porcao:"25g", porcaoG:25, p:2.0, c:11.0, g:10.0, kcal:142 },
+      { id:"choc_leite", nome:"Chocolate ao leite", porcao:"25g", porcaoG:25, p:1.5, c:15.0, g:7.5, kcal:134 },
+      { id:"chocolicia", nome:"Bolacha recheada", porcao:"3 un (30g)", porcaoG:30, p:1.5, c:19.0, g:6.0, kcal:136 },
+      { id:"doritos", nome:"Salgadinho de milho", porcao:"25g", porcaoG:25, p:1.5, c:15.0, g:6.5, kcal:125 },
+      { id:"cheetos", nome:"Salgadinho assado", porcao:"25g", porcaoG:25, p:1.2, c:14.5, g:7.0, kcal:126 },
+      { id:"bolo_cenoura", nome:"Bolo de cenoura c/ calda", porcao:"1 fatia (80g)", porcaoG:80, p:3.5, c:38.0, g:12.0, kcal:274 },
+      { id:"bolo_chocolate", nome:"Bolo de chocolate", porcao:"1 fatia (80g)", porcaoG:80, p:4.0, c:42.0, g:14.0, kcal:310 },
+      { id:"pudim", nome:"Pudim de leite", porcao:"1 fatia (100g)", porcaoG:100, p:4.0, c:32.0, g:6.0, kcal:198 },
+      { id:"doce_leite", nome:"Doce de leite", porcao:"1 col sopa (20g)", porcaoG:20, p:1.2, c:12.0, g:1.5, kcal:66 },
+      { id:"goiabada", nome:"Goiabada", porcao:"1 fatia (30g)", porcaoG:30, p:0.1, c:22.0, g:0.1, kcal:89 },
+      { id:"pacoca", nome:"Paçoca rolha", porcao:"1 un (20g)", porcaoG:20, p:3.5, c:10.0, g:5.0, kcal:99 },
+      { id:"gelatina", nome:"Gelatina (pronta)", porcao:"1 taça (100g)", porcaoG:100, p:1.5, c:15.0, g:0.0, kcal:66 },
+      { id:"biscoito_maisena", nome:"Biscoito maisena", porcao:"5 un (30g)", porcaoG:30, p:2.0, c:21.0, g:3.5, kcal:124 },
+      { id:"sorvete_creme", nome:"Sorvete de creme", porcao:"1 bola (60g)", porcaoG:60, p:2.0, c:14.0, g:5.5, kcal:114 },
+      { id:"brigadeiro", nome:"Brigadeiro", porcao:"2 un (30g)", porcaoG:30, p:1.5, c:18.0, g:4.5, kcal:119 },
     ],
     "🍔 Fast-food": [
-      { id:"kibe", nome:"Kibe frito", porcao:"1 un (80g)", porcaoG:80, p:10.0, c:15.0, g:12.0, kcal:208 },
+      { id:"sushi_salmao", nome:"Sushi Salmão (Niguiri/Ura)", porcao:"5 un (100g)", porcaoG:100, p:5.0, c:18.0, g:1.5, kcal:106 },
+      { id:"temaki_salmao", nome:"Temaki Salmão Completo", porcao:"1 un (150g)", porcaoG:150, p:15.0, c:25.0, g:8.0, kcal:232 },
+      { id:"batata_frita", nome:"Batata frita (fast-food)", porcao:"Porção peq (70g)", porcaoG:70, p:2.5, c:24.0, g:11.0, kcal:205 },
+      { id:"cachorro_quente", nome:"Cachorro-quente simples", porcao:"1 un (150g)", porcaoG:150, p:10.0, c:30.0, g:16.0, kcal:304 },
       { id:"esfirra_carne", nome:"Esfirra de carne", porcao:"1 un (80g)", porcaoG:80, p:8.0, c:22.0, g:10.0, kcal:210 },
       { id:"shawarma", nome:"Shawarma (wrap)", porcao:"1 un (250g)", porcaoG:250, p:22.0, c:35.0, g:18.0, kcal:390 },
       { id:"xsalada", nome:"X-Salada (s/ maionese)", porcao:"1 un (200g)", porcaoG:200, p:22.0, c:30.0, g:18.0, kcal:370 },
-      { id:"xfrango", nome:"X-Frango (s/ maionese)", porcao:"1 un (200g)", porcaoG:200, p:24.0, c:28.0, g:14.0, kcal:334 },
-      { id:"whopper_s_maio", nome:"Whopper (s/ maionese)", porcao:"1 un (260g)", porcaoG:260, p:28.0, c:42.0, g:22.0, kcal:480 },
-      { id:"duplo_xburguer_mc", nome:"Duplo X-Burguer MC", porcao:"1 un (200g)", porcaoG:200, p:28.0, c:35.0, g:26.0, kcal:490 },
+      { id:"whopper_s_maio", nome:"Hambúrguer Fast-Food G", porcao:"1 un (260g)", porcaoG:260, p:28.0, c:42.0, g:22.0, kcal:478 },
       { id:"pizza_frango_catup", nome:"Pizza frango c/ catupiry", porcao:"1 fatia (110g)", porcaoG:110, p:12.0, c:22.0, g:10.0, kcal:226 },
       { id:"pizza_calabresa", nome:"Pizza calabresa", porcao:"1 fatia (110g)", porcaoG:110, p:10.0, c:23.0, g:12.0, kcal:240 },
-      { id:"pizza_marguerita", nome:"Pizza marguerita", porcao:"1 fatia (100g)", porcaoG:100, p:8.5, c:22.0, g:9.0, kcal:204 },
-      { id:"pizza_mussarela", nome:"Pizza mussarela", porcao:"1 fatia (110g)", porcaoG:110, p:10.0, c:24.0, g:11.0, kcal:234 },
+      { id:"pizza_mussarela", nome:"Pizza mussarela", porcao:"1 fatia (110g)", porcaoG:110, p:10.0, c:24.0, g:11.0, kcal:235 },
       { id:"coxinha", nome:"Coxinha de frango", porcao:"1 un (90g)", porcaoG:90, p:8.0, c:24.0, g:12.0, kcal:236 },
       { id:"pastel_carne", nome:"Pastel de carne", porcao:"1 un (100g)", porcaoG:100, p:7.0, c:26.0, g:14.0, kcal:258 },
-      { id:"empada", nome:"Empada de frango", porcao:"1 un (80g)", porcaoG:80, p:6.0, c:20.0, g:12.0, kcal:212 },
       { id:"pao_queijo", nome:"Pão de queijo", porcao:"1 un médio (40g)", porcaoG:40, p:3.0, c:14.0, g:6.0, kcal:122 },
     ],
     "🥤 Bebidas": [
-      { id:"cafe_puro", nome:"Café puro (s/ açúcar)", porcao:"1 xíc (100ml)", porcaoG:100, p:0.2, c:0.0, g:0.0, kcal:2 },
-      { id:"cafe_acucar", nome:"Café c/ açúcar", porcao:"1 xíc + 1 col chá", porcaoG:105, p:0.2, c:5.0, g:0.0, kcal:22 },
+      { id:"cafe_puro", nome:"Café puro (s/ açúcar)", porcao:"1 xíc (100ml)", porcaoG:100, p:0.2, c:0.0, g:0.0, kcal:1 },
+      { id:"cafe_acucar", nome:"Café c/ açúcar", porcao:"1 xíc + 1 col chá", porcaoG:105, p:0.2, c:5.0, g:0.0, kcal:21 },
       { id:"suco_laranja", nome:"Suco de laranja natural", porcao:"200ml", porcaoG:200, p:1.0, c:22.0, g:0.2, kcal:94 },
-      { id:"coca_lata", nome:"Coca-Cola (lata)", porcao:"350ml", porcaoG:350, p:0.0, c:37.0, g:0.0, kcal:149 },
-      { id:"coca_zero", nome:"Coca-Cola Zero", porcao:"350ml", porcaoG:350, p:0.0, c:0.0, g:0.0, kcal:0 },
-      { id:"cerveja_lata", nome:"Cerveja (lata 350ml)", porcao:"350ml", porcaoG:350, p:1.0, c:12.0, g:0.0, kcal:148 },
+      { id:"coca_lata", nome:"Refrigerante Cola (lata)", porcao:"350ml", porcaoG:350, p:0.0, c:37.0, g:0.0, kcal:148 },
+      { id:"coca_zero", nome:"Refrigerante Zero", porcao:"350ml", porcaoG:350, p:0.0, c:0.0, g:0.0, kcal:0 },
+      { id:"cerveja_lata", nome:"Cerveja (lata)", porcao:"350ml", porcaoG:350, p:1.0, c:12.0, g:0.0, kcal:148 },
       { id:"agua_coco", nome:"Água de coco", porcao:"200ml", porcaoG:200, p:0.5, c:9.0, g:0.0, kcal:38 },
       { id:"acucar", nome:"Açúcar (1 col chá)", porcao:"5g", porcaoG:5, p:0.0, c:5.0, g:0.0, kcal:20 },
-      { id:"mel", nome:"Mel (1 col sopa)", porcao:"20g", porcaoG:20, p:0.1, c:16.0, g:0.0, kcal:64 },
     ],
     "🍌 Frutas": [
-      { id:"banana", nome:"Banana prata", porcao:"1 un média (75g)", porcaoG:75, p:1.0, c:17.0, g:0.2, kcal:72 },
-      { id:"maca", nome:"Maçã", porcao:"1 un média (130g)", porcaoG:130, p:0.3, c:17.0, g:0.2, kcal:69 },
-      { id:"laranja", nome:"Laranja", porcao:"1 un média (140g)", porcaoG:140, p:1.2, c:14.0, g:0.2, kcal:62 },
-      { id:"mamao", nome:"Mamão papaia", porcao:"1 fatia (150g)", porcaoG:150, p:0.8, c:14.0, g:0.2, kcal:59 },
-      { id:"manga", nome:"Manga", porcao:"1 fatia (100g)", porcaoG:100, p:0.5, c:15.0, g:0.3, kcal:64 },
-      { id:"uva", nome:"Uva", porcao:"10 un (80g)", porcaoG:80, p:0.5, c:13.0, g:0.2, kcal:53 },
-      { id:"melancia", nome:"Melancia", porcao:"1 fatia (150g)", porcaoG:150, p:1.0, c:12.0, g:0.2, kcal:48 },
-      { id:"morango", nome:"Morango", porcao:"8 un (100g)", porcaoG:100, p:0.8, c:7.0, g:0.3, kcal:33 },
-      { id:"abacaxi", nome:"Abacaxi", porcao:"1 fatia (100g)", porcaoG:100, p:0.5, c:12.0, g:0.1, kcal:48 },
+      { id:"banana", nome:"Banana prata", porcao:"1 un média (75g)", porcaoG:75, p:1.0, c:19.5, g:0.2, kcal:84 },
+      { id:"maca", nome:"Maçã", porcao:"1 un média (130g)", porcaoG:130, p:0.3, c:17.0, g:0.2, kcal:71 },
+      { id:"laranja", nome:"Laranja", porcao:"1 un média (140g)", porcaoG:140, p:1.2, c:14.0, g:0.2, kcal:63 },
+      { id:"mamao", nome:"Mamão papaia", porcao:"1 fatia (150g)", porcaoG:150, p:0.8, c:14.0, g:0.2, kcal:61 },
+      { id:"manga", nome:"Manga", porcao:"1 fatia (100g)", porcaoG:100, p:0.5, c:15.0, g:0.3, kcal:65 },
+      { id:"uva", nome:"Uva", porcao:"10 un (80g)", porcaoG:80, p:0.5, c:13.0, g:0.2, kcal:56 },
+      { id:"melancia", nome:"Melancia", porcao:"1 fatia (150g)", porcaoG:150, p:1.0, c:12.0, g:0.2, kcal:54 },
+      { id:"morango", nome:"Morango", porcao:"8 un (100g)", porcaoG:100, p:0.8, c:7.0, g:0.3, kcal:34 },
+      { id:"abacaxi", nome:"Abacaxi", porcao:"1 fatia (100g)", porcaoG:100, p:0.5, c:12.0, g:0.1, kcal:51 },
     ],
   };
 
@@ -3196,71 +3201,99 @@ tr:active { background: var(--surface2); }
   }
 
   // ══════════ AI EXPORT ══════════
-  const AI_SYSTEM_PROMPT = `Você é um coach especializado em nutrição e treino de força que analisa dados do Blocos Tracker, um app de tracking nutricional e de treino.
+  const AI_SYSTEM_PROMPT = `Você é um coach especializado em nutrição e treino de força que analisa dados exportados do Blocos Tracker, um app PWA brasileiro de tracking nutricional e de treino.
 
-## O que é o Blocos Tracker
-O app usa um sistema de "blocos" para contar macros:
-- 1 bloco P = proteína (valor configurável, padrão 25g)
-- 1 bloco C = carboidrato (valor configurável, padrão 25g)
-- 1 bloco G = gordura (valor configurável, padrão 10g)
-- Cada bloco tem aproximadamente 100 kcal de proteína/carbo e 90 kcal de gordura
+## Sistema de blocos
+O app conta macros em "blocos" (porções fixas configuradas pelo usuário):
+- 1P = X gramas de proteína (padrão: 25g, ~100 kcal)
+- 1C = X gramas de carboidrato (padrão: 25g, ~100 kcal)
+- 1G = X gramas de gordura (padrão: 10g, ~90 kcal)
+Os valores exatos de X estão em profile.blockSize do JSON.
 
-## Estrutura do JSON que você vai receber
-\`\`\`
+## Refeições (mealId → nome)
+- cafe → Café da manhã
+- lanche1 → Lanche 1 (manhã)
+- almoco → Almoço
+- lanche2 → Lanche 2 (tarde)
+- jantar → Jantar
+- ceia → Ceia
+
+## Estrutura do JSON
+\`\`\`json
 {
-  "exportedAt": "data da exportação",
+  "exportedAt": "ISO timestamp",
   "periodDays": 60,
   "profile": {
-    "goals": { "p": blocos_P, "c": blocos_C, "g": blocos_G, "kcal": kcal_alvo },
-    "blockSize": { "p": g_por_bloco_P, "c": g_por_bloco_C, "g": g_por_bloco_G },
-    "bodyData": { "sex", "age", "weight", "height", "bf", "leanMass", "bmr", "tdee" }
+    "goals": { "pG": meta_proteina_g, "cG": meta_carbo_g, "gG": meta_gordura_g, "kcal": meta_kcal },
+    "blockSize": { "pG": g_por_1P, "cG": g_por_1C, "gG": g_por_1G },
+    "bodyData": { "sex": "male|female", "age": anos, "weightKg": kg, "heightCm": cm, "activity": fator_tdee, "deficitPct": deficit_pct }
   },
-  "measurements": [ { "date", "peso", "cintura", "quadril", "bracoD", "bracoE", "coxaD", "coxaE", "bf", "note" } ],
+  "measurements": [
+    { "date": "YYYY-MM-DD", "weightKg": peso, "waistCm": cintura, "bfPct": gordura_pct, "note": "obs" }
+  ],
   "nutrition": {
-    "days": [ {
-      "date", "totalP", "totalC", "totalG", "totalKcal",
-      "adherenceP": 0-100%, "adherenceC": 0-100%, "adherenceG": 0-100%,
-      "meals": [ { "label", "p", "c", "g" } ]
-    } ],
-    "foodLog": [ {
-      "date",
-      "entries": [ {
-        "nome": "nome do alimento",
-        "qty": multiplicador_da_porcao,
-        "mealId": "cafe|lanche1|almoco|lanche2|jantar|ceia",
-        "pG": gramas_proteina, "cG": gramas_carbo, "gG": gramas_gordura,
-        "pBlocks": blocos_P, "cBlocks": blocos_C, "gBlocks": blocos_G,
-        "kcal": calorias,
-        "at": "timestamp_iso"
-      } ]
-    } ]
+    "days": [
+      {
+        "date": "YYYY-MM-DD",
+        "totalP": blocos_P_consumidos, "totalC": blocos_C, "totalG": blocos_G, "totalKcal": kcal,
+        "adherenceP": pct_0_a_100, "adherenceC": pct, "adherenceG": pct,
+        "meals": [ { "label": "Almoço", "p": blocos_P, "c": blocos_C, "g": blocos_G } ]
+      }
+    ],
+    "foodLog": [
+      {
+        "date": "YYYY-MM-DD",
+        "entries": [
+          {
+            "nome": "Frango grelhado (peito)",
+            "qty": 1.5,
+            "mealId": "almoco",
+            "pG": 48.0, "cG": 0.0, "gG": 3.75,
+            "pBlocks": 1.92, "cBlocks": 0.0, "gBlocks": 0.375,
+            "kcal": 226,
+            "at": "2026-02-27T12:30:00Z"
+          }
+        ]
+      }
+    ]
   },
   "workouts": {
-    "templates": [ { "id", "nome", "exercicios": [] } ],
-    "days": [ {
-      "date", "templateId", "templateNome",
-      "exercicios": [ { "nome", "series": [ { "reps", "carga" } ] } ],
-      "cardio": [ { "tipo", "minutos", "kcal" } ],
-      "totalKcalTreino", "nota"
-    } ]
+    "templates": [ { "id": "treino_a", "nome": "Treino A", "exercicios": ["supino_reto"] } ],
+    "days": [
+      {
+        "date": "YYYY-MM-DD",
+        "templateNome": "Treino A",
+        "exercicios": [ { "nome": "supino_reto", "series": [ { "reps": "10", "carga": "65" } ] } ],
+        "cardio": [ { "tipo": "bicicleta", "minutos": 20, "kcal": 140 } ],
+        "totalKcalTreino": 140,
+        "nota": "obs livre"
+      }
+    ]
   }
 }
 \`\`\`
 
 ## Como interpretar
-- "totalP/C/G" são blocos consumidos naquele dia (não gramas)
-- Para converter para gramas: multiplique pelo blockSize correspondente
-- "adherence" é o percentual da meta atingida naquele dia
-- Dias sem registro simplesmente não aparecem na lista
+- **nutrition.days.totalP/C/G**: em BLOCOS — multiplique por blockSize.pG/cG/gG para obter gramas
+- **nutrition.foodLog.entries.pG/cG/gG**: já estão em GRAMAS — use diretamente, sem conversão
+- **foodLog.qty**: multiplicador da porção padrão (1.0 = porção normal, 2.0 = dobro da porção)
+- **adherence**: % da meta atingida no dia (100 = bateu a meta, 80 = faltou 20%)
+- Dias sem registro não aparecem nas listas
+- O foodLog só existe nos dias em que o usuário selecionou alimentos pelo painel — inputs manuais não geram foodLog mas ainda somam nos totais de nutrition.days
 
-## Sua função
-Ao receber este JSON, analise os dados e ofereça:
-1. **Resumo da semana/mês** — aderência média, dias mais difíceis, padrões
-2. **Análise de treino** — progressão de cargas, frequência, pontos a melhorar
-3. **Sugestões práticas** — específicas para os dados, não genéricas
-4. **Alertas** — se notar algo preocupante (proteína consistentemente baixa, perda de peso rápida, etc.)
+## Categorias de alimentos no app
+Pães/Cereais/Raízes, Carnes & Proteínas, Proteicos & Laticínios, Legumes & Vegetais, Oleaginosas, Doces & Snacks, Fast-food, Bebidas, Frutas.
 
-Seja direto, use dados reais do JSON, e responda em português brasileiro.`;
+## Sua função como coach
+Ao receber o JSON, analise e responda com:
+1. **Resumo nutricional** — aderência média por macro, dias mais difíceis, padrão semanal
+2. **Análise de alimentos** — fontes de proteína mais frequentes, refeições com déficit crônico, alimentos que mais contribuem para desvios
+3. **Análise de treino** — frequência, progressão de cargas, grupos musculares negligenciados
+4. **Evolução corporal** — tendência de peso, correlação com aderência alimentar
+5. **Sugestões práticas** — específicas para os dados reais, não genéricas
+6. **Alertas** — proteína baixa, perda de peso acelerada, semanas sem treino, etc.
+
+Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Responda em português brasileiro.`;
 
   const exportAIJson = () => {
     const treino = treinoData || { days: {} };
