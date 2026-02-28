@@ -46,7 +46,8 @@ Organizado por seções com comentários `════`:
 | DAY NAVIGATION | ~1188 | `.date-nav-btn`, `.day-edit-banner`, `.banner-today-btn` |
 | HISTORY MODAL | ~1210 | `.hist-entry`, `.hist-mini-bar-*`, `.hist-empty` |
 | AI EXPORT | ~1316 | `.ai-export-desc`, `.ai-export-actions`, `.ai-export-status` |
-| DESKTOP | ~1321 | Media query para telas >= 720px |
+| HABIT TRACKER | ~1321 | `.habit-card`, `.habit-trigger`, `.habit-body`, `.habit-dot`, `.habit-score-dot` — grid neon retrátil |
+| DESKTOP | ~1407 | Media query para telas >= 720px |
 
 ### 2. HTML (~linhas 1195-1880)
 
@@ -54,7 +55,7 @@ Organizado por seções com comentários `════`:
 
 | View | ID | Linha aprox. | Função |
 |---|---|---|---|
-| 📊 Tracker | `viewTracker` | ~1213 | Registro diário de blocos P/C/G por refeição |
+| 📊 Tracker | `viewTracker` | ~1213 | Registro diário de blocos P/C/G por refeição. Topo: `#habitTracker` (renderizado por JS) |
 | ⚙️ Ajustes | `viewSettings` | ~1302 | Configuração de metas de macros |
 | 🧮 Macros | `viewCalc` | ~1365 | Calculadora JP7 + BMR + TDEE + macros + card Export IA |
 | 📏 Medição | `viewMeasure` | ~1468 | Registro de peso e medidas corporais |
@@ -98,6 +99,7 @@ Tudo dentro de uma IIFE `(() => { ... })()`. Seções:
 | SNAPSHOT | ~2669 | Fechar dia e salvar snapshot |
 | HISTORY MODAL | ~2679 | `openHistModal`, `closeHistModal`, `renderHistList` |
 | AI EXPORT | ~3204 | `AI_SYSTEM_PROMPT`, `exportAIJson()`, `copyAIPrompt()` |
+| HABIT TRACKER | ~4625 | `HABITS_KEY`, `HABITS_DEF` (5 hábitos), `getWeekDates()`, `renderHabitTracker()` |
 | FOOD PANEL | ~2745 | Busca, seleção, modal de alimentos |
 | TREINO PANEL | ~2967 | Estado do treino, load/save, render exercícios |
 | EXERCISE PROGRESSION MODAL | ~3292 | Modal com gráfico e tabela de evolução |
@@ -161,6 +163,14 @@ Dados da calculadora (sexo, idade, peso, altura, dobras cutâneas, atividade).
   }
 }
 ```
+
+### `blocos_tracker_habits_v1` (HABITS_KEY)
+```json
+{
+  "2026-02-27": { "dieta": true, "log": true, "treino": false, "cardio": false, "medidas": false }
+}
+```
+Estado aberto/fechado do card em `localStorage.getItem('blocos_habit_open')` (`'1'` = aberto, `'0'` = fechado).
 
 ### `blocos_tracker_presets_v1` (PRESETS_KEY)
 ```json
@@ -238,3 +248,4 @@ Grupo Glúteos: Hip thrust (barra/máquina), Máquina de glúteos (kickback), Gl
 3. Refeições favoritas (salvar combinações, adicionar com 1 toque)
 4. Export/import JSON (backup dos dados)
 5. Coach IA contextual — integração direta de API (próximo passo após validação do export manual)
+6. Habit Tracker: auto-check de Treino e Medidas ao salvar dados nessas seções

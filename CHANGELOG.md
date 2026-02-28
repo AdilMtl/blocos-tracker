@@ -5,6 +5,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v1.4.0] — 2026-02-27
+
+### Adicionado
+- [feat] **Habit Tracker semanal** no topo da aba Tracker — grid Seg–Dom com 5 hábitos (🥗 Dieta, 🍽️ Log, 🏋️ Treino, 🏃 Cardio, 📏 Medidas). Círculos neon por hábito com glow effect ao marcar. Dias futuros bloqueados. Score do dia (ex: 3/5) sempre visível no cabeçalho.
+- [feat] Habit Tracker **retrátil** — toggle com animação suave (`max-height`). Estado aberto/fechado persistido em `localStorage`. Colapsado exibe score dots coloridos + contagem ao lado do título.
+- [feat] **Botão "hoje"** no header — pill roxo minimalista que aparece (fade) ao navegar para outro dia e some ao voltar para hoje. Redefine data e sincroniza todas as views.
+
+### Infraestrutura
+- Service Worker: `blocos-v4` → `blocos-v5`.
+- Novo localStorage key: `blocos_tracker_habits_v1` — schema `{ "YYYY-MM-DD": { "dieta": true, "log": false, ... } }`. Não toca em nenhum dado existente.
+
+### Notas
+- Ideia futura: auto-check de Treino e Medidas quando o usuário salva dados nessas seções (hoje é 100% manual).
+
+---
+
 ## [v1.3.0] — 2026-02-27
 
 ### Adicionado
