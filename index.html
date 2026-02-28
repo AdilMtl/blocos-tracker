@@ -1313,6 +1313,11 @@ tr:active { background: var(--surface2); }
 .mchart-stat-val { font-size: 14px; font-weight: 800; color: var(--text); }
 .mchart-empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 14px; line-height: 1.6; }
 
+/* ════════════════════ AI EXPORT ════════════════════ */
+.ai-export-desc { font-size: 13px; color: var(--text3); line-height: 1.5; margin-bottom: 14px; }
+.ai-export-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.ai-export-status { font-size: 12px; color: var(--accent); margin-top: 8px; min-height: 18px; transition: opacity .3s; }
+
 /* ════════════════════ DESKTOP ════════════════════ */
 @media(min-width: 720px) {
   .kpi-grid { gap: 12px; }
@@ -1603,6 +1608,26 @@ tr:active { background: var(--surface2); }
             </div>
             <div style="height:10px"></div>
             <div class="ref-item"><b>Macros finais (g/dia):</b><div class="mono" id="outMacros" style="margin-top:4px;">—</div></div>
+          </div>
+        </div>
+
+        <div style="height:16px"></div>
+
+        <!-- AI Export -->
+        <div class="card" style="box-shadow:none; margin-bottom:0;">
+          <div class="card-header">
+            <div class="ch-info">
+              <b>🤖 Exportar para IA</b>
+              <span>Coach personalizado (GPT / Gemini)</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="ai-export-desc">Baixe seus dados dos últimos 60 dias e carregue em um GPT personalizado ou Gemini Gem para receber análises e sugestões de treino e nutrição.</p>
+            <div class="ai-export-actions">
+              <button class="btn sm primary" id="btnExportAI" type="button">⬇️ Baixar JSON</button>
+              <button class="btn sm ghost" id="btnCopyAIPrompt" type="button">📋 Copiar prompt do sistema</button>
+            </div>
+            <div class="ai-export-status" id="aiExportStatus"></div>
           </div>
         </div>
       </div>
@@ -3170,6 +3195,184 @@ tr:active { background: var(--surface2); }
       <div class="mchart-stat"><div class="mchart-stat-lbl">Variação</div><div class="mchart-stat-val" style="color:${trendColor}">${trend} ${Math.abs(diff).toFixed(1)}</div></div>`;
   }
 
+  // ══════════ AI EXPORT ══════════
+  const AI_SYSTEM_PROMPT = `Você é um coach especializado em nutrição e treino de força que analisa dados do Blocos Tracker, um app de tracking nutricional e de treino.
+
+## O que é o Blocos Tracker
+O app usa um sistema de "blocos" para contar macros:
+- 1 bloco P = proteína (valor configurável, padrão 25g)
+- 1 bloco C = carboidrato (valor configurável, padrão 25g)
+- 1 bloco G = gordura (valor configurável, padrão 10g)
+- Cada bloco tem aproximadamente 100 kcal de proteína/carbo e 90 kcal de gordura
+
+## Estrutura do JSON que você vai receber
+\`\`\`
+{
+  "exportedAt": "data da exportação",
+  "periodDays": 60,
+  "profile": {
+    "goals": { "p": blocos_P, "c": blocos_C, "g": blocos_G, "kcal": kcal_alvo },
+    "blockSize": { "p": g_por_bloco_P, "c": g_por_bloco_C, "g": g_por_bloco_G },
+    "bodyData": { "sex", "age", "weight", "height", "bf", "leanMass", "bmr", "tdee" }
+  },
+  "measurements": [ { "date", "peso", "cintura", "quadril", "bracoD", "bracoE", "coxaD", "coxaE", "bf", "note" } ],
+  "nutrition": {
+    "days": [ {
+      "date", "totalP", "totalC", "totalG", "totalKcal",
+      "adherenceP": 0-100%, "adherenceC": 0-100%, "adherenceG": 0-100%,
+      "meals": [ { "label", "p", "c", "g" } ]
+    } ]
+  },
+  "workouts": {
+    "templates": [ { "id", "nome", "exercicios": [] } ],
+    "days": [ {
+      "date", "templateId", "templateNome",
+      "exercicios": [ { "nome", "series": [ { "reps", "carga" } ] } ],
+      "cardio": [ { "tipo", "minutos", "kcal" } ],
+      "totalKcalTreino", "nota"
+    } ]
+  }
+}
+\`\`\`
+
+## Como interpretar
+- "totalP/C/G" são blocos consumidos naquele dia (não gramas)
+- Para converter para gramas: multiplique pelo blockSize correspondente
+- "adherence" é o percentual da meta atingida naquele dia
+- Dias sem registro simplesmente não aparecem na lista
+
+## Sua função
+Ao receber este JSON, analise os dados e ofereça:
+1. **Resumo da semana/mês** — aderência média, dias mais difíceis, padrões
+2. **Análise de treino** — progressão de cargas, frequência, pontos a melhorar
+3. **Sugestões práticas** — específicas para os dados, não genéricas
+4. **Alertas** — se notar algo preocupante (proteína consistentemente baixa, perda de peso rápida, etc.)
+
+Seja direto, use dados reais do JSON, e responda em português brasileiro.`;
+
+  const exportAIJson = () => {
+    const data = loadJSON(STORAGE_KEY) || {};
+    const settings = loadJSON(SETTINGS_KEY) || {};
+    const calc = loadJSON(CALC_KEY) || {};
+    const measure = loadJSON(MEASURE_KEY) || {};
+    const treino = loadJSON(TREINO_KEY) || {};
+    const templates = loadJSON(TREINO_TMPL_KEY) || [];
+
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 60);
+    const cutoffISO = cutoff.toISOString().slice(0, 10);
+
+    // Nutrition days
+    const allDays = data.days || {};
+    const nutritionDays = Object.entries(allDays)
+      .filter(([d]) => d >= cutoffISO)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, day]) => {
+        const meals = (settings.meals || []).map((m, i) => {
+          const meal = (day.meals || [])[i] || {};
+          return { label: m.label, p: meal.p || 0, c: meal.c || 0, g: meal.g || 0 };
+        });
+        const totalP = meals.reduce((s, m) => s + (m.p || 0), 0);
+        const totalC = meals.reduce((s, m) => s + (m.c || 0), 0);
+        const totalG = meals.reduce((s, m) => s + (m.g || 0), 0);
+        const bP = settings.pBlockG || 25;
+        const bC = settings.cBlockG || 25;
+        const bG = settings.gBlockG || 10;
+        const totalKcal = Math.round(totalP * bP * 4 + totalC * bC * 4 + totalG * bG * 9);
+        const gP = settings.goalP || 0;
+        const gC = settings.goalC || 0;
+        const gG = settings.goalG || 0;
+        return {
+          date, totalP: round1(totalP), totalC: round1(totalC), totalG: round1(totalG), totalKcal,
+          adherenceP: gP ? Math.round(totalP / gP * 100) : null,
+          adherenceC: gC ? Math.round(totalC / gC * 100) : null,
+          adherenceG: gG ? Math.round(totalG / gG * 100) : null,
+          meals
+        };
+      });
+
+    // Workout days
+    const treinoDays = Object.entries(treino.days || {})
+      .filter(([d]) => d >= cutoffISO)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, day]) => {
+        const tmpl = templates.find(t => t.id === day.templateId);
+        const exercicios = (day.exercicios || []).map(e => ({
+          nome: e.exercicioId,
+          series: (e.series || []).map(s => ({ reps: s.reps, carga: s.carga }))
+        }));
+        const cardio = (day.cardio || []).map(c => ({
+          tipo: c.tipo, minutos: c.minutos,
+          kcal: Math.round((c.minutos || 0) * (c.kcalPerMin || 7))
+        }));
+        return {
+          date,
+          templateId: day.templateId || null,
+          templateNome: tmpl ? tmpl.nome : (day.templateId || null),
+          exercicios, cardio,
+          totalKcalTreino: day.kcal || 0,
+          nota: day.nota || null
+        };
+      });
+
+    // Measurements
+    const measureEntries = Object.entries(measure.entries || {})
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, e]) => ({ date, ...e }));
+
+    const exportObj = {
+      exportedAt: new Date().toISOString(),
+      periodDays: 60,
+      profile: {
+        goals: {
+          p: settings.goalP || 0, c: settings.goalC || 0,
+          g: settings.goalG || 0, kcal: settings.goalKcal || 0
+        },
+        blockSize: {
+          p: settings.pBlockG || 25, c: settings.cBlockG || 25, g: settings.gBlockG || 10
+        },
+        bodyData: {
+          sex: calc.sex || null, age: calc.age || null,
+          weight: calc.weight || null, height: calc.height || null,
+          bf: calc.lastBF || null, leanMass: calc.lastLM || null,
+          bmr: calc.lastBMR || null,
+          activity: calc.activity || null
+        }
+      },
+      measurements: measureEntries,
+      nutrition: { days: nutritionDays },
+      workouts: {
+        templates: templates.map(t => ({ id: t.id, nome: t.nome, exercicios: t.exercicios || [] })),
+        days: treinoDays
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dateStr = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `blocos-tracker-${dateStr}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    const el = $('#aiExportStatus');
+    el.textContent = '✓ Arquivo baixado com sucesso';
+    setTimeout(() => { el.textContent = ''; }, 4000);
+  };
+
+  const copyAIPrompt = () => {
+    navigator.clipboard.writeText(AI_SYSTEM_PROMPT).then(() => {
+      const el = $('#aiExportStatus');
+      el.textContent = '✓ Prompt copiado — cole no campo "Instruções do sistema" do GPT/Gem';
+      setTimeout(() => { el.textContent = ''; }, 5000);
+    }).catch(() => {
+      const el = $('#aiExportStatus');
+      el.textContent = '✗ Não foi possível copiar — tente em um navegador diferente';
+      setTimeout(() => { el.textContent = ''; }, 4000);
+    });
+  };
+
   // ══════════ HISTORY MODAL ══════════
   const openHistModal = () => {
     renderHistList();
@@ -4404,6 +4607,10 @@ tr:active { background: var(--surface2); }
     // calc
     $("#btnCalcRun").addEventListener("click", () => { calcAll(); showToast("Calculado ✅"); });
     $("#btnCalcSave").addEventListener("click", () => { calcAll(); showToast("Parâmetros salvos 💾"); });
+
+    // ai export
+    $("#btnExportAI").addEventListener("click", exportAIJson);
+    $("#btnCopyAIPrompt").addEventListener("click", copyAIPrompt);
 
     $("#btnSendToSettings").addEventListener("click", () => {
       const r = calcAll();
