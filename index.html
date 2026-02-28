@@ -3221,6 +3221,18 @@ O app usa um sistema de "blocos" para contar macros:
       "date", "totalP", "totalC", "totalG", "totalKcal",
       "adherenceP": 0-100%, "adherenceC": 0-100%, "adherenceG": 0-100%,
       "meals": [ { "label", "p", "c", "g" } ]
+    } ],
+    "foodLog": [ {
+      "date",
+      "entries": [ {
+        "nome": "nome do alimento",
+        "qty": multiplicador_da_porcao,
+        "mealId": "cafe|lanche1|almoco|lanche2|jantar|ceia",
+        "pG": gramas_proteina, "cG": gramas_carbo, "gG": gramas_gordura,
+        "pBlocks": blocos_P, "cBlocks": blocos_C, "gBlocks": blocos_G,
+        "kcal": calorias,
+        "at": "timestamp_iso"
+      } ]
     } ]
   },
   "workouts": {
@@ -3336,7 +3348,13 @@ Seja direto, use dados reais do JSON, e responda em português brasileiro.`;
         }
       },
       measurements: measureEntries,
-      nutrition: { days: nutritionDays },
+      nutrition: {
+        days: nutritionDays,
+        foodLog: Object.entries(foodLog.days || {})
+          .filter(([d]) => d >= cutoffISO)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([date, entries]) => ({ date, entries }))
+      },
       workouts: {
         templates: templates.map(t => ({ id: t.id, nome: t.nome, exercicios: t.exercicios || [] })),
         days: treinoDays
