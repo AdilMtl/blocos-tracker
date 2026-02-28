@@ -3251,12 +3251,8 @@ Ao receber este JSON, analise os dados e ofereça:
 Seja direto, use dados reais do JSON, e responda em português brasileiro.`;
 
   const exportAIJson = () => {
-    const data = loadJSON(STORAGE_KEY) || {};
-    const settings = loadJSON(SETTINGS_KEY) || {};
-    const calc = loadJSON(CALC_KEY) || {};
-    const measure = loadJSON(MEASURE_KEY) || {};
-    const treino = loadJSON(TREINO_KEY) || {};
-    const templates = loadJSON(TREINO_TMPL_KEY) || [];
+    const treino = treinoData || { days: {} };
+    const templates = userTemplates || [];
 
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - 60);
@@ -3316,7 +3312,7 @@ Seja direto, use dados reais do JSON, e responda em português brasileiro.`;
       });
 
     // Measurements
-    const measureEntries = Object.entries(measure.entries || {})
+    const measureEntries = Object.entries(measure.days || {})
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, e]) => ({ date, ...e }));
 
