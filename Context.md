@@ -45,7 +45,8 @@ Organizado por seções com comentários `════`:
 | MODAL | ~794 | Bottom sheet modals (food, template edit, progressão, histórico) |
 | DAY NAVIGATION | ~1188 | `.date-nav-btn`, `.day-edit-banner`, `.banner-today-btn` |
 | HISTORY MODAL | ~1210 | `.hist-entry`, `.hist-mini-bar-*`, `.hist-empty` |
-| DESKTOP | ~1235 | Media query para telas >= 720px |
+| AI EXPORT | ~1316 | `.ai-export-desc`, `.ai-export-actions`, `.ai-export-status` |
+| DESKTOP | ~1321 | Media query para telas >= 720px |
 
 ### 2. HTML (~linhas 1195-1880)
 
@@ -55,7 +56,7 @@ Organizado por seções com comentários `════`:
 |---|---|---|---|
 | 📊 Tracker | `viewTracker` | ~1213 | Registro diário de blocos P/C/G por refeição |
 | ⚙️ Ajustes | `viewSettings` | ~1302 | Configuração de metas de macros |
-| 🧮 Macros | `viewCalc` | ~1365 | Calculadora JP7 + BMR + TDEE + macros |
+| 🧮 Macros | `viewCalc` | ~1365 | Calculadora JP7 + BMR + TDEE + macros + card Export IA |
 | 📏 Medição | `viewMeasure` | ~1468 | Registro de peso e medidas corporais |
 | 🏋️ Treino | `viewTreino` | ~1543 | Templates de treino, séries, cardio, progressão |
 | 🍽️ Alimentos | `viewAlimentos` | ~1689 | Base de 104 alimentos BR com porções |
@@ -96,6 +97,7 @@ Tudo dentro de uma IIFE `(() => { ... })()`. Seções:
 | MEASURE | ~2565 | Registro e histórico de medidas corporais |
 | SNAPSHOT | ~2669 | Fechar dia e salvar snapshot |
 | HISTORY MODAL | ~2679 | `openHistModal`, `closeHistModal`, `renderHistList` |
+| AI EXPORT | ~3204 | `AI_SYSTEM_PROMPT`, `exportAIJson()`, `copyAIPrompt()` |
 | FOOD PANEL | ~2745 | Busca, seleção, modal de alimentos |
 | TREINO PANEL | ~2967 | Estado do treino, load/save, render exercícios |
 | EXERCISE PROGRESSION MODAL | ~3292 | Modal com gráfico e tabela de evolução |
@@ -227,12 +229,12 @@ Grupo Glúteos: Hip thrust (barra/máquina), Máquina de glúteos (kickback), Gl
 
 ## Alimentos disponíveis (FOOD_DB)
 
-104 alimentos brasileiros em 9 categorias: Proteínas, Carbs, Gorduras, Vegetais, Frutas, Laticínios, Grãos, Lanches, Bebidas. Cada item tem: nome, porção padrão (g/ml), P/C/G por porção.
+109 alimentos brasileiros em 9 categorias (revisado TACO & Atwater): Pães/Cereais/Raízes, Carnes & Proteínas, Proteicos & Laticínios, Legumes & Vegetais, Oleaginosas, Doces & Snacks, Fast-food, Bebidas, Frutas. Cada item tem: id, nome, porção padrão (g/ml), P/C/G por porção, kcal.
 
 ## Roadmap planejado
 
 1. Dashboard diário com saldo calórico (meta - consumido + gasto treino)
-2. Gráficos de tendência de treino (volume total por template ao longo do tempo) ← próximo
+2. Gráficos de tendência de treino (volume total por template ao longo do tempo)
 3. Refeições favoritas (salvar combinações, adicionar com 1 toque)
 4. Export/import JSON (backup dos dados)
-5. Coach IA contextual (análise dos dados com feedback)
+5. Coach IA contextual — integração direta de API (próximo passo após validação do export manual)
