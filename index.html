@@ -3259,30 +3259,31 @@ Seja direto, use dados reais do JSON, e responda em português brasileiro.`;
     const cutoffISO = cutoff.toISOString().slice(0, 10);
 
     // Nutrition days
+    const bP = settings.blocks.pG || 25;
+    const bC = settings.blocks.cG || 25;
+    const bG = settings.blocks.gG || 10;
+    const goalBP = settings.goals.pG / Math.max(bP, 0.001);
+    const goalBC = settings.goals.cG / Math.max(bC, 0.001);
+    const goalBG = settings.goals.gG / Math.max(bG, 0.001);
     const allDays = data.days || {};
     const nutritionDays = Object.entries(allDays)
       .filter(([d]) => d >= cutoffISO)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, day]) => {
-        const meals = (settings.meals || []).map((m, i) => {
-          const meal = (day.meals || [])[i] || {};
-          return { label: m.label, p: meal.p || 0, c: meal.c || 0, g: meal.g || 0 };
+        const dayMeals = day.meals || {};
+        const meals = MEALS.map(m => {
+          const meal = dayMeals[m.id] || {};
+          return { label: m.name, p: meal.p || 0, c: meal.c || 0, g: meal.g || 0 };
         });
-        const totalP = meals.reduce((s, m) => s + (m.p || 0), 0);
-        const totalC = meals.reduce((s, m) => s + (m.c || 0), 0);
-        const totalG = meals.reduce((s, m) => s + (m.g || 0), 0);
-        const bP = settings.pBlockG || 25;
-        const bC = settings.cBlockG || 25;
-        const bG = settings.gBlockG || 10;
+        const totalP = round1(meals.reduce((s, m) => s + m.p, 0));
+        const totalC = round1(meals.reduce((s, m) => s + m.c, 0));
+        const totalG = round1(meals.reduce((s, m) => s + m.g, 0));
         const totalKcal = Math.round(totalP * bP * 4 + totalC * bC * 4 + totalG * bG * 9);
-        const gP = settings.goalP || 0;
-        const gC = settings.goalC || 0;
-        const gG = settings.goalG || 0;
         return {
-          date, totalP: round1(totalP), totalC: round1(totalC), totalG: round1(totalG), totalKcal,
-          adherenceP: gP ? Math.round(totalP / gP * 100) : null,
-          adherenceC: gC ? Math.round(totalC / gC * 100) : null,
-          adherenceG: gG ? Math.round(totalG / gG * 100) : null,
+          date, totalP, totalC, totalG, totalKcal,
+          adherenceP: goalBP ? Math.round(totalP / goalBP * 100) : null,
+          adherenceC: goalBC ? Math.round(totalC / goalBC * 100) : null,
+          adherenceG: goalBG ? Math.round(totalG / goalBG * 100) : null,
           meals
         };
       });
@@ -3321,18 +3322,17 @@ Seja direto, use dados reais do JSON, e responda em português brasileiro.`;
       periodDays: 60,
       profile: {
         goals: {
-          p: settings.goalP || 0, c: settings.goalC || 0,
-          g: settings.goalG || 0, kcal: settings.goalKcal || 0
+          pG: settings.goals.pG || 0, cG: settings.goals.cG || 0,
+          gG: settings.goals.gG || 0, kcal: settings.goals.kcal || 0
         },
         blockSize: {
-          p: settings.pBlockG || 25, c: settings.cBlockG || 25, g: settings.gBlockG || 10
+          pG: settings.blocks.pG || 25, cG: settings.blocks.cG || 25, gG: settings.blocks.gG || 10
         },
         bodyData: {
           sex: calc.sex || null, age: calc.age || null,
-          weight: calc.weight || null, height: calc.height || null,
-          bf: calc.lastBF || null, leanMass: calc.lastLM || null,
-          bmr: calc.lastBMR || null,
-          activity: calc.activity || null
+          weightKg: calc.weightKg || null, heightCm: calc.heightCm || null,
+          activity: calc.activity || null,
+          deficitPct: calc.deficitPct || null
         }
       },
       measurements: measureEntries,
