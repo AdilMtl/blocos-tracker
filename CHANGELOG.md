@@ -5,6 +5,44 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v1.7.0] — 2026-03-01
+
+### Adicionado
+- [feat] **Energy Analytics Dashboard** na Home — painel de análise energética diária e semanal:
+  - `getEnergyForDate(date)`: helper puro que retorna `{consumed, bmr, tdee, exercise, total, balance}` para qualquer dia.
+  - Card **"⚡ Energia Hoje"**: 4 KPIs inline (kcal consumido / gasto basal / treino / saldo) com cor semântica — verde para déficit, roxo para superávit.
+  - Barra de progresso consumido vs meta kcal.
+  - **Gráfico semanal Seg–Dom**: barras duplas sobrepostas (gasto atrás em surface3, consumido na frente em accent) + linha meta tracejada. Dia atual com borda destacada; dias futuros sem barra; dias sem dados com opacidade reduzida.
+  - **Projeção kg/semana**: média de saldo dos últimos 7 dias × 7 / 7700 — exibida se ≥ 3 dias com dados (📉 déficit / 📈 superávit).
+- [feat] **Saudação contextual vs histórico** — ao visualizar hoje: "Bom dia/tarde/noite 👋"; ao visualizar dia passado: "📅 Histórico". Dados e cards atualizam em tempo real ao mudar a data.
+
+### Melhorado
+- [improve] **Home reativa aos 3 caminhos de mudança de data** — `renderHomeDashboard()` agora é chamado explicitamente em: (1) `datePick.change`, (2) `shiftDate()` — botões ‹ ›, (3) `btnGoToday` — botão "hoje". Antes era necessário clicar na aba Home para atualizar.
+
+### Corrigido
+- [fix] `barWrap.innerHTML` não era resetado no path `hasBmr=true` de `renderEnergyCard()` — a cada re-render uma nova barra era acumulada sobre a anterior.
+- [fix] `.week-bar-wrap` sem altura efetiva (colapsava para `min-height:4px` por `flex:1` sem pai esticado) — corrigido com altura explícita via `style="height:${chartH}px"` inline.
+
+### Notas
+- **Requer JP7 configurado** (Mais → Calculadora) para exibir barras de gasto basal/total no gráfico. Sem JP7, o card mostra apenas consumido + mensagem instrutiva. Isso é intencional — sem BMR não é possível calcular gasto real.
+- **Ideia futura**: tela de primeiro acesso / onboarding quando não há nenhum dado registrado — guiar o usuário a configurar JP7, metas e primeiro log antes de exibir o dashboard.
+- localStorage: **nenhuma mudança de schema** — dados existentes totalmente compatíveis.
+
+---
+
+## [v1.6.0] — 2026-02-28
+
+### Adicionado
+- [feat] **Auto-check de hábitos ao salvar dados** — ao salvar Diário (hábito "log" e "dieta"), Treino/Cardio ("treino" e "cardio") e Medidas ("medidas"), o hábito correspondente é marcado automaticamente para o dia de hoje, com toast de confirmação. Guard `currentDate() === todayISO()` garante que só afeta o dia atual.
+
+### Melhorado
+- [improve] **FAB (+) removido** — era redundante com o grid 2×2 da Home e causava confusão sobre sua função.
+
+### Notas
+- localStorage: nenhuma mudança de schema.
+
+---
+
 ## [v1.5.0] — 2026-02-28
 
 ### Identidade
