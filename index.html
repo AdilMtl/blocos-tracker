@@ -1429,18 +1429,6 @@ tr:active { background: var(--surface2); }
 .home-action-card:active { background: var(--surface3); transform: scale(.96); }
 .home-action-icon { font-size: 28px; line-height: 1.2; }
 .home-action-label { font-size: 13px; font-weight: 600; color: var(--text2); }
-.fab {
-  position: fixed; right: 18px;
-  bottom: calc(64px + var(--safe-bottom) + 16px);
-  width: 50px; height: 50px; border-radius: 50%;
-  background: var(--accent); color: #fff; font-size: 24px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; border: none;
-  box-shadow: 0 4px 20px rgba(124,92,255,.45);
-  z-index: 200; -webkit-tap-highlight-color: transparent;
-  transition: transform .15s;
-}
-.fab:active { transform: scale(.88); }
 
 /* ════════════════════ DESKTOP ════════════════════ */
 /* btn hoje */
@@ -2115,8 +2103,6 @@ tr:active { background: var(--surface2); }
 
 </div><!-- /app -->
 
-<!-- FAB -->
-<button class="fab" id="fabAdd" type="button" title="Adicionar rápido">+</button>
 
 <!-- FOOD MODAL (bottom sheet) -->
 <div class="modal-overlay" id="foodModalOverlay"></div>
@@ -4279,6 +4265,11 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     treinoData.days[currentDate()] = clone(treinoState);
     saveJSON(TREINO_KEY, treinoData);
     showToast("Treino salvo 🏋️✅");
+    // auto-check hábitos (só para o dia de hoje)
+    if (currentDate() === todayISO()) {
+      if (treinoState.exercicios.length > 0) autoCheckHabit('treino');
+      if (treinoState.cardio.length > 0) autoCheckHabit('cardio');
+    }
   };
 
   // ─── History with kcal ───
@@ -4880,6 +4871,18 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     });
   };
 
+  const autoCheckHabit = (id) => {
+    const todayStr = todayISO();
+    const hData = loadJSON(HABITS_KEY, {});
+    if (!hData[todayStr]) hData[todayStr] = {};
+    if (hData[todayStr][id]) return;
+    hData[todayStr][id] = true;
+    saveJSON(HABITS_KEY, hData);
+    if ($("#viewHome").classList.contains("active")) renderHabitTracker();
+    const hab = HABITS_DEF.find(h => h.id === id);
+    showToast(`Hábito ✓ ${hab ? hab.label : id}`);
+  };
+
   // ══════════ INIT ══════════
   try {
     datePick.value = todayISO();
@@ -4909,6 +4912,15 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       saveJSON(STORAGE_KEY, data);
       updateUI();
       showToast("Salvo ✅");
+      // auto-check hábitos (só para o dia de hoje)
+      if (currentDate() === todayISO()) {
+        const jant = data.days[currentDate()].meals.jantar;
+        if ((jant.p + jant.c + jant.g) > 0) autoCheckHabit('log');
+        const t = totals();
+        const kcal = Math.round(t.p*(settings.kcalPerBlock.p||0) + t.c*(settings.kcalPerBlock.c||0) + t.g*(settings.kcalPerBlock.g||0));
+        const kcalGoal = settings.goals.kcal || 0;
+        if (kcal > 0 && kcalGoal > 0 && kcal <= kcalGoal) autoCheckHabit('dieta');
+      }
     });
 
     datePick.addEventListener("change", () => {
@@ -5031,7 +5043,11 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     });
 
     // measure
-    $("#btnSaveMeasure").addEventListener("click", () => saveMeasureForDate(currentDate()));
+    $("#btnSaveMeasure").addEventListener("click", () => {
+      const hadWeight = clampNum($("#mWeight").value) > 0;
+      saveMeasureForDate(currentDate());
+      if (hadWeight) autoCheckHabit('medidas');
+    });
     $("#btnClearMeasureDay").addEventListener("click", () => clearMeasureDay(currentDate()));
     $("#btnResetMeasureAll").addEventListener("click", resetMeasureAll);
     $("#btnExportMeasure").addEventListener("click", exportMeasureJSON);
