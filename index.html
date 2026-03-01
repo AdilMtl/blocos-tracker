@@ -3182,14 +3182,20 @@ tr:active { background: var(--surface2); }
 
   // ══════════ HOME DASHBOARD ══════════
   const renderHomeDashboard = () => {
-    // Saudação contextual
-    const hour = new Date().getHours();
-    const greet = hour < 12 ? "Bom dia 👋" : hour < 18 ? "Boa tarde 👋" : "Boa noite 🌙";
+    // Saudação: hoje vs histórico
+    const cur = currentDate();
+    const isViewingToday = cur === todayISO();
     const greetEl = $("#homeGreeting");
-    if(greetEl) greetEl.textContent = greet;
+    if (greetEl) {
+      if (isViewingToday) {
+        const hour = new Date().getHours();
+        greetEl.textContent = hour < 12 ? "Bom dia 👋" : hour < 18 ? "Boa tarde 👋" : "Boa noite 🌙";
+      } else {
+        greetEl.textContent = "📅 Histórico";
+      }
+    }
 
     // Data formatada
-    const cur = currentDate();
     const [y, mo, dy] = cur.split('-');
     const dateLabel = new Date(+y, +mo-1, +dy).toLocaleDateString('pt-BR', {
       weekday: 'long', day: 'numeric', month: 'long'
@@ -4964,6 +4970,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     fillInputsFromState();
     updateUI();
     treinoLoaded = false;
+    if($("#viewHome").classList.contains("active")) renderHomeDashboard();
     if($("#viewCorpo").classList.contains("active")) fillMeasureFormForDate(currentDate());
     if($("#viewTreino").classList.contains("active")) renderTreinoPanel();
     updateDayBanner();
@@ -5129,6 +5136,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       fillInputsFromState();
       updateUI();
       treinoLoaded = false;
+      if($("#viewHome").classList.contains("active")) renderHomeDashboard();
       if($("#viewCorpo").classList.contains("active")) fillMeasureFormForDate(currentDate());
       if($("#viewTreino").classList.contains("active")) renderTreinoPanel();
       updateDayBanner();
@@ -5155,6 +5163,9 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       fillInputsFromState();
       updateUI();
       treinoLoaded = false;
+      if($("#viewHome").classList.contains("active")){
+        renderHomeDashboard();
+      }
       if($("#viewCorpo").classList.contains("active")){
         fillMeasureFormForDate(currentDate());
       }
