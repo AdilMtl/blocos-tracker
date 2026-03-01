@@ -2,7 +2,8 @@
   "name": "Kcal.ix",
   "short_name": "Kcal.ix",
   "description": "Tracker de nutrição, treino e composição corporal",
-  "start_url": "./index.html",
+  "scope": "/blocos-tracker/",
+  "start_url": "/blocos-tracker/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0e18",
@@ -12,13 +13,25 @@
       "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
