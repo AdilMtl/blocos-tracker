@@ -5,6 +5,30 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v1.9.0] — 2026-03-01
+
+### Melhorado
+- [improve] **UX de alimentos na aba Diário — reposicionamento e sub-accordions**:
+  - Accordion "🍽️ Adicionar alimentos" movido para dentro do card Progresso, logo após os KPIs e antes de ☕ Café — sem scroll longo para chegar na seção
+  - Conteúdo interno reorganizado em 3 sub-accordions colapsáveis: **🔍 Buscar alimento**, **📋 Adicionados hoje (N itens)**, **➕ Alimento personalizado**
+  - Título "Adicionados hoje" mostra contagem dinâmica de itens no próprio botão do accordion
+  - Card separado de Alimentos removido — estrutura integrada ao card Progresso
+- [improve] **Modal de porção — controle granular**:
+  - Input numérico editável substitui display estático — usuário pode digitar qualquer valor decimal (ex: 1.3, 2.5, 0.25)
+  - 4 botões de ajuste rápido: **−.5 / −.1 / +.1 / +.5** (era apenas −0.5 / +0.5)
+  - Cursor protegido: `updateModalUI` não sobrescreve o input enquanto em foco
+  - Mínimo: 0.1 porção
+
+### Corrigido
+- [fix] **max-height accordion**: override `#accAlimentos` → 9000px para evitar clipping quando sub-accordions estão abertos simultaneamente com lista grande de alimentos
+
+### Notas
+- `sw.js`: CACHE_NAME `kcalix-v2` → `kcalix-v3` — força reload do cache nos usuários existentes
+- Nenhuma chave de localStorage alterada
+- `FOOD_DB` intacta — lista de alimentos não foi tocada
+
+---
+
 ## [v1.8.3] — 2026-03-01
 
 ### Adicionado
