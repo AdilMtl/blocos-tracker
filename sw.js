@@ -1,4 +1,4 @@
-const CACHE_NAME = 'blocos-v5';
+const CACHE_NAME = 'kcalix-v1';
 const ASSETS = [
   './',
   './index.html',

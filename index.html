@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-  <title>Blocos • Tracker</title>
+  <title>Kcal.ix</title>
 
   <!-- PWA -->
   <link rel="manifest" href="./manifest.json" />
@@ -192,7 +192,7 @@ body::after {
   max-width: 600px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
 }
 .nav-tab {
   display: flex;
@@ -1404,6 +1404,44 @@ tr:active { background: var(--surface2); }
 .habit-score-dot.lit { background: var(--h-color); box-shadow: 0 0 5px var(--h-color); }
 .habit-score-num { font-size: 11px; font-weight: 700; color: var(--text2); white-space: nowrap; }
 
+/* ════════════════════ HOME DASHBOARD ════════════════════ */
+.home-greeting { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
+.home-date-sub { font-size: 13px; color: var(--text3); margin-bottom: 14px; }
+.home-kcal-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.home-kcal-num { font-size: 32px; font-weight: 800; letter-spacing: -.5px; line-height: 1; }
+.home-kcal-unit { font-size: 14px; font-weight: 400; color: var(--text3); margin-left: 3px; }
+.home-kcal-goal { font-size: 12px; color: var(--text3); }
+.home-kcal-bar { height: 8px; background: var(--surface3); border-radius: 999px; overflow: hidden; margin-bottom: 14px; }
+.home-kcal-fill { height: 100%; border-radius: 999px; background: var(--accent); transition: width .4s ease; }
+.home-macro-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.home-macro-item { display: flex; flex-direction: column; gap: 3px; }
+.home-macro-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+.home-macro-val { font-size: 11px; color: var(--text2); }
+.home-macro-bar { height: 4px; background: var(--surface3); border-radius: 999px; overflow: hidden; }
+.home-macro-fill { height: 100%; border-radius: 999px; transition: width .4s ease; }
+.home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.home-action-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 22px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; font-family: var(--font);
+  transition: background .15s, transform .1s;
+}
+.home-action-card:active { background: var(--surface3); transform: scale(.96); }
+.home-action-icon { font-size: 28px; line-height: 1.2; }
+.home-action-label { font-size: 13px; font-weight: 600; color: var(--text2); }
+.fab {
+  position: fixed; right: 18px;
+  bottom: calc(64px + var(--safe-bottom) + 16px);
+  width: 50px; height: 50px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-size: 24px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: none;
+  box-shadow: 0 4px 20px rgba(124,92,255,.45);
+  z-index: 200; -webkit-tap-highlight-color: transparent;
+  transition: transform .15s;
+}
+.fab:active { transform: scale(.88); }
+
 /* ════════════════════ DESKTOP ════════════════════ */
 /* btn hoje */
 .btn-hoje {
@@ -1434,7 +1472,7 @@ tr:active { background: var(--surface2); }
   <!-- ═══ HEADER ═══ -->
   <div class="header">
     <div class="header-left">
-      <h1>📦 Blocos Tracker</h1>
+      <h1>Kcal.ix</h1>
       <div class="sub">Offline • Salva localmente</div>
     </div>
     <div class="header-right">
@@ -1447,11 +1485,66 @@ tr:active { background: var(--surface2); }
     </div>
   </div>
 
-  <!-- ═══════════════ VIEW: TRACKER ═══════════════ -->
-  <div id="viewTracker" class="view active">
+  <!-- ═══════════════ VIEW: HOME ═══════════════ -->
+  <div id="viewHome" class="view active">
 
-    <!-- Habit Tracker -->
     <div id="habitTracker" class="habit-card"></div>
+
+    <div class="home-greeting" id="homeGreeting">Olá 👋</div>
+    <div class="home-date-sub" id="homeDate"></div>
+
+    <!-- Card de progresso do dia -->
+    <div class="card" style="cursor:pointer;margin-bottom:12px;" onclick="openTab('diario')">
+      <div class="card-body">
+        <div class="home-kcal-row">
+          <span class="home-kcal-num" id="homeKcalVal">0<span class="home-kcal-unit">kcal</span></span>
+          <span class="home-kcal-goal">meta: <b id="homeKcalGoal">—</b></span>
+        </div>
+        <div class="home-kcal-bar"><div class="home-kcal-fill" id="homeKcalFill" style="width:0%"></div></div>
+        <div class="home-macro-row">
+          <div class="home-macro-item">
+            <div class="home-macro-label">Proteína</div>
+            <div class="home-macro-bar"><div class="home-macro-fill" id="homePFill" style="background:var(--pColor);width:0%"></div></div>
+            <div class="home-macro-val"><span id="homePVal">0</span>g / <span id="homePGoal">—</span></div>
+          </div>
+          <div class="home-macro-item">
+            <div class="home-macro-label">Carbo</div>
+            <div class="home-macro-bar"><div class="home-macro-fill" id="homeCFill" style="background:var(--cColor);width:0%"></div></div>
+            <div class="home-macro-val"><span id="homeCVal">0</span>g / <span id="homeCGoal">—</span></div>
+          </div>
+          <div class="home-macro-item">
+            <div class="home-macro-label">Gordura</div>
+            <div class="home-macro-bar"><div class="home-macro-fill" id="homeGFill" style="background:var(--gColor);width:0%"></div></div>
+            <div class="home-macro-val"><span id="homeGVal">0</span>g / <span id="homeGGoal">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid de ações -->
+    <div class="home-grid">
+      <button class="home-action-card" type="button" onclick="openTab('diario')">
+        <span class="home-action-icon">📊</span>
+        <span class="home-action-label">Diário</span>
+      </button>
+      <button class="home-action-card" type="button" onclick="openTab('treino')">
+        <span class="home-action-icon">🏋️</span>
+        <span class="home-action-label">Treino</span>
+      </button>
+      <button class="home-action-card" type="button" onclick="openTab('corpo')">
+        <span class="home-action-icon">📏</span>
+        <span class="home-action-label">Corpo</span>
+      </button>
+      <button class="home-action-card" type="button" onclick="document.getElementById('btnExportAI').click()">
+        <span class="home-action-icon">🤖</span>
+        <span class="home-action-label">IA Export</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════ VIEW: DIÁRIO ═══════════════ -->
+  <div id="viewDiario" class="view">
 
     <!-- Presets -->
     <div class="card">
@@ -1552,10 +1645,64 @@ tr:active { background: var(--surface2); }
         <div class="meal-list" id="mealList"></div>
       </div>
     </div>
+
+    <!-- ─── Alimentos (embutido no Diário) ─── -->
+    <div class="card">
+      <div class="accordion" id="accAlimentos">
+        <button class="acc-trigger" type="button" onclick="toggleAcc('accAlimentos'); renderFoodPanel();">
+          🍽️ Alimentos
+          <span class="acc-chevron">▾</span>
+        </button>
+        <div class="acc-content"><div class="acc-inner">
+
+          <div class="food-search-wrap">
+            <span class="food-search-icon">🔍</span>
+            <input class="food-search" id="foodSearch" type="text" placeholder="Buscar alimento..." autocomplete="off" />
+          </div>
+          <div class="cat-tabs" id="catTabs"></div>
+          <div class="food-grid" id="foodGrid"></div>
+
+          <div style="height:16px"></div>
+
+          <div class="card-header" style="padding:0 0 8px;">
+            <div class="ch-info">
+              <b>📋 Adicionados hoje</b>
+              <span id="foodLogCount">0 itens</span>
+            </div>
+          </div>
+          <div class="food-log" id="foodLog"></div>
+
+          <div style="height:16px"></div>
+
+          <div class="accordion" id="accCustomFood">
+            <button class="acc-trigger" type="button" onclick="toggleAcc('accCustomFood')">
+              ➕ Alimento personalizado
+              <span class="acc-chevron">▾</span>
+            </button>
+            <div class="acc-content"><div class="acc-inner">
+              <div class="custom-food-form">
+                <div class="form-grid cols-2">
+                  <div class="form-row"><label>Nome</label><input id="cfName" placeholder="Ex: Barra de cereal" /></div>
+                  <div class="form-row"><label>Porção</label><input id="cfPortion" placeholder="Ex: 1 un (25g)" /></div>
+                  <div class="form-row"><label>Proteína (g)</label><input id="cfP" inputmode="decimal" placeholder="0" /></div>
+                  <div class="form-row"><label>Carbo (g)</label><input id="cfC" inputmode="decimal" placeholder="0" /></div>
+                  <div class="form-row"><label>Gordura (g)</label><input id="cfG" inputmode="decimal" placeholder="0" /></div>
+                  <div class="form-row"><label>kcal</label><input id="cfKcal" inputmode="decimal" placeholder="0" /></div>
+                </div>
+                <div class="btn-group" style="margin-top:4px;">
+                  <button class="btn sm primary" id="btnAddCustomFood" type="button">Salvar alimento</button>
+                </div>
+              </div>
+            </div></div>
+          </div>
+
+        </div></div>
+      </div>
+    </div>
   </div>
 
-  <!-- ═══════════════ VIEW: SETTINGS ═══════════════ -->
-  <div id="viewSettings" class="view">
+  <!-- ═══════════════ VIEW: MAIS ═══════════════ -->
+  <div id="viewMais" class="view">
     <div class="card">
       <div class="card-header">
         <div class="ch-info">
@@ -1615,10 +1762,7 @@ tr:active { background: var(--surface2); }
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ═══════════════ VIEW: CALC ═══════════════ -->
-  <div id="viewCalc" class="view">
     <div class="card">
       <div class="card-header">
         <div class="ch-info">
@@ -1740,8 +1884,8 @@ tr:active { background: var(--surface2); }
     </div>
   </div>
 
-  <!-- ═══════════════ VIEW: MEASURE ═══════════════ -->
-  <div id="viewMeasure" class="view">
+  <!-- ═══════════════ VIEW: CORPO ═══════════════ -->
+  <div id="viewCorpo" class="view">
     <div class="card">
       <div class="card-header" style="flex-wrap:wrap; gap:8px;">
         <div class="ch-info">
@@ -1968,78 +2112,11 @@ tr:active { background: var(--surface2); }
     </div>
   </div>
 
-  <!-- ═══════════════ VIEW: ALIMENTOS ═══════════════ -->
-  <div id="viewAlimentos" class="view">
-    <div class="card">
-      <div class="card-header" style="flex-wrap:wrap; gap:8px;">
-        <div class="ch-info">
-          <b>🍽️ Alimentos</b>
-          <span>Selecione, ajuste porções e adicione à refeição.</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <!-- Search -->
-        <div class="food-search-wrap">
-          <span class="food-search-icon">🔍</span>
-          <input class="food-search" id="foodSearch" type="text" placeholder="Buscar alimento..." autocomplete="off" />
-        </div>
-
-        <!-- Category tabs -->
-        <div class="cat-tabs" id="catTabs"></div>
-
-        <!-- Food list -->
-        <div class="food-grid" id="foodGrid"></div>
-      </div>
-    </div>
-
-    <!-- Food log for today -->
-    <div class="card">
-      <div class="card-header">
-        <div class="ch-info">
-          <b>📋 Adicionados hoje</b>
-          <span id="foodLogCount">0 itens</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="food-log" id="foodLog"></div>
-      </div>
-    </div>
-
-    <!-- Custom food -->
-    <div class="card">
-      <div class="card-header">
-        <div class="ch-info">
-          <b>➕ Alimento personalizado</b>
-          <span>Adicione um alimento que não está na lista.</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="accordion" id="accCustomFood">
-          <button class="acc-trigger" type="button" onclick="toggleAcc('accCustomFood')">
-            Criar alimento
-            <span class="acc-chevron">▾</span>
-          </button>
-          <div class="acc-content"><div class="acc-inner">
-            <div class="custom-food-form">
-              <div class="form-grid cols-2">
-                <div class="form-row"><label>Nome</label><input id="cfName" placeholder="Ex: Barra de cereal" /></div>
-                <div class="form-row"><label>Porção</label><input id="cfPortion" placeholder="Ex: 1 un (25g)" /></div>
-                <div class="form-row"><label>Proteína (g)</label><input id="cfP" inputmode="decimal" placeholder="0" /></div>
-                <div class="form-row"><label>Carbo (g)</label><input id="cfC" inputmode="decimal" placeholder="0" /></div>
-                <div class="form-row"><label>Gordura (g)</label><input id="cfG" inputmode="decimal" placeholder="0" /></div>
-                <div class="form-row"><label>kcal</label><input id="cfKcal" inputmode="decimal" placeholder="0" /></div>
-              </div>
-              <div class="btn-group" style="margin-top:4px;">
-                <button class="btn sm primary" id="btnAddCustomFood" type="button">Salvar alimento</button>
-              </div>
-            </div>
-          </div></div>
-        </div>
-      </div>
-    </div>
-  </div>
 
 </div><!-- /app -->
+
+<!-- FAB -->
+<button class="fab" id="fabAdd" type="button" title="Adicionar rápido">+</button>
 
 <!-- FOOD MODAL (bottom sheet) -->
 <div class="modal-overlay" id="foodModalOverlay"></div>
@@ -2139,29 +2216,25 @@ tr:active { background: var(--surface2); }
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <div class="bottom-nav-inner">
-    <button class="nav-tab active" id="tabTracker" type="button">
+    <button class="nav-tab active" id="tabHome" type="button">
+      <span class="nav-icon">🏠</span>
+      Home
+    </button>
+    <button class="nav-tab" id="tabDiario" type="button">
       <span class="nav-icon">📊</span>
-      Tracker
-    </button>
-    <button class="nav-tab" id="tabSettings" type="button">
-      <span class="nav-icon">⚙️</span>
-      Ajustes
-    </button>
-    <button class="nav-tab" id="tabCalc" type="button">
-      <span class="nav-icon">🧮</span>
-      Macros
-    </button>
-    <button class="nav-tab" id="tabMeasure" type="button">
-      <span class="nav-icon">📏</span>
-      Medição
-    </button>
-    <button class="nav-tab" id="tabAlimentos" type="button">
-      <span class="nav-icon">🍽️</span>
-      Alimentos
+      Diário
     </button>
     <button class="nav-tab" id="tabTreino" type="button">
       <span class="nav-icon">🏋️</span>
       Treino
+    </button>
+    <button class="nav-tab" id="tabCorpo" type="button">
+      <span class="nav-icon">📏</span>
+      Corpo
+    </button>
+    <button class="nav-tab" id="tabMais" type="button">
+      <span class="nav-icon">⚙️</span>
+      Mais
     </button>
   </div>
 </div>
@@ -2896,20 +2969,72 @@ tr:active { background: var(--surface2); }
     renderPresetHints();
   };
 
+  // ══════════ HOME DASHBOARD ══════════
+  const renderHomeDashboard = () => {
+    // Saudação contextual
+    const hour = new Date().getHours();
+    const greet = hour < 12 ? "Bom dia 👋" : hour < 18 ? "Boa tarde 👋" : "Boa noite 🌙";
+    const greetEl = $("#homeGreeting");
+    if(greetEl) greetEl.textContent = greet;
+
+    // Data formatada
+    const cur = currentDate();
+    const [y, mo, dy] = cur.split('-');
+    const dateLabel = new Date(+y, +mo-1, +dy).toLocaleDateString('pt-BR', {
+      weekday: 'long', day: 'numeric', month: 'long'
+    });
+    const dateEl = $("#homeDate");
+    if(dateEl) dateEl.textContent = dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1);
+
+    // Totais em gramas
+    const t = totals(); // blocos
+    const pG = round1(t.p * settings.blocks.pG);
+    const cG = round1(t.c * settings.blocks.cG);
+    const gG = round1(t.g * settings.blocks.gG);
+
+    // Kcal
+    const kcal = Math.round(
+      t.p * (settings.kcalPerBlock.p || 0) +
+      t.c * (settings.kcalPerBlock.c || 0) +
+      t.g * (settings.kcalPerBlock.g || 0)
+    );
+    const kcalGoal = settings.goals.kcal || 0;
+
+    const hKcalVal = $("#homeKcalVal");
+    if(hKcalVal) hKcalVal.innerHTML = `${kcal}<span class="home-kcal-unit">kcal</span>`;
+    const hKcalGoal = $("#homeKcalGoal");
+    if(hKcalGoal) hKcalGoal.textContent = kcalGoal ? `${kcalGoal} kcal` : "—";
+    const hKcalFill = $("#homeKcalFill");
+    if(hKcalFill) hKcalFill.style.width = kcalGoal > 0 ? `${Math.min(100, Math.round((kcal/kcalGoal)*100))}%` : "0%";
+
+    // Macro bars helper
+    const setMacro = (idVal, idGoal, idFill, val, goal) => {
+      const vEl = $(`#${idVal}`); if(vEl) vEl.textContent = val;
+      const gEl = $(`#${idGoal}`); if(gEl) gEl.textContent = goal ? `${goal}g` : "—";
+      const fEl = $(`#${idFill}`); if(fEl) fEl.style.width = goal > 0 ? `${Math.min(100, Math.round((val/goal)*100))}%` : "0%";
+    };
+    setMacro("homePVal","homePGoal","homePFill", pG, settings.goals.pG);
+    setMacro("homeCVal","homeCGoal","homeCFill", cG, settings.goals.cG);
+    setMacro("homeGVal","homeGGoal","homeGFill", gG, settings.goals.gG);
+
+    renderHabitTracker();
+  };
+
   // ══════════ TABS ══════════
   const openTab = (which) => {
-    const views = ["tracker","settings","calc","measure","alimentos","treino"];
+    const views = ["home","diario","treino","corpo","mais"];
     views.forEach(v => {
       $(`#tab${v.charAt(0).toUpperCase()+v.slice(1)}`).classList.toggle("active", v === which);
       $(`#view${v.charAt(0).toUpperCase()+v.slice(1)}`).classList.toggle("active", v === which);
     });
+    sessionStorage.setItem('kcalix_tab', which);
 
     if(!datePick.value) datePick.value = todayISO();
-    if(which === "settings") fillSettingsForm();
-    if(which === "calc") fillCalcForm();
-    if(which === "measure") fillMeasureFormForDate(currentDate());
-    if(which === "alimentos") renderFoodPanel();
+    if(which === "mais") { fillSettingsForm(); fillCalcForm(); }
+    if(which === "corpo") fillMeasureFormForDate(currentDate());
     if(which === "treino") renderTreinoPanel();
+    if(which === "diario") renderFoodPanel();
+    if(which === "home") renderHomeDashboard();
     updateUI();
   };
   window.openTab = openTab;
@@ -3169,7 +3294,7 @@ tr:active { background: var(--surface2); }
       `;
       tr.addEventListener("click", () => {
         datePick.value = k;
-        openTab("measure");
+        openTab("corpo");
         fillMeasureFormForDate(k);
         showToast("Carregado 📅");
       });
@@ -3307,7 +3432,7 @@ tr:active { background: var(--surface2); }
   }
 
   // ══════════ AI EXPORT ══════════
-  const AI_SYSTEM_PROMPT = `Você é um coach especializado em nutrição e treino de força que analisa dados exportados do Blocos Tracker, um app PWA brasileiro de tracking nutricional e de treino.
+  const AI_SYSTEM_PROMPT = `Você é um coach especializado em nutrição e treino de força que analisa dados exportados do Kcal.ix, um app PWA brasileiro de tracking nutricional e de treino.
 
 ## Sistema de blocos
 O app conta macros em "blocos" (porções fixas configuradas pelo usuário):
@@ -3505,7 +3630,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     const a = document.createElement('a');
     const dateStr = new Date().toISOString().slice(0, 10);
     a.href = url;
-    a.download = `blocos-tracker-${dateStr}.json`;
+    a.download = `kcalix-${dateStr}.json`;
     a.click();
     URL.revokeObjectURL(url);
 
@@ -4621,7 +4746,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     fillInputsFromState();
     updateUI();
     treinoLoaded = false;
-    if($("#viewMeasure").classList.contains("active")) fillMeasureFormForDate(currentDate());
+    if($("#viewCorpo").classList.contains("active")) fillMeasureFormForDate(currentDate());
     if($("#viewTreino").classList.contains("active")) renderTreinoPanel();
     updateDayBanner();
   };
@@ -4774,7 +4899,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       fillInputsFromState();
       updateUI();
       treinoLoaded = false;
-      if($("#viewMeasure").classList.contains("active")) fillMeasureFormForDate(currentDate());
+      if($("#viewCorpo").classList.contains("active")) fillMeasureFormForDate(currentDate());
       if($("#viewTreino").classList.contains("active")) renderTreinoPanel();
       updateDayBanner();
     });
@@ -4791,7 +4916,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       fillInputsFromState();
       updateUI();
       treinoLoaded = false;
-      if($("#viewMeasure").classList.contains("active")){
+      if($("#viewCorpo").classList.contains("active")){
         fillMeasureFormForDate(currentDate());
       }
       if($("#viewTreino").classList.contains("active")){
@@ -4825,12 +4950,11 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     $("#histModalOverlay").addEventListener("click", closeHistModal);
 
     // tabs
-    $("#tabTracker").addEventListener("click", () => openTab("tracker"));
-    $("#tabSettings").addEventListener("click", () => openTab("settings"));
-    $("#tabCalc").addEventListener("click", () => openTab("calc"));
-    $("#tabMeasure").addEventListener("click", () => openTab("measure"));
-    $("#tabAlimentos").addEventListener("click", () => openTab("alimentos"));
+    $("#tabHome").addEventListener("click", () => openTab("home"));
+    $("#tabDiario").addEventListener("click", () => openTab("diario"));
     $("#tabTreino").addEventListener("click", () => openTab("treino"));
+    $("#tabCorpo").addEventListener("click", () => openTab("corpo"));
+    $("#tabMais").addEventListener("click", () => openTab("mais"));
 
     // treino
     $("#btnSaveTreino").addEventListener("click", saveTreino);
@@ -4923,14 +5047,19 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       });
     });
 
-    // init calc/measures
+    // init calc/measures/food/treino (sem abrir tabs ainda)
     fillCalcForm();
     try{ calcAll(); }catch(e){}
     fillMeasureFormForDate(currentDate());
     renderFoodPanel();
     treinoLoaded = false;
     renderTreinoPanel();
-    renderHabitTracker();
+
+    // Abertura inteligente: sessionStorage mantém aba entre trocas de app;
+    // limpa ao fechar a aba do browser → volta para Home na próxima abertura
+    const VALID_TABS = ["home","diario","treino","corpo","mais"];
+    const savedTab = sessionStorage.getItem('kcalix_tab');
+    openTab((savedTab && VALID_TABS.includes(savedTab)) ? savedTab : "home");
 
     showToast("Pronto ✅");
   } catch(err) {

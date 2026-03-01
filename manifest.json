@@ -1,7 +1,7 @@
 {
-  "name": "Blocos Tracker",
-  "short_name": "Blocos",
-  "description": "Tracker de nutrição, treino e composição corporal em blocos",
+  "name": "Kcal.ix",
+  "short_name": "Kcal.ix",
+  "description": "Tracker de nutrição, treino e composição corporal",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
