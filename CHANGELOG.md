@@ -1,7 +1,38 @@
 # Changelog
 
-Todas as mudanças notáveis do Blocos Tracker são documentadas aqui.
+Todas as mudanças notáveis do Kcal.ix são documentadas aqui.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
+
+---
+
+## [v1.5.0] — 2026-02-28
+
+### Identidade
+- [feat] **App renomeado: Blocos Tracker → Kcal.ix** — `<title>`, `<h1>`, `manifest.json` (name/short_name), prompt do sistema IA e nome do arquivo de export JSON. Storage keys preservados intactos (sem perda de dados).
+
+### Adicionado
+- [feat] **Home dashboard** — nova aba padrão com saudação contextual (Bom dia/tarde/noite), data formatada, card de progresso calórico (barra kcal consumida vs meta) e 3 mini-barras de macros (Proteína / Carbo / Gordura em gramas vs meta).
+- [feat] **Grid 2×2 de ações rápidas** na Home — blocos quadrados tocáveis: 📊 Diário · 🏋️ Treino · 📏 Corpo · 🤖 IA Export. Toque no card de progresso navega direto ao Diário.
+- [feat] **FAB (+)** — botão flutuante fixo (placeholder visual; Fase 2 implementa bottom sheet de quick-add).
+- [feat] **Abertura inteligente via sessionStorage** — app abre na Home na primeira abertura; mantém a aba ativa ao trocar de app e voltar (sessionStorage limpa ao fechar a aba do browser).
+
+### Melhorado
+- [improve] **Bottom-nav: 6 → 5 abas** — Home · Diário · Treino · Corpo · Mais. Thumb zone otimizada; `grid-template-columns: repeat(5, 1fr)`.
+- [improve] **Aba "Mais"** unifica Ajustes + Calculadora JP7 (antes em abas separadas) num único accordion, limpando a nav principal.
+- [improve] **Alimentos integrado no Diário** — seção "🍽️ Alimentos" como accordion colapsável no fim da aba Diário (busca, log do dia, alimento personalizado). Não ocupa mais uma aba dedicada na nav.
+- [improve] **Habit Tracker movido para a Home** — removido do topo do Diário; `renderHabitTracker()` continua apontando para `#habitTracker` sem mudança de lógica.
+
+### Corrigido
+- [fix] `grid-template-columns: repeat(6→5, 1fr)` no `.bottom-nav-inner` — com 5 tabs, o 6º slot gerava coluna vazia e tabs menores.
+
+### Infraestrutura
+- Service Worker: `blocos-v5` → `kcalix-v1` (limpeza de cache antigo; necessária por causa do rename).
+- `PLAN.md` adicionado ao repositório — plano de reestruturação com todas as etapas [x] marcadas.
+
+### Notas
+- localStorage: **nenhuma mudança de schema** — todos os dados do usuário compatíveis com versões anteriores.
+- ⚠️ Bug pré-existente registrado (não introduzido nesta versão): `select#tmplEditCardioType` tem `font-size: 13px` → pode causar zoom automático no iOS ao focar. Correção planejada.
+- Próxima fase (Fase 2): FAB com bottom sheet de quick-add (Alimento / Treino / Medição rápida).
 
 ---
 

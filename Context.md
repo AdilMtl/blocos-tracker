@@ -1,8 +1,8 @@
-# Blocos Tracker — Contexto do Projeto
+# Kcal.ix — Contexto do Projeto
 
 ## Visão geral
 
-App single-page (PWA) de tracking nutricional, treino e composição corporal. Tudo em **um único arquivo `index.html`** (~4000 linhas) com CSS + HTML + JS inline. Sem frameworks, sem build, sem dependências externas além da fonte Google (DM Sans).
+App single-page (PWA) de tracking nutricional, treino e composição corporal. Tudo em **um único arquivo `index.html`** (~5082 linhas) com CSS + HTML + JS inline. Sem frameworks, sem build, sem dependências externas além da fonte Google (DM Sans).
 
 Hospedado no GitHub Pages. Funciona 100% offline via Service Worker. Dados persistem no localStorage do navegador.
 
@@ -11,18 +11,19 @@ Hospedado no GitHub Pages. Funciona 100% offline via Service Worker. Dados persi
 ```
 blocos-tracker/
 ├── index.html      ← O APP INTEIRO (CSS + HTML + JS). Este é o único arquivo que muda.
-├── manifest.json   ← Metadados PWA (nome, ícones, cores). Raramente muda.
-├── sw.js           ← Service Worker (cache offline). Só muda ao trocar versão do cache.
+├── manifest.json   ← Metadados PWA (nome: "Kcal.ix", ícones, cores). Raramente muda.
+├── sw.js           ← Service Worker (cache offline). CACHE_NAME: kcalix-v1
 ├── icon-192.png    ← Ícone do app 192×192
 ├── icon-512.png    ← Ícone do app 512×512
-└── PROJECT.md      ← Este arquivo
+├── PLAN.md         ← Plano de reestruturação v1.5.0 (referência histórica)
+└── Context.md      ← Este arquivo
 ```
 
 ## Estrutura do index.html
 
 O arquivo é dividido em 3 grandes blocos sequenciais:
 
-### 1. CSS (~linhas 19-1195)
+### 1. CSS (~linhas 19-1460)
 
 Organizado por seções com comentários `════`:
 
@@ -33,7 +34,7 @@ Organizado por seções com comentários `════`:
 | LAYOUT | ~78 | Container principal `.app` |
 | HEADER | ~87 | Barra superior fixa |
 | BUTTONS | ~136 | `.btn`, `.btn.primary`, `.btn.sm`, etc |
-| BOTTOM NAV | ~179 | Navegação inferior (6 abas) |
+| BOTTOM NAV | ~179 | Navegação inferior (5 abas) — `repeat(5, 1fr)` |
 | FOOTER STATUS BAR | ~225 | Barra fixa de kcal no rodapé |
 | CARDS | ~272 | `.card`, `.card-header`, `.card-body` |
 | ACCORDION | ~293 | Expandir/colapsar seções |
@@ -47,20 +48,20 @@ Organizado por seções com comentários `════`:
 | HISTORY MODAL | ~1210 | `.hist-entry`, `.hist-mini-bar-*`, `.hist-empty` |
 | AI EXPORT | ~1316 | `.ai-export-desc`, `.ai-export-actions`, `.ai-export-status` |
 | HABIT TRACKER | ~1321 | `.habit-card`, `.habit-trigger`, `.habit-body`, `.habit-dot`, `.habit-score-dot` — grid neon retrátil |
-| DESKTOP | ~1407 | Media query para telas >= 720px |
+| HOME DASHBOARD | ~1407 | `.home-greeting`, `.home-kcal-bar`, `.home-macro-row`, `.home-grid`, `.home-action-card`, `.fab` |
+| DESKTOP | ~1445 | Media query para telas >= 720px |
 
-### 2. HTML (~linhas 1195-1880)
+### 2. HTML (~linhas 1460-2120)
 
-6 views (abas), apenas uma visível por vez via classe `.active`:
+5 views (abas), apenas uma visível por vez via classe `.active`:
 
 | View | ID | Linha aprox. | Função |
 |---|---|---|---|
-| 📊 Tracker | `viewTracker` | ~1213 | Registro diário de blocos P/C/G por refeição. Topo: `#habitTracker` (renderizado por JS) |
-| ⚙️ Ajustes | `viewSettings` | ~1302 | Configuração de metas de macros |
-| 🧮 Macros | `viewCalc` | ~1365 | Calculadora JP7 + BMR + TDEE + macros + card Export IA |
-| 📏 Medição | `viewMeasure` | ~1468 | Registro de peso e medidas corporais |
-| 🏋️ Treino | `viewTreino` | ~1543 | Templates de treino, séries, cardio, progressão |
-| 🍽️ Alimentos | `viewAlimentos` | ~1689 | Base de 104 alimentos BR com porções |
+| 🏠 Home | `viewHome` | ~1488 | Dashboard: saudação, progresso kcal/macros, grid 2×2 de ações, Habit Tracker |
+| 📊 Diário | `viewDiario` | ~1559 | Registro diário de blocos P/C/G por refeição + accordion Alimentos no fim |
+| ⚙️ Mais | `viewMais` | ~1617 | Ajustes de metas + Calculadora JP7 + IA Export (merged, accordion) |
+| 📏 Corpo | `viewCorpo` | ~1800 | Registro de peso e medidas corporais |
+| 🏋️ Treino | `viewTreino` | ~1878 | Templates de treino, séries, cardio, progressão |
 
 Modais (bottom sheets que abrem sobre as views):
 - **Food Modal** (`foodModal`) — Seleção de alimento com ajuste de porção
@@ -74,38 +75,40 @@ Elementos de navegação:
 - **`#btnPrevDay` / `#btnNextDay`** — botões ‹ › dentro do `.date-pill` no header
 - **`#dayEditBanner`** — banner contextual no card de Progresso ao editar dias passados
 
-### 3. JavaScript (~linhas 1837-4015)
+### 3. JavaScript (~linhas 2245-5063)
 
 Tudo dentro de uma IIFE `(() => { ... })()`. Seções:
 
 | Seção | Linha aprox. | O que faz |
 |---|---|---|
-| UTILS | ~1839 | `$()`, `$$()`, `clone()`, `round1()` |
-| CONSTANTS | ~1851 | Storage keys, defaults para settings/calc/measure |
-| EXERCISE DATABASE | ~1861 | `EXERCISE_DB` — 63 exercícios por grupo muscular |
-| CARDIO TYPES | ~1918 | `CARDIO_TYPES` — 12 tipos com kcal/min |
-| DEFAULT TEMPLATES | ~1927 | 4 templates padrão (A/B/C/Alt) |
-| FOOD DATABASE | ~1924 | `FOOD_DB` — 104 alimentos BR com macros |
-| TOAST | ~2103 | Notificações temporárias |
-| ACCORDION | ~2111 | Toggle de seções expansíveis |
-| STORAGE | ~2117 | `loadJSON()`, `saveJSON()` — wrapper localStorage |
-| DATE | ~2146 | `todayISO()`, `currentDate()`, data picker |
-| MEALS BUILD | ~2158 | Constrói grid de refeições dinamicamente |
-| UI UPDATE | ~2292 | `updateUI()` — recalcula totais, barras, KPIs |
-| TABS | ~2388 | `openTab()` — troca de view |
-| SETTINGS | ~2406 | Aplicar/resetar configurações de macros |
-| CALC (JP7) | ~2457 | Calculadora Jackson-Pollock 7 dobras + Siri |
-| MEASURE | ~2565 | Registro e histórico de medidas corporais |
-| SNAPSHOT | ~2669 | Fechar dia e salvar snapshot |
-| HISTORY MODAL | ~2679 | `openHistModal`, `closeHistModal`, `renderHistList` |
-| AI EXPORT | ~3204 | `AI_SYSTEM_PROMPT`, `exportAIJson()`, `copyAIPrompt()` |
-| HABIT TRACKER | ~4625 | `HABITS_KEY`, `HABITS_DEF` (5 hábitos), `getWeekDates()`, `renderHabitTracker()` |
-| FOOD PANEL | ~2745 | Busca, seleção, modal de alimentos |
-| TREINO PANEL | ~2967 | Estado do treino, load/save, render exercícios |
-| EXERCISE PROGRESSION MODAL | ~3292 | Modal com gráfico e tabela de evolução |
-| TEMPLATE HISTORY MODAL | ~3352 | Modal com comparação entre sessões |
-| TEMPLATE EDITOR | ~3472 | CRUD de templates de treino |
-| DAY NAVIGATION | ~3808 | `shiftDate`, `updateDayBanner` — navegação ‹ › e banner |
+| UTILS | ~2247 | `$()`, `$$()`, `clone()`, `round1()` |
+| CONSTANTS | ~2260 | Storage keys, defaults para settings/calc/measure |
+| EXERCISE DATABASE | ~2270 | `EXERCISE_DB` — 70 exercícios por grupo muscular |
+| CARDIO TYPES | ~2327 | `CARDIO_TYPES` — 12 tipos com kcal/min |
+| DEFAULT TEMPLATES | ~2336 | 4 templates padrão (A/B/C/Alt) |
+| FOOD DATABASE | ~2333 | `FOOD_DB` — 109 alimentos BR com macros |
+| TOAST | ~2445 | Notificações temporárias |
+| ACCORDION | ~2453 | Toggle de seções expansíveis |
+| STORAGE | ~2459 | `loadJSON()`, `saveJSON()` — wrapper localStorage |
+| DATE | ~2488 | `todayISO()`, `currentDate()`, data picker |
+| MEALS BUILD | ~2500 | Constrói grid de refeições dinamicamente |
+| UI UPDATE | ~2639 | `updateUI()` — recalcula totais, barras, KPIs |
+| HOME DASHBOARD | ~2973 | `renderHomeDashboard()` — saudação, kcal, macros, habits |
+| TABS | ~3024 | `openTab()` — troca de view + sessionStorage |
+| SETTINGS | ~3088 | Aplicar/resetar configurações de macros |
+| CALC (JP7) | ~3180 | Calculadora Jackson-Pollock 7 dobras + Siri |
+| MEASURE | ~3207 | Registro e histórico de medidas corporais |
+| SNAPSHOT | ~3390 | Fechar dia e salvar snapshot |
+| HISTORY MODAL | ~3400 | `openHistModal`, `closeHistModal`, `renderHistList` |
+| AI EXPORT | ~3440 | `AI_SYSTEM_PROMPT`, `exportAIJson()`, `copyAIPrompt()` |
+| FOOD PANEL | ~3750 | Busca, seleção, modal de alimentos |
+| TREINO PANEL | ~4000 | Estado do treino, load/save, render exercícios |
+| EXERCISE PROGRESSION MODAL | ~4400 | Modal com gráfico e tabela de evolução |
+| TEMPLATE HISTORY MODAL | ~4450 | Modal com comparação entre sessões |
+| TEMPLATE EDITOR | ~4570 | CRUD de templates de treino |
+| DAY NAVIGATION | ~4720 | `shiftDate`, `updateDayBanner` — navegação ‹ › e banner |
+| HABIT TRACKER | ~4760 | `HABITS_KEY`, `HABITS_DEF` (5 hábitos), `getWeekDates()`, `renderHabitTracker()` |
+| INIT | ~4882 | Event listeners, bootstrap — abre aba via sessionStorage |
 | INIT | ~3852 | Event listeners, bootstrap inicial |
 
 ## Modelo de dados (localStorage)
