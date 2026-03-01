@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kcalix-v1';
+const CACHE_NAME = 'kcalix-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -23,6 +23,19 @@ self.addEventListener('activate', (e) => {
     )
   );
   self.clients.claim();
+});
+
+// Notification click: focus or open the app window
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ('focus' in client) return client.focus();
+      }
+      return self.clients.openWindow('./');
+    })
+  );
 });
 
 // Fetch: network-first for HTML (always get latest), cache-first for assets

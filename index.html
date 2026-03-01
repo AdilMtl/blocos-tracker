@@ -1452,6 +1452,21 @@ tr:active { background: var(--surface2); }
 .week-meta-line { position:absolute; left:0; right:0; border-top:1.5px dashed var(--accent2); opacity:.45; pointer-events:none; z-index:2; }
 .energy-projection { font-size:11px; color:var(--text2); text-align:center; margin-top:8px; letter-spacing:.01em; }
 
+/* ── Timer de Pausa ── */
+.timer-tabs { display:flex; gap:6px; margin-bottom:12px; }
+.timer-tab-btn { flex:1; padding:8px 0; border-radius:8px; border:1.5px solid var(--border); background:transparent; color:var(--text2); font-size:13px; font-weight:600; font-family:var(--font); cursor:pointer; transition:all .15s; }
+.timer-tab-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.timer-display { text-align:center; font-size:56px; font-weight:700; letter-spacing:.03em; color:var(--text1); font-variant-numeric:tabular-nums; margin:6px 0 14px; line-height:1; transition:color .2s; }
+.timer-display.running { color:var(--accent); }
+.timer-display.finished { color:var(--accent2); }
+.timer-presets { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+.timer-preset-btn { flex:1; min-width:52px; padding:11px 4px; border-radius:10px; border:1.5px solid var(--border); background:var(--surface2); color:var(--text1); font-size:14px; font-weight:700; font-family:var(--font); cursor:pointer; text-align:center; transition:all .15s; user-select:none; }
+.timer-preset-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.timer-preset-btn:active { opacity:.7; transform:scale(.96); }
+.timer-ctrl { display:flex; gap:8px; }
+.timer-ctrl .btn { flex:1; }
+.timer-notify-hint { font-size:11px; color:var(--text3); text-align:center; margin-top:10px; min-height:16px; }
+
 /* ════════════════════ DESKTOP ════════════════════ */
 /* btn hoje */
 .btn-hoje {
@@ -2028,6 +2043,40 @@ tr:active { background: var(--surface2); }
 
         <div style="height:10px;"></div>
 
+        <!-- Timer de Pausa -->
+        <div class="accordion" id="accTimer">
+          <button class="acc-trigger" type="button" onclick="toggleAcc('accTimer')">
+            ⏱ Timer de Pausa
+            <span class="acc-chevron">▾</span>
+          </button>
+          <div class="acc-content"><div class="acc-inner">
+            <div class="timer-tabs">
+              <button class="timer-tab-btn active" id="timerTabTimer" type="button">⏱ Timer</button>
+              <button class="timer-tab-btn" id="timerTabStopwatch" type="button">⏱ Cronômetro</button>
+            </div>
+            <!-- Timer countdown -->
+            <div id="timerPanel">
+              <div class="timer-display" id="timerDisplay">1:30</div>
+              <div class="timer-presets" id="timerPresets"></div>
+              <div class="timer-ctrl">
+                <button class="btn sm ghost" id="timerBtnStop" type="button">Stop</button>
+                <button class="btn sm ghost" id="timerBtnReset" type="button">Reset</button>
+              </div>
+              <div class="timer-notify-hint" id="timerHint"></div>
+            </div>
+            <!-- Cronômetro -->
+            <div id="stopwatchPanel" style="display:none;">
+              <div class="timer-display" id="swDisplay">0:00</div>
+              <div class="timer-ctrl">
+                <button class="btn sm primary" id="swBtnStart" type="button">Iniciar</button>
+                <button class="btn sm ghost" id="swBtnReset" type="button">Reset</button>
+              </div>
+            </div>
+          </div></div>
+        </div>
+
+        <div style="height:10px;"></div>
+
         <!-- Notes -->
         <div class="form-row">
           <label>Observação do treino</label>
@@ -2292,7 +2341,8 @@ tr:active { background: var(--surface2); }
   const FOOD_LOG_KEY = "blocos_tracker_food_log_v1";
   const TREINO_KEY   = "blocos_tracker_treino_v1";
   const TREINO_TMPL_KEY = "blocos_tracker_treino_templates_v1";
-  const PRESETS_KEY     = "blocos_tracker_presets_v1";
+  const PRESETS_KEY         = "blocos_tracker_presets_v1";
+  const TIMER_PRESETS_KEY   = "blocos_tracker_timer_presets_v1";
 
   // ══════════ EXERCISE DATABASE ══════════
   const EXERCISE_DB = {
@@ -4505,6 +4555,193 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     }
   };
 
+  // ══════════ TIMER DE PAUSA ══════════
+  const DEFAULT_TIMER_PRESETS = [30, 60, 90, 120, 180];
+
+  const loadTimerPresets = () => {
+    try {
+      const saved = localStorage.getItem(TIMER_PRESETS_KEY);
+      if (saved) { const p = JSON.parse(saved); if (Array.isArray(p) && p.length > 0) return p; }
+    } catch(e) {}
+    return [...DEFAULT_TIMER_PRESETS];
+  };
+
+  const saveTimerPresets = (presets) => localStorage.setItem(TIMER_PRESETS_KEY, JSON.stringify(presets));
+
+  let timerPresets = loadTimerPresets();
+
+  let timerState = {
+    running: false, totalSecs: 90, remainSecs: 90, startedAt: null,
+    intervalId: null, notifTimeoutId: null,
+    swElapsed: 0, swRunning: false, swStartedAt: null, swIntervalId: null,
+  };
+
+  const fmtTimerSecs = (secs) => {
+    const m = Math.floor(Math.abs(secs) / 60);
+    const s = Math.abs(secs) % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const timerSetDisplay = (secs, state) => {
+    const el = $("#timerDisplay");
+    if (!el) return;
+    el.textContent = fmtTimerSecs(secs);
+    el.className = "timer-display" + (state === 'running' ? ' running' : state === 'finished' ? ' finished' : '');
+  };
+
+  const swSetDisplay = (secs) => { const el = $("#swDisplay"); if (el) el.textContent = fmtTimerSecs(secs); };
+
+  const updateTimerHint = () => {
+    const hint = $("#timerHint");
+    if (!hint) return;
+    if (!("Notification" in window)) {
+      hint.textContent = "Notificações não suportadas neste browser.";
+    } else if (Notification.permission === "granted") {
+      hint.textContent = "Notificação ativa — pode minimizar o app.";
+    } else if (Notification.permission === "denied") {
+      hint.textContent = "Notificações bloqueadas nas configurações do browser.";
+    } else {
+      hint.textContent = "";
+    }
+  };
+
+  let _notifPermAsked = false;
+  const ensureNotifPermission = async () => {
+    if (_notifPermAsked || !("Notification" in window)) return;
+    _notifPermAsked = true;
+    if (Notification.permission === "default") {
+      await Notification.requestPermission().catch(() => {});
+    }
+    updateTimerHint();
+  };
+
+  const timerFireNotification = () => {
+    if (!("Notification" in window) || Notification.permission !== "granted") return;
+    const payload = { body: "Hora da próxima série 💪", icon: "./icon-192.png", badge: "./icon-192.png", tag: "timer-end", renotify: true };
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.ready
+        .then(reg => reg.showNotification("⏱ Pausa terminada!", payload))
+        .catch(() => { try { new Notification("⏱ Pausa terminada!", payload); } catch(e) {} });
+    } else {
+      try { new Notification("⏱ Pausa terminada!", payload); } catch(e) {}
+    }
+  };
+
+  const timerStop = () => {
+    if (timerState.intervalId) { clearInterval(timerState.intervalId); timerState.intervalId = null; }
+    if (timerState.notifTimeoutId) { clearTimeout(timerState.notifTimeoutId); timerState.notifTimeoutId = null; }
+    timerState.running = false;
+    timerSetDisplay(timerState.remainSecs, '');
+    renderTimerPresets();
+  };
+
+  const timerReset = () => {
+    timerStop();
+    timerState.remainSecs = timerState.totalSecs;
+    timerSetDisplay(timerState.totalSecs, '');
+    renderTimerPresets();
+  };
+
+  const timerStart = (secs) => {
+    timerStop();
+    timerState.totalSecs = secs;
+    timerState.remainSecs = secs;
+    timerState.startedAt = Date.now();
+    timerState.running = true;
+    timerSetDisplay(secs, 'running');
+    renderTimerPresets();
+    if (timerState.notifTimeoutId) clearTimeout(timerState.notifTimeoutId);
+    timerState.notifTimeoutId = setTimeout(timerFireNotification, secs * 1000);
+    timerState.intervalId = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - timerState.startedAt) / 1000);
+      const remain = timerState.totalSecs - elapsed;
+      timerState.remainSecs = Math.max(0, remain);
+      if (remain <= 0) {
+        timerSetDisplay(0, 'finished');
+        clearInterval(timerState.intervalId);
+        timerState.intervalId = null;
+        timerState.running = false;
+        renderTimerPresets();
+      } else {
+        timerSetDisplay(remain, 'running');
+      }
+    }, 250);
+  };
+
+  const renderTimerPresets = () => {
+    const container = $("#timerPresets");
+    if (!container) return;
+    container.innerHTML = "";
+    timerPresets.forEach((secs, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "timer-preset-btn" + (timerState.running && secs === timerState.totalSecs ? " active" : "");
+      btn.textContent = fmtTimerSecs(secs);
+      btn.addEventListener("click", async () => {
+        await ensureNotifPermission();
+        timerStart(secs);
+      });
+      let longPressId = null;
+      btn.addEventListener("pointerdown", () => {
+        longPressId = setTimeout(() => {
+          longPressId = null;
+          const val = prompt(`Preset ${idx + 1} — novo tempo em segundos:`, String(secs));
+          if (val === null) return;
+          const n = parseInt(val, 10);
+          if (isNaN(n) || n < 5 || n > 3600) { showToast("Tempo inválido (5–3600s)"); return; }
+          timerPresets[idx] = n;
+          saveTimerPresets(timerPresets);
+          renderTimerPresets();
+        }, 600);
+      });
+      ["pointerup","pointerleave","pointercancel"].forEach(ev =>
+        btn.addEventListener(ev, () => { if (longPressId) { clearTimeout(longPressId); longPressId = null; } })
+      );
+      container.appendChild(btn);
+    });
+  };
+
+  // ── Cronômetro ──
+  const swStop = () => {
+    if (timerState.swIntervalId) { clearInterval(timerState.swIntervalId); timerState.swIntervalId = null; }
+    timerState.swRunning = false;
+    const btn = $("#swBtnStart"); if (btn) btn.textContent = "Iniciar";
+  };
+
+  const swReset = () => { swStop(); timerState.swElapsed = 0; swSetDisplay(0); };
+
+  const swToggle = () => {
+    if (timerState.swRunning) { swStop(); return; }
+    timerState.swRunning = true;
+    timerState.swStartedAt = Date.now() - (timerState.swElapsed * 1000);
+    const btn = $("#swBtnStart"); if (btn) btn.textContent = "Pausar";
+    timerState.swIntervalId = setInterval(() => {
+      timerState.swElapsed = Math.floor((Date.now() - timerState.swStartedAt) / 1000);
+      swSetDisplay(timerState.swElapsed);
+    }, 250);
+  };
+
+  const timerSwitchTab = (tab) => {
+    $("#timerTabTimer").className    = "timer-tab-btn" + (tab === 'timer'      ? " active" : "");
+    $("#timerTabStopwatch").className = "timer-tab-btn" + (tab === 'stopwatch' ? " active" : "");
+    $("#timerPanel").style.display      = tab === 'timer'      ? "" : "none";
+    $("#stopwatchPanel").style.display  = tab === 'stopwatch'  ? "" : "none";
+  };
+  window.timerSwitchTab = timerSwitchTab;
+
+  const initTimer = () => {
+    renderTimerPresets();
+    timerSetDisplay(timerState.totalSecs, '');
+    swSetDisplay(0);
+    updateTimerHint();
+    $("#timerTabTimer").addEventListener("click",      () => timerSwitchTab('timer'));
+    $("#timerTabStopwatch").addEventListener("click",  () => timerSwitchTab('stopwatch'));
+    $("#timerBtnStop").addEventListener("click",  timerStop);
+    $("#timerBtnReset").addEventListener("click", timerReset);
+    $("#swBtnStart").addEventListener("click",    swToggle);
+    $("#swBtnReset").addEventListener("click",    swReset);
+  };
+
   // ─── History with kcal ───
   const calcDayKcal = (day) => {
     let k = 0;
@@ -5207,6 +5444,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     $("#tabMais").addEventListener("click", () => openTab("mais"));
 
     // treino
+    initTimer();
     $("#btnSaveTreino").addEventListener("click", saveTreino);
     $("#btnAddCardio").addEventListener("click", () => {
       treinoState.cardio.push({ tipo: "bicicleta", minutos: 15 });
