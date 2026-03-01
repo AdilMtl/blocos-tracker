@@ -3879,7 +3879,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
         const totalP = round1(meals.reduce((s, m) => s + m.p, 0));
         const totalC = round1(meals.reduce((s, m) => s + m.c, 0));
         const totalG = round1(meals.reduce((s, m) => s + m.g, 0));
-        const totalKcal = Math.round(totalP * bP * 4 + totalC * bC * 4 + totalG * bG * 9);
+        const totalKcal = Math.round(totalP * (settings.kcalPerBlock.p || 0) + totalC * (settings.kcalPerBlock.c || 0) + totalG * (settings.kcalPerBlock.g || 0));
         return {
           date, totalP, totalC, totalG, totalKcal,
           adherenceP: goalBP ? Math.round(totalP / goalBP * 100) : null,
@@ -5438,6 +5438,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     $("#btnSave").addEventListener("click", () => {
       syncFromInputsToState();
       saveJSON(STORAGE_KEY, data);
+      saveJSON(FOOD_LOG_KEY, foodLog);
       updateUI();
       showToast("Salvo ✅");
       // auto-check hábitos (só para o dia de hoje)
@@ -5447,7 +5448,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
         const t = totals();
         const kcal = Math.round(t.p*(settings.kcalPerBlock.p||0) + t.c*(settings.kcalPerBlock.c||0) + t.g*(settings.kcalPerBlock.g||0));
         const kcalGoal = settings.goals.kcal || 0;
-        if (kcal > 0 && kcalGoal > 0 && kcal <= kcalGoal) autoCheckHabit('dieta');
+        if ((jant.p + jant.c + jant.g) > 0 && kcal > 0 && kcalGoal > 0 && kcal <= kcalGoal) autoCheckHabit('dieta');
       }
     });
 
