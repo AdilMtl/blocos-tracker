@@ -376,6 +376,7 @@ body::after {
   transition: max-height .3s ease;
 }
 .accordion.open .acc-content { max-height: 3000px; }
+#accAlimentos.open > .acc-content { max-height: 9000px; }
 .acc-inner { padding: 0 14px 14px; }
 
 /* ════════════════════ KPI / PROGRESS ════════════════════ */
@@ -988,12 +989,45 @@ tr:active { background: var(--surface2); }
   font-family: var(--font);
 }
 .qty-btn:active { transform: scale(.92); }
+.qty-btn.qty-sm {
+  width: 40px; height: 40px;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
 .qty-display {
   flex: 1;
   text-align: center;
   font-size: 28px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+}
+.qty-input {
+  flex: 1;
+  text-align: center;
+  font-size: 26px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  background: var(--surface2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 4px 6px;
+  font-family: var(--font);
+  min-width: 0;
+  -moz-appearance: textfield;
+}
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.qty-input:focus { border-color: rgba(124,92,255,.4); outline: none; }
+.acc-sub {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: 8px;
+  margin-bottom: 2px;
+  color: var(--text2);
 }
 .qty-label {
   text-align: center;
@@ -1733,64 +1767,71 @@ tr:active { background: var(--surface2); }
 
         <div class="status-pills" id="statusBadges"></div>
 
+        <!-- ─── Adicionar alimentos ─── -->
+        <div class="accordion" id="accAlimentos" style="margin-top:4px;border-top:1px solid var(--line);padding-top:4px;">
+          <button class="acc-trigger" type="button" onclick="toggleAcc('accAlimentos'); renderFoodPanel();">
+            🍽️ Adicionar alimentos
+            <span class="acc-chevron">▾</span>
+          </button>
+          <div class="acc-content"><div class="acc-inner" style="padding:0 0 4px;">
+
+            <!-- Sub: Buscar alimento -->
+            <div class="accordion" id="accFoodSearch">
+              <button class="acc-trigger acc-sub" type="button" onclick="toggleAcc('accFoodSearch')">
+                🔍 Buscar alimento
+                <span class="acc-chevron">▾</span>
+              </button>
+              <div class="acc-content"><div class="acc-inner">
+                <div class="food-search-wrap">
+                  <span class="food-search-icon">🔍</span>
+                  <input class="food-search" id="foodSearch" type="text" placeholder="Buscar alimento..." autocomplete="off" />
+                </div>
+                <div class="cat-tabs" id="catTabs"></div>
+                <div class="food-grid" id="foodGrid"></div>
+              </div></div>
+            </div>
+
+            <!-- Sub: Adicionados hoje -->
+            <div class="accordion" id="accFoodLog">
+              <button class="acc-trigger acc-sub" type="button" onclick="toggleAcc('accFoodLog')">
+                📋 Adicionados hoje — <span id="foodLogCount">0 itens</span>
+                <span class="acc-chevron">▾</span>
+              </button>
+              <div class="acc-content"><div class="acc-inner">
+                <div class="food-log" id="foodLog"></div>
+              </div></div>
+            </div>
+
+            <!-- Sub: Alimento personalizado -->
+            <div class="accordion" id="accCustomFood">
+              <button class="acc-trigger acc-sub" type="button" onclick="toggleAcc('accCustomFood')">
+                ➕ Alimento personalizado
+                <span class="acc-chevron">▾</span>
+              </button>
+              <div class="acc-content"><div class="acc-inner">
+                <div class="custom-food-form">
+                  <div class="form-grid cols-2">
+                    <div class="form-row"><label>Nome</label><input id="cfName" placeholder="Ex: Barra de cereal" /></div>
+                    <div class="form-row"><label>Porção</label><input id="cfPortion" placeholder="Ex: 1 un (25g)" /></div>
+                    <div class="form-row"><label>Proteína (g)</label><input id="cfP" inputmode="decimal" placeholder="0" /></div>
+                    <div class="form-row"><label>Carbo (g)</label><input id="cfC" inputmode="decimal" placeholder="0" /></div>
+                    <div class="form-row"><label>Gordura (g)</label><input id="cfG" inputmode="decimal" placeholder="0" /></div>
+                    <div class="form-row"><label>kcal</label><input id="cfKcal" inputmode="decimal" placeholder="0" /></div>
+                  </div>
+                  <div class="btn-group" style="margin-top:4px;">
+                    <button class="btn sm primary" id="btnAddCustomFood" type="button">Salvar alimento</button>
+                  </div>
+                </div>
+              </div></div>
+            </div>
+
+          </div></div>
+        </div>
+
         <div style="height:12px"></div>
 
         <!-- Meals -->
         <div class="meal-list" id="mealList"></div>
-      </div>
-    </div>
-
-    <!-- ─── Alimentos (embutido no Diário) ─── -->
-    <div class="card">
-      <div class="accordion" id="accAlimentos">
-        <button class="acc-trigger" type="button" onclick="toggleAcc('accAlimentos'); renderFoodPanel();">
-          🍽️ Alimentos
-          <span class="acc-chevron">▾</span>
-        </button>
-        <div class="acc-content"><div class="acc-inner">
-
-          <div class="food-search-wrap">
-            <span class="food-search-icon">🔍</span>
-            <input class="food-search" id="foodSearch" type="text" placeholder="Buscar alimento..." autocomplete="off" />
-          </div>
-          <div class="cat-tabs" id="catTabs"></div>
-          <div class="food-grid" id="foodGrid"></div>
-
-          <div style="height:16px"></div>
-
-          <div class="card-header" style="padding:0 0 8px;">
-            <div class="ch-info">
-              <b>📋 Adicionados hoje</b>
-              <span id="foodLogCount">0 itens</span>
-            </div>
-          </div>
-          <div class="food-log" id="foodLog"></div>
-
-          <div style="height:16px"></div>
-
-          <div class="accordion" id="accCustomFood">
-            <button class="acc-trigger" type="button" onclick="toggleAcc('accCustomFood')">
-              ➕ Alimento personalizado
-              <span class="acc-chevron">▾</span>
-            </button>
-            <div class="acc-content"><div class="acc-inner">
-              <div class="custom-food-form">
-                <div class="form-grid cols-2">
-                  <div class="form-row"><label>Nome</label><input id="cfName" placeholder="Ex: Barra de cereal" /></div>
-                  <div class="form-row"><label>Porção</label><input id="cfPortion" placeholder="Ex: 1 un (25g)" /></div>
-                  <div class="form-row"><label>Proteína (g)</label><input id="cfP" inputmode="decimal" placeholder="0" /></div>
-                  <div class="form-row"><label>Carbo (g)</label><input id="cfC" inputmode="decimal" placeholder="0" /></div>
-                  <div class="form-row"><label>Gordura (g)</label><input id="cfG" inputmode="decimal" placeholder="0" /></div>
-                  <div class="form-row"><label>kcal</label><input id="cfKcal" inputmode="decimal" placeholder="0" /></div>
-                </div>
-                <div class="btn-group" style="margin-top:4px;">
-                  <button class="btn sm primary" id="btnAddCustomFood" type="button">Salvar alimento</button>
-                </div>
-              </div>
-            </div></div>
-          </div>
-
-        </div></div>
       </div>
     </div>
   </div>
@@ -2255,9 +2296,11 @@ tr:active { background: var(--surface2); }
   <div class="modal-body">
     <div class="qty-label" id="fmPortion">—</div>
     <div class="qty-row">
-      <button class="qty-btn" id="fmMinus" type="button">−</button>
-      <div class="qty-display" id="fmQty">1</div>
-      <button class="qty-btn" id="fmPlus" type="button">+</button>
+      <button class="qty-btn qty-sm" id="fmMinus5" type="button">−.5</button>
+      <button class="qty-btn qty-sm" id="fmMinus1" type="button">−.1</button>
+      <input class="qty-input" id="fmQty" type="number" min="0.1" step="0.1" inputmode="decimal" value="1" />
+      <button class="qty-btn qty-sm" id="fmPlus1" type="button">+.1</button>
+      <button class="qty-btn qty-sm" id="fmPlus5" type="button">+.5</button>
     </div>
     <div class="modal-macros">
       <div class="mm-box mmp"><div class="mm-val" id="fmP">0</div><div class="mm-lbl">Prot</div></div>
@@ -4251,9 +4294,12 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
 
   const updateModalUI = () => {
     if(!modalFood) return;
+    const qtyEl = $("#fmQty");
     $("#fmName").textContent = modalFood.nome;
     $("#fmPortion").textContent = `${modalFood.porcao} × ${modalQty}`;
-    $("#fmQty").textContent = modalQty % 1 === 0 ? modalQty : modalQty.toFixed(1);
+    if(document.activeElement !== qtyEl) {
+      qtyEl.value = round1(modalQty) % 1 === 0 ? round1(modalQty).toString() : round1(modalQty).toFixed(1);
+    }
 
     const calc = foodToBlocks(modalFood, modalQty);
     $("#fmP").textContent = calc.pG.toFixed(1) + "g";
@@ -5528,11 +5574,21 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     });
     $("#foodModalOverlay").addEventListener("click", closeFoodModal);
     $("#fmClose").addEventListener("click", closeFoodModal);
-    $("#fmMinus").addEventListener("click", () => {
-      if(modalQty > 0.5) { modalQty = round1(modalQty - 0.5); updateModalUI(); }
+    $("#fmMinus5").addEventListener("click", () => {
+      modalQty = round1(Math.max(0.1, modalQty - 0.5)); updateModalUI();
     });
-    $("#fmPlus").addEventListener("click", () => {
+    $("#fmMinus1").addEventListener("click", () => {
+      modalQty = round1(Math.max(0.1, modalQty - 0.1)); updateModalUI();
+    });
+    $("#fmPlus1").addEventListener("click", () => {
+      modalQty = round1(modalQty + 0.1); updateModalUI();
+    });
+    $("#fmPlus5").addEventListener("click", () => {
       modalQty = round1(modalQty + 0.5); updateModalUI();
+    });
+    $("#fmQty").addEventListener("input", () => {
+      const v = parseFloat($("#fmQty").value);
+      if(!isNaN(v) && v >= 0.1) { modalQty = round1(v); updateModalUI(); }
     });
     $("#fmAdd").addEventListener("click", addFoodToMeal);
     $("#btnAddCustomFood").addEventListener("click", addCustomFood);
