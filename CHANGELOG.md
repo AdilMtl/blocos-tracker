@@ -5,6 +5,32 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v1.8.0] — 2026-03-01
+
+### Adicionado
+- [feat] **Timer de Pausa** no viewTreino — accordion "⏱ Timer de Pausa" com:
+  - 5 presets configuráveis (padrão: 30s · 1:00 · 1:30 · 2:00 · 3:00) salvos em `blocos_tracker_timer_presets_v1`
+  - Um toque no preset seleciona e inicia imediatamente
+  - Long press (600ms) no preset abre edição inline (prompt)
+  - Botões Stop e Reset
+  - Display grande MM:SS com estado visual (branco → verde rodando → roxo finalizado)
+- [feat] **Notificação nativa** ao fim da pausa — funciona com o app minimizado (Android Chrome e iOS PWA instalada ≥ 16.4)
+  - Permissão solicitada uma vez no primeiro uso; timer funciona normalmente se negada
+  - Clicar na notificação foca/abre o app via `notificationclick` no Service Worker
+- [feat] **Cronômetro** (conta pra cima) — aba secundária dentro do mesmo accordion, start/pause/reset
+- [feat] **sw.js**: handler `notificationclick` para focar janela existente ou abrir nova
+
+### Técnico
+- `CACHE_NAME`: `kcalix-v1` → `kcalix-v2` (bump obrigatório pela mudança no sw.js)
+- `setTimeout` usa `Date.now()` como referência (sem drift acumulado em background)
+- Nova chave localStorage: `blocos_tracker_timer_presets_v1` (array de inteiros em segundos)
+
+### Notas
+- **iOS sem PWA instalada**: notificações não funcionam no Safari sem instalar o app na tela inicial — limitação da plataforma Apple.
+- localStorage: nenhuma chave existente alterada; dados de treino intactos.
+
+---
+
 ## [v1.7.0] — 2026-03-01
 
 ### Adicionado
