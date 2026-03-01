@@ -5,6 +5,30 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v1.8.3] — 2026-03-01
+
+### Adicionado
+- [feat] **Banner de instalação PWA** fixo acima da bottom-nav:
+  - **iOS Safari**: instrução manual "Compartilhar → Adicionar à Tela de Início"
+  - **Android Chrome**: captura `beforeinstallprompt` e exibe botão "Instalar" com prompt nativo
+  - Dismiss via ✕ salvo em `blocos_tracker_pwa_dismissed` (não reaparece)
+  - Esconde automaticamente via evento `appinstalled`
+  - Touch targets dos botões ≥ 40px
+
+### Corrigido
+- [fix] **manifest.json**: `scope` e `start_url` agora absolutos (`/blocos-tracker/`) — resolve abertura em modo browser em vez de standalone no iOS
+- [fix] **manifest.json**: `"purpose": "any maskable"` separado em duas entradas distintas — compatibilidade com validadores iOS/Safari
+- [fix] **`apple-mobile-web-app-title`**: "Blocos" → "Kcal.ix"
+- [fix] **Diet auto-check**: hábito "dieta" agora só é marcado automaticamente se jantar estiver preenchido (indica fim do dia) — antes disparava pela manhã com qualquer valor ≤ meta
+- [fix] **Export JSON IA**: `totalKcal` em `nutrition.days` usa `settings.kcalPerBlock` (idêntico ao app) em vez de `blocks.pG × 4` — elimina divergência em configs personalizadas
+- [fix] **`btnSave`**: agora persiste `foodLog` explicitamente junto com `data` — eliminava risco de perda do log de alimentos após reload sem autosave
+
+### Notas
+- **Para testar**: validar banner iOS e fluxo de instalação em device real (iPhone)
+- localStorage: nenhuma chave alterada; nova chave: `blocos_tracker_pwa_dismissed`
+
+---
+
 ## [v1.8.0] — 2026-03-01
 
 ### Adicionado
