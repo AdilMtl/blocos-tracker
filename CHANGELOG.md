@@ -5,6 +5,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v1.10.3] — 2026-03-02
+
+### Adicionado
+- [feat] **Modal de histórico semanal**: botão "📊 histórico" no canto superior direito do card "Últimos 7 dias" na Home. Abre bottom sheet com gráfico de barras e projeção de qualquer semana passada. Navegação ‹/› entre semanas, botão › desabilitado na semana atual.
+
+### Corrigido
+- [fix] **Barras do gráfico semanal desproporcionais**: `total` passou a usar `bmr + exercise` em vez de `tdee + exercise`. TDEE (BMR × fator de atividade) somado ao treino duplicava o gasto — barra cinza ficava muito alta em relação ao consumido.
+- [fix] **Projeção semanal não aparecia**: threshold reduzido de `>= 3` para `>= 2` dias com `balance != null`. Com a correção anterior do balance (que passou a exigir `consumed > 0`), o início de semana nunca atingia 3 dias.
+- [fix] **Fundo transparente no modal de histórico**: variável CSS `--surface1` não existe no projeto; substituída por `linear-gradient(180deg, #1a2035, #121828)` (padrão do `.modal-sheet`).
+
+### Notas técnicas
+- `total` e `basalTotal` são agora o mesmo valor (`bmr + exercise`); `tdee` ainda é calculado e retornado no objeto de `getEnergyForDate()` mas não é usado nos renderers.
+- CACHE_NAME bumped: `kcalix-v4` → `kcalix-v5`.
+- **Próxima feature planejada (v1.11.0)**: objetivos de dieta inteligentes — seletor cut/bulk/recomp/maintain com presets baseados em evidência científica. Spec em `memory/algoritmo-consulta-nutricional.md`. Aguarda JSON de pesquisa científica para implementação.
+
+---
+
 ## [v1.10.2] — 2026-03-02
 
 ### Melhorado
