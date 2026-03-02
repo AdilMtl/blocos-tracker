@@ -5,6 +5,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v1.10.1] — 2026-03-01
+
+### Melhorado
+- [improve] **Botão "Adicionar alimentos"**: trocado de `acc-trigger` para `btn ghost` full-width — visual consistente com demais botões do app (borda visível, min-height 44px, anima ao toque)
+- [improve] **Lista "Adicionados hoje"**: `max-height` expandida de `33vh` para `50vh` — mais itens visíveis antes de precisar de scroll
+- [improve] **X de limpar busca centralizado**: padding do `.fd-search-wrap` ajustado de `12px 12px 0` para `10px 12px` (simétrico) — ícone e botão ✕ alinhados ao centro do campo
+
+### Documentação
+- [docs] **SPEC - Implementar AI.md**: guia completo para gerar especificação técnica de AI Agent nutricional (Estágio 1 consultivo + Estágio 2 agêntico) incluindo instruções de implementação para vibe-coder (API keys, hosting, banco de dados, passo a passo por fase)
+
+---
+
 ## [v1.10.0] — 2026-03-01
 
 ### Adicionado
