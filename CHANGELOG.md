@@ -5,6 +5,39 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v1.10.0] — 2026-03-01
+
+### Adicionado
+- [feat] **Tab "Recentes" no Food Drawer**: exibe os últimos 10 alimentos únicos adicionados (por `foodId`, ordem cronológica desc via campo `at`). Só aparece se houver histórico no `foodLog`.
+- [feat] **Botão ✕ para limpar busca**: aparece dentro do campo de pesquisa quando há texto digitado — limpa instantaneamente sem precisar apagar manualmente.
+- [feat] **21 novos alimentos no FOOD_DB** distribuídos em 7 categorias:
+  - 🍞 Pães: Biscoito de arroz
+  - 🥩 Carnes: Sobrecoxa assada (s/ pele), Frango desfiado c/ molho tomate
+  - 🥤 Proteicos: Nestlé/Nutren Whey, Piracajuba Whey, Not Shake (choc + morango), Leite de soja (original + zero), Leite de amêndoas, Queijo Cottage
+  - 🥜 Oleaginosas: Amêndoas torradas (com sal), Mix de castanhas e sementes
+  - 🍫 Doces: Biscoito Jasmine S/ Açúcar, Biscoito Nesfit, Bolo de fubá, Bolo aveia/banana/passas S/ Açúcar
+  - 🍔 Fast-food: Sanduíche de Frango Empanado, Nuggets assado (airfryer/forno)
+  - 🍌 Frutas: Pitaya, Mirtilo (Blueberry)
+
+### Melhorado
+- [improve] **Food Panel Drawer**: seção "Adicionar alimentos" do Diário completamente redesenhada.
+  - Substitui os 3 sub-accordions aninhados (`#accFoodSearch`, `#accFoodLog`, `#accCustomFood`) por um **bottom sheet fixo de 88dvh** com animação slide-up
+  - Layout: header fixo → busca → tabs → grid scrollável (`flex:1`) → botão "personalizado" sticky → peek "adicionados hoje"
+  - Grid de alimentos limitado à área do drawer — página não rola mais enquanto lista cresce
+- [improve] **"Adicionados hoje" como peek expansível**: barra fixa de 44px na base do drawer com contagem dinâmica. Toque expande até `max-height: 33vh` com lista scrollável. Colapsa/expande sem fechar o drawer.
+- [improve] **"Alimento personalizado" em mini-modal**: botão sempre visível na última linha do drawer. Ao clicar, abre modal dedicado (z-index 321) com o mesmo formulário de 6 campos — sem precisar rolar o drawer.
+
+### Corrigido
+- [fix] **Z-index do modal de porção**: `#foodModal` estava em z-index 301, abaixo do drawer (311) — o modal de porção abria invisível. Corrigido com inline `z-index: 316` (overlay: 315).
+- [fix] **`window.openFoodDrawer` não exposto**: função definida dentro do IIFE não era acessível pelo atributo `onclick` inline. Adicionado `window.openFoodDrawer = openFoodDrawer`.
+
+### Notas
+- `sw.js`: CACHE_NAME `kcalix-v3` → `kcalix-v4` — força reload do cache nos usuários existentes
+- Nenhuma chave de localStorage alterada — dados do usuário preservados
+- `renderFoodPanel` mantido como alias de `renderFoodDrawer` para compatibilidade interna
+
+---
+
 ## [v1.9.0] — 2026-03-01
 
 ### Melhorado
