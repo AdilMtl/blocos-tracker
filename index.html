@@ -3380,7 +3380,8 @@ tr:active { background: var(--surface2); }
 
     const tdee     = bmr != null ? Math.round(bmr * (calc.activity || 1.55)) : null;
     const exercise = Math.round((treinoData.days[date] || {}).kcal || 0);
-    const total    = tdee != null ? tdee + exercise : null;
+    // Balanço usa BMR puro + treino logado (tdee fica só p/ referência no calculador)
+    const total    = bmr != null ? bmr + exercise : null;
     const balance  = (consumed > 0 && total != null) ? consumed - total : null;
     return { consumed, bmr, tdee, exercise, total, balance };
   };
@@ -3420,8 +3421,8 @@ tr:active { background: var(--surface2); }
           <span class="energy-kpi-label">kcal in</span>
         </div>
         <div class="energy-kpi">
-          <span class="energy-kpi-val">${e.tdee ?? "—"}</span>
-          <span class="energy-kpi-label">gasto</span>
+          <span class="energy-kpi-val">${e.bmr ?? "—"}</span>
+          <span class="energy-kpi-label">basal</span>
         </div>
         <div class="energy-kpi">
           <span class="energy-kpi-val">${e.exercise > 0 ? "+"+e.exercise : e.exercise}</span>
