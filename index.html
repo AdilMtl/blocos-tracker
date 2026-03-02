@@ -662,6 +662,22 @@ body::after {
   letter-spacing: 0.5px;
   margin-bottom: 8px;
 }
+.nutri-banner {
+  border-radius: var(--radius-xs);
+  padding: 9px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.nutri-banner-ok {
+  background: rgba(34,197,94,.08);
+  border: 1px solid rgba(34,197,94,.2);
+  color: var(--text2);
+}
+.nutri-banner-warn {
+  background: rgba(251,191,36,.08);
+  border: 1px solid rgba(251,191,36,.25);
+  color: var(--text2);
+}
 
 /* ════════════════════ FORM ELEMENTS ════════════════════ */
 .form-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
@@ -3615,7 +3631,7 @@ tr:active { background: var(--surface2); }
     sessionStorage.setItem('kcalix_tab', which);
 
     if(!datePick.value) datePick.value = todayISO();
-    if(which === "mais") { fillSettingsForm(); fillCalcForm(); }
+    if(which === "mais") { fillSettingsForm(); fillCalcForm(); renderNutriBanner(); }
     if(which === "corpo") fillMeasureFormForDate(currentDate());
     if(which === "treino") renderTreinoPanel();
     if(which === "diario") renderFoodPanel();
@@ -3625,11 +3641,49 @@ tr:active { background: var(--surface2); }
   window.openTab = openTab;
 
   // ══════════ SETTINGS ══════════
+  const updateKcalFromMacros = () => {
+    const p = parseFloat($("#setGoalP").value) || 0;
+    const c = parseFloat($("#setGoalC").value) || 0;
+    const g = parseFloat($("#setGoalG").value) || 0;
+    const kcal = Math.round(p * 4 + c * 4 + g * 9);
+    $("#setGoalKcal").value = kcal > 0 ? kcal : "";
+  };
+
+  const renderNutriBanner = () => {
+    const el = $("#nutriBanner");
+    if (!el) return;
+    if (localStorage.getItem(CALC_KEY) === null) {
+      el.innerHTML = `<div class="nutri-banner nutri-banner-warn">⚠️ Configure seu perfil na calculadora abaixo para ver análise energética.</div>`;
+      return;
+    }
+    const c = calc;
+    const sf = c.skinfolds || {};
+    const sum7 = (sf.chest||0)+(sf.ax||0)+(sf.tri||0)+(sf.sub||0)+(sf.ab||0)+(sf.sup||0)+(sf.th||0);
+    let leanKg = null, bf = null, bmr = null;
+    if (c.age > 0 && sum7 > 0) {
+      const bd = bodyDensityJP7(c.sex, c.age, sum7);
+      bf = bfSiri(bd);
+      if (Number.isFinite(bf) && bf > 0 && c.weightKg > 0) {
+        leanKg = c.weightKg - (c.weightKg * (bf / 100));
+      }
+    }
+    if (leanKg != null && leanKg > 0) bmr = Math.round(bmrKatch(leanKg));
+    else if (c.weightKg > 0 && c.heightCm > 0 && c.age > 0) bmr = Math.round(bmrMifflin(c.sex, c.weightKg, c.heightCm, c.age));
+    if (bmr === null) {
+      el.innerHTML = `<div class="nutri-banner nutri-banner-warn">⚠️ Dados incompletos — preencha peso, altura e idade na calculadora abaixo.</div>`;
+      return;
+    }
+    const sexLabel = c.sex === "male" ? "♂" : "♀";
+    const bfPart  = (bf != null && Number.isFinite(bf)) ? ` · BF% ${bf.toFixed(1)}` : "";
+    const lmPart  = leanKg != null ? ` · Magra ${leanKg.toFixed(1)}kg` : "";
+    el.innerHTML = `<div class="nutri-banner nutri-banner-ok">🔥 BMR ${bmr} kcal${bfPart}${lmPart} · ${sexLabel} ${c.age}a · ${c.weightKg}kg</div>`;
+  };
+
   const fillSettingsForm = () => {
     $("#setGoalP").value = settings.goals.pG;
     $("#setGoalC").value = settings.goals.cG;
     $("#setGoalG").value = settings.goals.gG;
-    $("#setGoalKcal").value = settings.goals.kcal;
+    updateKcalFromMacros();
     $("#setPBlockG").value = settings.blocks.pG;
     $("#setCBlockG").value = settings.blocks.cG;
     $("#setGBlockG").value = settings.blocks.gG;
@@ -5894,9 +5948,14 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     $("#btnApplyBlockConfig").addEventListener("click", applySettingsFromForm);
     $("#btnResetSettings").addEventListener("click", resetSettings);
 
+    // kcal auto-calc ao digitar macros
+    ["setGoalP","setGoalC","setGoalG"].forEach(id =>
+      $("#" + id).addEventListener("input", updateKcalFromMacros)
+    );
+
     // calc
-    $("#btnCalcRun").addEventListener("click", () => { calcAll(); showToast("Calculado ✅"); });
-    $("#btnCalcSave").addEventListener("click", () => { calcAll(); showToast("Parâmetros salvos 💾"); });
+    $("#btnCalcRun").addEventListener("click", () => { calcAll(); renderNutriBanner(); showToast("Calculado ✅"); });
+    $("#btnCalcSave").addEventListener("click", () => { calcAll(); renderNutriBanner(); showToast("Parâmetros salvos 💾"); });
 
     // ai export
     $("#btnExportAI").addEventListener("click", exportAIJson);
@@ -5913,7 +5972,8 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       settings.goals.gG = Math.round(r.fatG);
       settings.goals.kcal = Math.round(r.kcalTarget);
       saveJSON(SETTINGS_KEY, settings);
-      showToast("Metas enviadas ⚙️✅");
+      fillSettingsForm();
+      showToast("Metas aplicadas ✅");
     });
 
     $("#btnSendToMeasure").addEventListener("click", () => {
@@ -5951,7 +6011,14 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
 
     // init calc/measures/food/treino (sem abrir tabs ainda)
     fillCalcForm();
+    fillSettingsForm();
     try{ calcAll(); }catch(e){}
+    renderNutriBanner();
+    // primeiro acesso: abre calculadora automaticamente
+    if (localStorage.getItem(CALC_KEY) === null) {
+      const accCalc = $("#accCalcFull");
+      if (accCalc && !accCalc.classList.contains("open")) toggleAcc("accCalcFull");
+    }
     fillMeasureFormForDate(currentDate());
     renderFoodPanel();
     treinoLoaded = false;
