@@ -376,7 +376,7 @@ body::after {
   transition: max-height .3s ease;
 }
 .accordion.open .acc-content { max-height: 3000px; }
-#accAlimentos.open > .acc-content { max-height: 9000px; }
+
 .acc-inner { padding: 0 14px 14px; }
 
 /* ════════════════════ KPI / PROGRESS ════════════════════ */
@@ -878,6 +878,184 @@ tr:active { background: var(--surface2); }
   padding: 24px 12px;
   color: var(--text3);
   font-size: 12px;
+}
+
+/* ════════════════════ FOOD DRAWER ════════════════════ */
+.food-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 310;
+  background: rgba(0,0,0,.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
+.food-drawer-overlay.open { opacity: 1; pointer-events: auto; }
+
+.food-drawer {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 311;
+  max-width: 600px;
+  margin: 0 auto;
+  height: 88dvh;
+  background: linear-gradient(180deg, #1a2035, #121828);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(100%);
+  transition: transform .3s cubic-bezier(.32,.72,0,1);
+}
+.food-drawer.open { transform: translateY(0); }
+
+.fd-handle {
+  width: 36px; height: 4px;
+  background: rgba(255,255,255,.15);
+  border-radius: 999px;
+  margin: 10px auto 6px;
+  flex-shrink: 0;
+}
+
+.fd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 16px 12px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.fd-header b { font-size: 15px; }
+
+.fd-search-wrap {
+  position: relative;
+  padding: 12px 12px 0;
+  flex-shrink: 0;
+}
+.fd-search {
+  width: 100%;
+  padding: 12px 40px 12px 38px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: rgba(0,0,0,.15);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color .2s;
+  box-sizing: border-box;
+}
+.fd-search:focus { border-color: rgba(124,92,255,.4); }
+.fd-search::placeholder { color: var(--text3); }
+.fd-search-icon {
+  position: absolute;
+  left: 24px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--text3);
+  pointer-events: none;
+}
+.fd-search-clear {
+  position: absolute;
+  right: 24px; top: 50%;
+  transform: translateY(-50%);
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,.1);
+  color: var(--text2);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.fd-search-clear.visible { opacity: 1; pointer-events: auto; }
+
+.fd-cat-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px 12px 6px;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.fd-cat-tabs::-webkit-scrollbar { display: none; }
+
+.fd-grid {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fd-custom-row {
+  flex-shrink: 0;
+  padding: 10px 12px;
+  border-top: 1px solid var(--line);
+}
+.fd-custom-btn {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed rgba(124,92,255,.4);
+  background: rgba(124,92,255,.06);
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .15s;
+}
+.fd-custom-btn:active { background: rgba(124,92,255,.15); }
+
+.fd-peek {
+  flex-shrink: 0;
+  border-top: 1px solid var(--line);
+  max-height: 44px;
+  overflow: hidden;
+  transition: max-height .3s ease;
+}
+.fd-peek.open { max-height: 33vh; }
+
+.fd-peek-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  height: 44px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+.fd-peek-header b { font-size: 13px; color: var(--text2); }
+.fd-peek-chevron {
+  font-size: 12px;
+  color: var(--text3);
+  transition: transform .25s ease;
+}
+.fd-peek.open .fd-peek-chevron { transform: rotate(180deg); }
+
+.fd-log {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 /* ═══ FOOD MODAL (bottom sheet) ═══ */
@@ -1768,64 +1946,11 @@ tr:active { background: var(--surface2); }
         <div class="status-pills" id="statusBadges"></div>
 
         <!-- ─── Adicionar alimentos ─── -->
-        <div class="accordion" id="accAlimentos" style="margin-top:4px;border-top:1px solid var(--line);padding-top:4px;">
-          <button class="acc-trigger" type="button" onclick="toggleAcc('accAlimentos'); renderFoodPanel();">
+        <div style="margin-top:4px;border-top:1px solid var(--line);padding-top:4px;">
+          <button class="acc-trigger" type="button" onclick="openFoodDrawer()">
             🍽️ Adicionar alimentos
-            <span class="acc-chevron">▾</span>
+            <span style="margin-left:auto;font-size:14px;color:var(--text3);">▸</span>
           </button>
-          <div class="acc-content"><div class="acc-inner" style="padding:0 0 4px;">
-
-            <!-- Sub: Buscar alimento -->
-            <div class="accordion" id="accFoodSearch">
-              <button class="acc-trigger acc-sub" type="button" onclick="toggleAcc('accFoodSearch')">
-                🔍 Buscar alimento
-                <span class="acc-chevron">▾</span>
-              </button>
-              <div class="acc-content"><div class="acc-inner">
-                <div class="food-search-wrap">
-                  <span class="food-search-icon">🔍</span>
-                  <input class="food-search" id="foodSearch" type="text" placeholder="Buscar alimento..." autocomplete="off" />
-                </div>
-                <div class="cat-tabs" id="catTabs"></div>
-                <div class="food-grid" id="foodGrid"></div>
-              </div></div>
-            </div>
-
-            <!-- Sub: Adicionados hoje -->
-            <div class="accordion" id="accFoodLog">
-              <button class="acc-trigger acc-sub" type="button" onclick="toggleAcc('accFoodLog')">
-                📋 Adicionados hoje — <span id="foodLogCount">0 itens</span>
-                <span class="acc-chevron">▾</span>
-              </button>
-              <div class="acc-content"><div class="acc-inner">
-                <div class="food-log" id="foodLog"></div>
-              </div></div>
-            </div>
-
-            <!-- Sub: Alimento personalizado -->
-            <div class="accordion" id="accCustomFood">
-              <button class="acc-trigger acc-sub" type="button" onclick="toggleAcc('accCustomFood')">
-                ➕ Alimento personalizado
-                <span class="acc-chevron">▾</span>
-              </button>
-              <div class="acc-content"><div class="acc-inner">
-                <div class="custom-food-form">
-                  <div class="form-grid cols-2">
-                    <div class="form-row"><label>Nome</label><input id="cfName" placeholder="Ex: Barra de cereal" /></div>
-                    <div class="form-row"><label>Porção</label><input id="cfPortion" placeholder="Ex: 1 un (25g)" /></div>
-                    <div class="form-row"><label>Proteína (g)</label><input id="cfP" inputmode="decimal" placeholder="0" /></div>
-                    <div class="form-row"><label>Carbo (g)</label><input id="cfC" inputmode="decimal" placeholder="0" /></div>
-                    <div class="form-row"><label>Gordura (g)</label><input id="cfG" inputmode="decimal" placeholder="0" /></div>
-                    <div class="form-row"><label>kcal</label><input id="cfKcal" inputmode="decimal" placeholder="0" /></div>
-                  </div>
-                  <div class="btn-group" style="margin-top:4px;">
-                    <button class="btn sm primary" id="btnAddCustomFood" type="button">Salvar alimento</button>
-                  </div>
-                </div>
-              </div></div>
-            </div>
-
-          </div></div>
         </div>
 
         <div style="height:12px"></div>
@@ -2284,10 +2409,60 @@ tr:active { background: var(--surface2); }
 
 </div><!-- /app -->
 
+<!-- ═══════════════ FOOD DRAWER ═══════════════ -->
+<div class="food-drawer-overlay" id="foodDrawerOverlay"></div>
+<div class="food-drawer" id="foodDrawer">
+  <div class="fd-handle"></div>
+  <div class="fd-header">
+    <b>🍽️ Adicionar alimentos</b>
+    <button class="modal-close" id="fdClose" type="button">✕</button>
+  </div>
+  <div class="fd-search-wrap">
+    <span class="fd-search-icon">🔍</span>
+    <input class="fd-search" id="fdSearch" type="text" placeholder="Buscar alimento..." autocomplete="off" />
+    <button class="fd-search-clear" id="fdClear" type="button">✕</button>
+  </div>
+  <div class="fd-cat-tabs" id="fdCatTabs"></div>
+  <div class="fd-grid" id="fdGrid"></div>
+  <div class="fd-custom-row">
+    <button class="fd-custom-btn" id="fdCustomBtn" type="button">➕ Criar alimento personalizado</button>
+  </div>
+  <div class="fd-peek" id="fdPeek">
+    <div class="fd-peek-header" id="fdPeekHeader">
+      <b>📋 Adicionados hoje · <span id="fdPeekCount">0 itens</span></b>
+      <span class="fd-peek-chevron">▾</span>
+    </div>
+    <div class="fd-log" id="fdLog"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ CUSTOM FOOD MINI-MODAL ═══════════════ -->
+<div class="modal-overlay" id="customFoodOverlay" style="z-index:320;"></div>
+<div class="modal-sheet" id="customFoodModal" style="z-index:321;">
+  <div class="modal-handle"></div>
+  <div class="modal-header">
+    <b>➕ Alimento personalizado</b>
+    <button class="modal-close" id="customFoodClose" type="button">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-grid cols-2">
+      <div class="form-row"><label>Nome</label><input id="cfName" placeholder="Ex: Barra de cereal" /></div>
+      <div class="form-row"><label>Porção</label><input id="cfPortion" placeholder="Ex: 1 un (25g)" /></div>
+      <div class="form-row"><label>Proteína (g)</label><input id="cfP" inputmode="decimal" placeholder="0" /></div>
+      <div class="form-row"><label>Carbo (g)</label><input id="cfC" inputmode="decimal" placeholder="0" /></div>
+      <div class="form-row"><label>Gordura (g)</label><input id="cfG" inputmode="decimal" placeholder="0" /></div>
+      <div class="form-row"><label>kcal</label><input id="cfKcal" inputmode="decimal" placeholder="0" /></div>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn primary" id="btnAddCustomFood" type="button" style="width:100%;">Salvar alimento</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- FOOD MODAL (bottom sheet) -->
-<div class="modal-overlay" id="foodModalOverlay"></div>
-<div class="modal-sheet" id="foodModal">
+<div class="modal-overlay" id="foodModalOverlay" style="z-index:315;"></div>
+<div class="modal-sheet" id="foodModal" style="z-index:316;">
   <div class="modal-handle"></div>
   <div class="modal-header">
     <b id="fmName">—</b>
@@ -2530,6 +2705,7 @@ tr:active { background: var(--surface2); }
       { id:"aveia", nome:"Aveia em flocos", porcao:"3 col sopa (30g)", porcaoG:30, p:4.0, c:18.0, g:2.5, kcal:111 },
       { id:"granola", nome:"Granola", porcao:"40g", porcaoG:40, p:3.5, c:28.0, g:5.0, kcal:171 },
       { id:"cuscuz", nome:"Cuscuz de milho", porcao:"100g", porcaoG:100, p:2.0, c:25.0, g:0.5, kcal:113 },
+      { id:"biscoito_arroz", nome:"Biscoito de arroz", porcao:"1 pacote peq (30g)", porcaoG:30, p:2.5, c:24.0, g:1.0, kcal:115 },
     ],
     "🥩 Carnes & Proteínas": [
       { id:"frango_grelhado", nome:"Frango grelhado (peito)", porcao:"100g", porcaoG:100, p:32.0, c:0.0, g:2.5, kcal:151 },
@@ -2547,6 +2723,8 @@ tr:active { background: var(--surface2); }
       { id:"linguica", nome:"Linguiça calabresa", porcao:"1 gomo (60g)", porcaoG:60, p:10.0, c:1.0, g:14.0, kcal:170 },
       { id:"atum_lata", nome:"Atum em lata (água)", porcao:"1 lata (120g)", porcaoG:120, p:30.0, c:0.0, g:1.0, kcal:129 },
       { id:"sardinha_lata", nome:"Sardinha em lata (óleo)", porcao:"1 lata (125g)", porcaoG:125, p:24.0, c:0.0, g:12.0, kcal:204 },
+      { id:"sobrecoxa_s_pele", nome:"Sobrecoxa assada (sem pele)", porcao:"100g", porcaoG:100, p:28.0, c:0.0, g:9.0, kcal:193 },
+      { id:"frango_desf_molho", nome:"Frango desfiado c/ molho tomate", porcao:"100g", porcaoG:100, p:25.0, c:3.0, g:5.0, kcal:157 },
     ],
     "🥤 Proteicos & Laticínios": [
       { id:"bebida_proteica_vegana", nome:"Bebida proteica vegana", porcao:"1 un (250ml)", porcaoG:250, p:15.0, c:5.0, g:2.0, kcal:98 },
@@ -2559,6 +2737,14 @@ tr:active { background: var(--surface2); }
       { id:"requeijao", nome:"Requeijão cremoso", porcao:"1 col sopa (30g)", porcaoG:30, p:3.0, c:1.0, g:7.0, kcal:79 },
       { id:"queijo_minas", nome:"Queijo minas frescal", porcao:"1 fatia (30g)", porcaoG:30, p:4.5, c:1.0, g:5.0, kcal:67 },
       { id:"queijo_mussarela", nome:"Queijo mussarela", porcao:"1 fatia (20g)", porcaoG:20, p:4.5, c:0.5, g:4.5, kcal:61 },
+      { id:"nestle_whey", nome:"Bebida Láctea Proteica (Nestlé/Nutren)", porcao:"1 un (250ml)", porcaoG:250, p:15.0, c:12.0, g:3.0, kcal:135 },
+      { id:"piracajuba_whey", nome:"Piracajuba Whey", porcao:"1 un (250ml)", porcaoG:250, p:23.0, c:10.0, g:2.5, kcal:155 },
+      { id:"not_shake_choc", nome:"Not Shake Proteico Chocolate", porcao:"1 un (250ml)", porcaoG:250, p:16.0, c:13.0, g:4.5, kcal:157 },
+      { id:"not_shake_morango", nome:"Not Shake Proteico Morango", porcao:"1 un (250ml)", porcaoG:250, p:16.0, c:12.0, g:4.0, kcal:148 },
+      { id:"leite_soja", nome:"Leite de Soja (Original)", porcao:"200ml", porcaoG:200, p:5.5, c:7.0, g:3.5, kcal:82 },
+      { id:"leite_soja_zero", nome:"Leite de Soja (Zero Açúcar)", porcao:"200ml", porcaoG:200, p:5.5, c:2.0, g:3.0, kcal:57 },
+      { id:"leite_amendoas", nome:"Leite de Amêndoas", porcao:"200ml", porcaoG:200, p:1.0, c:0.5, g:2.5, kcal:29 },
+      { id:"cottage", nome:"Queijo Cottage", porcao:"2 col sopa (50g)", porcaoG:50, p:5.5, c:1.5, g:2.0, kcal:46 },
     ],
     "🥬 Legumes & Vegetais": [
       { id:"cenoura_refogada", nome:"Cenoura refogada", porcao:"100g", porcaoG:100, p:1.0, c:7.5, g:2.0, kcal:52 },
@@ -2586,6 +2772,8 @@ tr:active { background: var(--surface2); }
       { id:"azeite", nome:"Azeite de oliva", porcao:"1 col sopa (13ml)", porcaoG:13, p:0.0, c:0.0, g:13.0, kcal:117 },
       { id:"manteiga", nome:"Manteiga", porcao:"1 col chá (5g)", porcaoG:5, p:0.0, c:0.0, g:4.0, kcal:36 },
       { id:"abacate", nome:"Abacate", porcao:"3 col sopa (80g)", porcaoG:80, p:1.0, c:5.0, g:7.0, kcal:87 },
+      { id:"amendoa_torrada", nome:"Amêndoas torradas (com sal)", porcao:"10 un (15g)", porcaoG:15, p:3.2, c:3.0, g:7.5, kcal:92 },
+      { id:"mix_castanhas", nome:"Mix de castanhas e sementes", porcao:"15g", porcaoG:15, p:2.5, c:4.0, g:8.0, kcal:98 },
     ],
     "🍫 Doces & Snacks": [
       { id:"choc_amargo", nome:"Chocolate amargo 70%", porcao:"25g", porcaoG:25, p:2.0, c:11.0, g:10.0, kcal:142 },
@@ -2603,6 +2791,10 @@ tr:active { background: var(--surface2); }
       { id:"biscoito_maisena", nome:"Biscoito maisena", porcao:"5 un (30g)", porcaoG:30, p:2.0, c:21.0, g:3.5, kcal:124 },
       { id:"sorvete_creme", nome:"Sorvete de creme", porcao:"1 bola (60g)", porcaoG:60, p:2.0, c:14.0, g:5.5, kcal:114 },
       { id:"brigadeiro", nome:"Brigadeiro", porcao:"2 un (30g)", porcaoG:30, p:1.5, c:18.0, g:4.5, kcal:119 },
+      { id:"biscoito_jasmine_s_acucar", nome:"Biscoito Jasmine (Sem Açúcar)", porcao:"6 un (30g)", porcaoG:30, p:3.0, c:18.0, g:4.5, kcal:125 },
+      { id:"biscoito_nesfit", nome:"Biscoito Fit (Tipo Nesfit)", porcao:"6 un (30g)", porcaoG:30, p:2.5, c:20.0, g:4.5, kcal:131 },
+      { id:"bolo_fuba", nome:"Bolo de fubá caseiro", porcao:"1 fatia (80g)", porcaoG:80, p:4.5, c:42.0, g:10.0, kcal:276 },
+      { id:"bolo_aveia_banana", nome:"Bolo aveia, banana e passas (S/ Açúcar)", porcao:"1 fatia (80g)", porcaoG:80, p:4.0, c:30.0, g:8.0, kcal:208 },
     ],
     "🍔 Fast-food": [
       { id:"sushi_salmao", nome:"Sushi Salmão (Niguiri/Ura)", porcao:"5 un (100g)", porcaoG:100, p:5.0, c:18.0, g:1.5, kcal:106 },
@@ -2619,6 +2811,8 @@ tr:active { background: var(--surface2); }
       { id:"coxinha", nome:"Coxinha de frango", porcao:"1 un (90g)", porcaoG:90, p:8.0, c:24.0, g:12.0, kcal:236 },
       { id:"pastel_carne", nome:"Pastel de carne", porcao:"1 un (100g)", porcaoG:100, p:7.0, c:26.0, g:14.0, kcal:258 },
       { id:"pao_queijo", nome:"Pão de queijo", porcao:"1 un médio (40g)", porcaoG:40, p:3.0, c:14.0, g:6.0, kcal:122 },
+      { id:"sanduiche_frango_fastfood", nome:"Sanduíche de Frango Empanado", porcao:"1 un (170g)", porcaoG:170, p:15.0, c:40.0, g:18.0, kcal:382 },
+      { id:"nuggets_assado", nome:"Nuggets assado (forno/airfryer)", porcao:"5 un (100g)", porcaoG:100, p:14.0, c:16.0, g:10.0, kcal:210 },
     ],
     "🥤 Bebidas": [
       { id:"cafe_puro", nome:"Café puro (s/ açúcar)", porcao:"1 xíc (100ml)", porcaoG:100, p:0.2, c:0.0, g:0.0, kcal:1 },
@@ -2640,6 +2834,8 @@ tr:active { background: var(--surface2); }
       { id:"melancia", nome:"Melancia", porcao:"1 fatia (150g)", porcaoG:150, p:1.0, c:12.0, g:0.2, kcal:54 },
       { id:"morango", nome:"Morango", porcao:"8 un (100g)", porcaoG:100, p:0.8, c:7.0, g:0.3, kcal:34 },
       { id:"abacaxi", nome:"Abacaxi", porcao:"1 fatia (100g)", porcaoG:100, p:0.5, c:12.0, g:0.1, kcal:51 },
+      { id:"pitaya", nome:"Pitaya", porcao:"100g", porcaoG:100, p:1.5, c:11.0, g:0.5, kcal:55 },
+      { id:"mirtilo", nome:"Mirtilo (Blueberry)", porcao:"1 xícara (100g)", porcaoG:100, p:0.7, c:14.0, g:0.3, kcal:62 },
     ],
   };
 
@@ -4132,38 +4328,72 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     if(!foodLog.days[date]) foodLog.days[date] = [];
   };
 
+  // Últimos 10 alimentos únicos adicionados (por foodId, ordem cronológica desc)
+  const getRecentFoods = () => {
+    const allFoods = getAllFoods();
+    const lookup = {};
+    for(const list of Object.values(allFoods)) for(const f of list) lookup[f.id] = f;
+    const entries = [];
+    for(const dayEntries of Object.values(foodLog.days)) for(const e of dayEntries) entries.push(e);
+    entries.sort((a, b) => (b.at || "").localeCompare(a.at || ""));
+    const seen = new Set();
+    const result = [];
+    for(const e of entries){
+      if(!seen.has(e.foodId) && lookup[e.foodId]){
+        seen.add(e.foodId);
+        result.push(lookup[e.foodId]);
+        if(result.length === 10) break;
+      }
+    }
+    return result;
+  };
+
   // Render category tabs
   const renderCatTabs = () => {
-    const catTabs = $("#catTabs");
+    const catTabs = $("#fdCatTabs");
     catTabs.innerHTML = "";
     const allFoods = getAllFoods();
     const cats = Object.keys(allFoods);
+    const recentFoods = getRecentFoods();
+
+    // "Recentes" tab — só aparece se houver histórico
+    if(recentFoods.length > 0){
+      const rTab = document.createElement("button");
+      rTab.className = `cat-tab ${foodActiveCat === "__recentes__" ? "active" : ""}`;
+      rTab.textContent = "Recentes";
+      rTab.addEventListener("click", () => { foodActiveCat = "__recentes__"; renderFoodDrawer(); });
+      catTabs.appendChild(rTab);
+    } else if(foodActiveCat === "__recentes__"){
+      foodActiveCat = null;
+    }
 
     // "Todos" tab
     const allTab = document.createElement("button");
     allTab.className = `cat-tab ${foodActiveCat === null ? "active" : ""}`;
     allTab.textContent = "Todos";
-    allTab.addEventListener("click", () => { foodActiveCat = null; renderFoodPanel(); });
+    allTab.addEventListener("click", () => { foodActiveCat = null; renderFoodDrawer(); });
     catTabs.appendChild(allTab);
 
     for(const cat of cats){
       const tab = document.createElement("button");
       tab.className = `cat-tab ${foodActiveCat === cat ? "active" : ""}`;
       tab.textContent = cat;
-      tab.addEventListener("click", () => { foodActiveCat = cat; renderFoodPanel(); });
+      tab.addEventListener("click", () => { foodActiveCat = cat; renderFoodDrawer(); });
       catTabs.appendChild(tab);
     }
   };
 
   // Render food grid
   const renderFoodGrid = () => {
-    const grid = $("#foodGrid");
+    const grid = $("#fdGrid");
     grid.innerHTML = "";
     const allFoods = getAllFoods();
     const term = foodSearchTerm.toLowerCase().trim();
 
     let items = [];
-    if(foodActiveCat && allFoods[foodActiveCat]){
+    if(foodActiveCat === "__recentes__"){
+      items = getRecentFoods();
+    } else if(foodActiveCat && allFoods[foodActiveCat]){
       items = allFoods[foodActiveCat].map(f => ({...f}));
     } else {
       for(const [cat, list] of Object.entries(allFoods)){
@@ -4201,10 +4431,10 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     }
   };
 
-  // Render food log for current day
+  // Render food log (peek section)
   const renderFoodLog = () => {
-    const log = $("#foodLog");
-    const countEl = $("#foodLogCount");
+    const log = $("#fdLog");
+    const countEl = $("#fdPeekCount");
     ensureFoodLogDay(currentDate());
     const entries = foodLog.days[currentDate()] || [];
     countEl.textContent = `${entries.length} ite${entries.length === 1 ? "m" : "ns"}`;
@@ -4234,7 +4464,6 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     const entry = foodLog.days[currentDate()][idx];
     if(!entry) return;
 
-    // Subtract blocks from the meal
     ensureDay(currentDate());
     const meal = data.days[currentDate()].meals[entry.mealId];
     if(meal){
@@ -4252,10 +4481,38 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     showToast("Removido 🗑️");
   };
 
-  const renderFoodPanel = () => {
+  const renderFoodDrawer = () => {
     renderCatTabs();
     renderFoodGrid();
     renderFoodLog();
+  };
+  const renderFoodPanel = renderFoodDrawer; // alias para compatibilidade
+
+  // Drawer open/close
+  const openFoodDrawer = () => {
+    foodSearchTerm = "";
+    $("#fdSearch").value = "";
+    $("#fdClear").classList.remove("visible");
+    $("#foodDrawerOverlay").classList.add("open");
+    $("#foodDrawer").classList.add("open");
+    renderFoodDrawer();
+  };
+
+  const closeFoodDrawer = () => {
+    $("#foodDrawerOverlay").classList.remove("open");
+    $("#foodDrawer").classList.remove("open");
+  };
+  window.openFoodDrawer = openFoodDrawer;
+
+  // Custom food mini-modal open/close
+  const openCustomFoodModal = () => {
+    $("#customFoodOverlay").classList.add("open");
+    $("#customFoodModal").classList.add("open");
+  };
+
+  const closeCustomFoodModal = () => {
+    $("#customFoodOverlay").classList.remove("open");
+    $("#customFoodModal").classList.remove("open");
   };
 
   // ═══ FOOD MODAL ═══
@@ -4376,7 +4633,8 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     $("#cfG").value = "";
     $("#cfKcal").value = "";
 
-    renderFoodPanel();
+    closeCustomFoodModal();
+    renderFoodDrawer();
     showToast(`${name} adicionado ⭐`);
   };
 
@@ -5567,11 +5825,28 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     $("#tmplHistClose").addEventListener("click", closeTmplHistModal);
     $("#btnTreinoHist").addEventListener("click", openTmplHistModal);
 
-    // food panel
-    $("#foodSearch").addEventListener("input", (e) => {
+    // food drawer
+    $("#foodDrawerOverlay").addEventListener("click", closeFoodDrawer);
+    $("#fdClose").addEventListener("click", closeFoodDrawer);
+    $("#fdSearch").addEventListener("input", (e) => {
       foodSearchTerm = e.target.value;
+      $("#fdClear").classList.toggle("visible", foodSearchTerm !== "");
       renderFoodGrid();
     });
+    $("#fdClear").addEventListener("click", () => {
+      foodSearchTerm = "";
+      $("#fdSearch").value = "";
+      $("#fdClear").classList.remove("visible");
+      renderFoodGrid();
+    });
+    $("#fdPeekHeader").addEventListener("click", () => {
+      $("#fdPeek").classList.toggle("open");
+    });
+    $("#fdCustomBtn").addEventListener("click", openCustomFoodModal);
+    $("#customFoodOverlay").addEventListener("click", closeCustomFoodModal);
+    $("#customFoodClose").addEventListener("click", closeCustomFoodModal);
+
+    // food portion modal
     $("#foodModalOverlay").addEventListener("click", closeFoodModal);
     $("#fmClose").addEventListener("click", closeFoodModal);
     $("#fmMinus5").addEventListener("click", () => {

@@ -1,79 +1,15 @@
-# Kcal.ix — Plano de Reestruturação de UX
+# Kcal.ix — Plano de Desenvolvimento
 
-Spec aprovada em: 2026-02-28
-Status geral: ✅ Concluído — Todas as etapas implementadas
+## Histórico de fases concluídas
 
----
-
-## Passos de implementação
-
-### ETAPA 1 — Rename: Blocos Tracker → Kcal.ix
-- [x] `<title>` no index.html
-- [x] `<h1>` no header do index.html
-- [x] `AI_SYSTEM_PROMPT` (menção ao app)
-- [x] Nome do arquivo de export JSON (download)
-- [x] `manifest.json`: name + short_name + description
-- [x] `sw.js`: CACHE_NAME bump (blocos-v5 → kcalix-v1)
-- **Nota:** storage keys (`blocos_tracker_*`) NÃO mudam — contêm dados reais do usuário
-
----
-
-### ETAPA 2 — Bottom-nav: 6 → 5 abas ✅
-- [x] Renomear IDs: `viewTracker` → `viewDiario`, ajustar referências no JS
-- [x] viewSettings + viewCalc → merged em `viewMais`
-- [x] `viewMeasure` → `viewCorpo`
-- [x] Atualizar HTML da bottom-nav (5 itens: Home | Diário | Treino | Corpo | Mais)
-- [x] Atualizar `openTab()` no JS com novos IDs/labels
-- [x] Criar `<div id="viewHome">` como primeira view (stub renderHomeDashboard)
-- [x] viewAlimentos mantido no HTML, removido da nav (Etapa 3 move conteúdo)
-
----
-
-### ETAPA 3 — Alimentos dentro do Diário ✅
-- [x] Mover HTML de `#viewAlimentos` para accordion no fim de `#viewDiario`
-- [x] `openTab("diario")` chama `renderFoodPanel()`
-- [x] Accordion trigger também chama `renderFoodPanel()` ao abrir
-- [x] `<div id="viewAlimentos">` removido do HTML
-
----
-
-### ETAPA 4 — Habit Tracker move para Home ✅
-- [x] `#habitTracker` criado dentro de `#viewHome`
-- [x] Removido do topo de `#viewDiario`
-- [x] `renderHabitTracker()` usa `$('#habitTracker')` — funciona sem mudança
-
----
-
-### ETAPA 5 — CSS da Home ✅
-- [x] `.home-grid`, `.home-action-card`, `.home-action-icon`, `.home-action-label`
-- [x] `.home-kcal-bar`, `.home-kcal-fill`, `.home-macro-bar`, `.home-macro-fill`
-- [x] `.home-greeting`, `.home-date-sub`, `.home-kcal-row`, `.home-macro-row`
-- [x] `.fab`: fixed, z-index 200, cor accent, active scale
-
----
-
-### ETAPA 6 — HTML da Home ✅
-- [x] Saudação contextual + data formatada (`#homeGreeting`, `#homeDate`)
-- [x] `#habitTracker` no topo
-- [x] Card "Hoje" clicável: barra kcal + 3 mini-barras P/C/G
-- [x] Grid 2×2: Diário / Treino / Corpo / IA Export
-- [x] FAB `#fabAdd` (placeholder — Fase 2 implementa bottom sheet)
-
----
-
-### ETAPA 7 — JS da Home ✅
-- [x] `renderHomeDashboard()`: saudação, data, kcal, P/C/G em gramas vs meta
-- [x] Barra kcal usa `settings.kcalPerBlock` × blocos consumidos
-- [x] Macro bars usam gramas: `totals() × settings.blocks.*` vs `settings.goals.*`
-- [x] Bloco IA Export → `document.getElementById('btnExportAI').click()`
-
----
-
-### ETAPA 8 — Comportamento de abertura (sessionStorage) ✅
-- [x] `openTab()` faz `sessionStorage.setItem('kcalix_tab', which)` a cada troca
-- [x] No boot: lê sessionStorage → abre aba salva ou Home se não existir
-- [x] sessionStorage é per-session: fecha aba → reabre → volta para Home ✓
-- [x] Troca de app no celular: sessionStorage preservada → mantém aba ✓
+| Fase | Descrição | Versão |
+|---|---|---|
+| Fase 1 (Etapas 1–8) | Rename + reestruturação de UX (nav, views, Home) | v1.5.0 |
+| Fase 2 | Auto-check de hábitos, remoção do FAB | v1.6.0 |
+| Fase 3 | Energy Analytics Dashboard (BMR, gráfico semanal, projeção) | v1.7.0 |
+| Fase 4 | Timer de pausa no treino + cronômetro + notificação nativa | v1.8.0 |
+| Fase 5 | Banner PWA (iOS + Android), diet auto-check | v1.8.3 |
+| Fase 6 | Accordion alimentos no Diário: sub-accordions, modal de porção, UX de refeições | v1.9.0 |
 
 ---
 
@@ -86,111 +22,129 @@ Status geral: ✅ Concluído — Todas as etapas implementadas
 
 ---
 
-## Fase 2 ✅ Concluído (2026-02-28 — v1.6.0)
-- [x] FAB (+) removido — redundante com grid da Home
-- [x] Auto-check de hábitos ao salvar dados (log, dieta, treino, cardio, medidas)
-- [ ] Gráfico semanal de kcal → movido para Fase 3
-
----
-
-## Fase 3 — Energy Analytics Dashboard (spec aprovada em: 2026-02-28)
+## Fase 7 — Food Panel Drawer (spec aprovada em: 2026-03-01)
 
 ### Visão geral
-Painel de análise energética diária e semanal na Home. Combina calorias
-consumidas, gasto basal (TDEE), gasto de treino e exibe saldo com
-projeção de evolução corporal (ganho de massa / perda de gordura).
 
-### Dados disponíveis (sem nova infra de storage)
+Redesenho da UX de adição de alimentos no Diário. Substitui o sistema de
+sub-accordions aninhados por um **bottom drawer fixo** inspirado no MyFitnessPal,
+com layout dividido em zona de busca (70%) e zona de log do dia (30%).
 
-| Variável           | Fonte                                         |
-|--------------------|-----------------------------------------------|
-| kcalConsumido(dia) | data.days[date].meals + settings.kcalPerBlock |
-| kcalTreino(dia)    | treinoData.days[date].kcal (já salvo)         |
-| BMR                | calc (CALC_KEY) → bmrKatch ou bmrMifflin      |
-| TDEE               | calc.activity × BMR                           |
-| kcalGasto(dia)     | TDEE + kcalTreino(dia)                        |
-| Saldo(dia)         | kcalConsumido - kcalGasto                     |
-| Meta kcal          | settings.goals.kcal                           |
+### Motivação
 
-**Nota:** BMR é calculado uma vez a partir do `calc` salvo — não varia
-por dia. Para dias sem treino registrado, kcalTreino = 0.
+- Lista de alimentos cresce indefinidamente, sem altura máxima
+- "Adicionados hoje" e "Alimento personalizado" ficam soterrados abaixo da lista
+- Sem botão ✕ para limpar o campo de busca
+- Sem aba de "Recentes" para acessar alimentos usados frequentemente
 
----
-
-### ETAPA 1 — Helper: getEnergyForDate(date) ✅
-Função pura que retorna { consumed, bmr, tdee, exercise, total, balance }
+### Layout do drawer
 
 ```
-- [x] Definir getEnergyForDate(date) no escopo do IIFE
-- [x] consumed: soma meals do data.days[date] × kcalPerBlock
-- [x] bmr: recalcular de calc (Katch se leanKg disponível, senão Mifflin)
-      → se calc vazio (nenhum dado inserido), bmr = null
-- [x] tdee: bmr × (calc.activity || 1.55)
-- [x] exercise: treinoData.days[date]?.kcal || 0
-- [x] total: tdee + exercise
-- [x] balance: consumed - total (null se consumed=0 ou tdee=null)
-- [x] Retorna null para cada campo que não pode ser calculado
+┌────────────────────────────────────────┐  ← slide up desde o bottom
+│  🍽️ Adicionar alimentos           ✕   │  ← header fixo
+├────────────────────────────────────────┤
+│ [🔍 Buscar alimento...      ] [ ✕ ]   │  ← search + clear button
+│ [Recentes][Todos][Cat 1][Cat 2] →      │  ← cat tabs (scroll horizontal)
+│                                        │
+│  food-item                             │  ← grid scrollável (flex:1)
+│  food-item                             │
+│  food-item                             │
+│  ...                                   │
+│                                        │
+│ ┌────────────────────────────────────┐ │
+│ │ ➕ Criar alimento personalizado    │ │  ← sticky, sempre visível
+│ └────────────────────────────────────┘ │
+├────────────────────────────────────────┤
+│ 📋 Adicionados hoje · N itens      ▾  │  ← peek 44px, tap p/ expandir
+│   (lista dos itens ao expandir)        │  ← max ~33vh
+└────────────────────────────────────────┘
 ```
 
----
+### Detalhes de comportamento
 
-### ETAPA 2 — KPIs de energia (card "Hoje") ✅
+**Drawer:**
+- Altura total: `88dvh` com `safe-area-inset-bottom`
+- Overlay escuro atrás, tap fecha
+- `#accAlimentos` no Diário vira apenas o botão trigger (não mais um accordion)
 
-- [x] HTML: div#energyCard no viewHome (abaixo do card macros)
-- [x] 4 KPIs inline: consumido / gasto / treino / saldo
-- [x] Saldo com cor semântica: verde (<0 déficit) / accent2 (>0 superávit)
-- [x] Barra de progresso: consumido vs meta
-- [x] Se JP7 não salvo: exibe só consumido + msg "Configure JP7"
-- [x] CSS: .energy-kpi-row, .energy-kpi, .energy-kpi-val, .energy-bar-wrap
+**Tab "Recentes":**
+- Aparece antes de "Todos" somente se existir histórico no `foodLog`
+- Lista até 10 alimentos únicos por `foodId`, ordenados por `at` timestamp desc
+- Buscados em todos os dias do `foodLog.days`
 
----
+**Botão ✕ no search:**
+- Visível somente quando `foodSearchTerm !== ""`
+- Limpa o input e re-renderiza o grid
 
-### ETAPA 3 — Gráfico semanal de barras ✅
+**"Alimento personalizado" (sticky):**
+- Sempre visível como última linha antes do peek
+- Ao clicar, abre mini-modal (overlay separado) com o form atual dos 6 campos
 
-- [x] HTML: div#weekEnergyChart vazio no viewHome
-- [x] JS: renderWeekEnergyChart() — 7 dias da semana atual (Seg→Dom)
-- [x] Barras duplas sobrepostas: gasto (surface3, full) + consumido (accent, 55%)
-- [x] Linha tracejada = settings.goals.kcal
-- [x] Dia atual: borda accent2
-- [x] Dias sem dados: opacidade reduzida
-- [x] Dias futuros: sem barra
-- [x] CSS: .week-chart-wrap, .week-bars, .week-bar-group, .week-meta-line
-
----
-
-### ETAPA 4 — Projeção semanal ✅
-
-- [x] Média de balance dos dias com dados (só dias não-futuros com balance!=null)
-- [x] Converter para kg: média × 7 / 7700
-- [x] Exibe se ≥ 3 dias com dados (📉 déficit / 📈 superávit)
-- [x] CSS: .energy-projection
+**"Adicionados hoje" (peek):**
+- Colapsado por padrão: 44px, mostra count
+- Toque expande até `max-height: 33vh`, com overflow-y scroll
+- Ao remover item, re-renderiza contagem e lista sem fechar o drawer
 
 ---
 
-### ETAPA 5 — Integração com renderHomeDashboard() ✅
+### ETAPA 1 — CSS do drawer
 
-- [x] Chamar renderEnergyCard() dentro de renderHomeDashboard()
-- [x] Chamar renderWeekEnergyChart() dentro de renderHomeDashboard()
-- [x] Atualiza toda vez que Home é aberta (via openTab)
-
----
-
-### Limitações documentadas (v1 da feature)
-
-1. BMR fixo: usa último calc salvo, não calcula por peso do dia
-2. TDEE = BMR × fator geral (não ajusta por tipo de dia — treino vs descanso)
-3. kcalTreino é estimativa (fórmula interna, não dispositivo externo)
-4. foodLog (alimentos detalhados) não entra no cálculo — só blocos do Diário
-5. Dias sem refeição registrada são excluídos da projeção
+- [ ] Remover regra `#accAlimentos.open > .acc-content { max-height:9000px }`
+- [ ] `.food-drawer-overlay`: fixed, fullscreen, z-index 310, backdrop semitransparente
+- [ ] `.food-drawer`: fixed, bottom 0, width 100%, height 88dvh, z-index 311, slide-up animation, flex column
+- [ ] `.fd-header`: flex, shrink 0, título + botão ✕
+- [ ] `.fd-search-wrap`: position relative, shrink 0; `.fd-search-clear`: botão ✕ absoluto à direita
+- [ ] `.fd-cat-tabs`: igual ao `.cat-tabs` atual (reutilizar ou renomear)
+- [ ] `.fd-grid`: flex 1, overflow-y auto, `-webkit-overflow-scrolling: touch`
+- [ ] `.fd-custom-row`: shrink 0, botão full-width, borda topo
+- [ ] `.fd-peek`: shrink 0, height 44px, cursor pointer, borda topo, transição max-height
+- [ ] `.fd-peek.open`: max-height 33vh, overflow-y auto
+- [ ] `.fd-peek-header`: flex, align-center, padding, chevron rotacionável
 
 ---
 
-### Critérios de feito da Fase 3 ✅ (implementado 2026-02-28)
+### ETAPA 2 — HTML
 
-- [x] Card energia visível na Home com 4 KPIs
-- [x] Barra consumido vs meta renderizada
-- [x] Gráfico 7 dias com barras duplas e linha meta
-- [x] Projeção exibida se ≥ 3 dias com dados
-- [x] Sem BMR configurado: card degradado mas sem erro
-- [x] Funciona em 375px sem overflow horizontal
-- [x] Re-render ao abrir Home
+- [ ] `#accAlimentos`: manter o `<div class="accordion">` mas remover o conteúdo dos sub-accordions; trigger chama `openFoodDrawer()` em vez de `toggleAcc()`
+- [ ] Após `</div><!-- /app -->`: adicionar `#foodDrawerOverlay` + `#foodDrawer`
+- [ ] Estrutura do drawer: `#fdHeader` / `#fdSearchWrap` (input `#fdSearch` + btn `#fdClear`) / `#fdCatTabs` / `#fdGrid` / `#fdCustomRow` / `#fdPeek` (`#fdPeekHeader` + `#fdLog`)
+- [ ] Remover os 3 divs `#accFoodSearch`, `#accFoodLog`, `#accCustomFood` do viewDiario
+
+---
+
+### ETAPA 3 — JS: helpers e funções de render
+
+- [ ] `getRecentFoods()`: varre `foodLog.days`, ordena entries por `at` desc, deduplica por `foodId`, retorna array de food objects (até 10)
+- [ ] `openFoodDrawer()`: adiciona class `.open` no overlay + drawer; chama `renderFoodDrawer()`
+- [ ] `closeFoodDrawer()`: remove class `.open`
+- [ ] `renderFoodDrawer()`: chama `renderFdCatTabs()` + `renderFdGrid()` + `renderFdLog()`
+- [ ] `renderFdCatTabs()`: baseada em `renderCatTabs()`, mas targets `#fdCatTabs`; adiciona tab "Recentes" antes de "Todos" se `getRecentFoods().length > 0`; quando "Recentes" ativo, passa lista direto para `renderFdGrid()`
+- [ ] `renderFdGrid()`: baseada em `renderFoodGrid()`, mas target `#fdGrid`; usa `foodSearchTerm` da mesma var global
+- [ ] `renderFdLog()`: baseada em `renderFoodLog()`, mas target `#fdLog` e `#fdPeekHeader` (atualiza count)
+
+---
+
+### ETAPA 4 — JS: event listeners
+
+- [ ] `#foodDrawerOverlay` click → `closeFoodDrawer()`
+- [ ] `#fdHeader` botão ✕ click → `closeFoodDrawer()`
+- [ ] `#fdSearch` input → atualiza `foodSearchTerm`, mostra/esconde `#fdClear`, chama `renderFdGrid()`
+- [ ] `#fdClear` click → limpa `#fdSearch`, zera `foodSearchTerm`, chama `renderFdGrid()`
+- [ ] `#fdPeekHeader` click → toggle class `.open` em `#fdPeek`, rotaciona chevron
+- [ ] `#fdCustomRow` click → abre mini-modal `#customFoodModal` (reusa form existente ou abre accordion inline)
+- [ ] Adaptar `addFoodToMeal()` e `removeFoodLogEntry()` para chamar `renderFdLog()` além das renders existentes
+- [ ] Adaptar `openTab("diario")` para não mais chamar `renderFoodPanel()` (só chama quando drawer abre)
+
+---
+
+### Critérios de feito (Fase 7)
+
+- [ ] Drawer abre/fecha com animação suave, overlay fecha ao clicar fora
+- [ ] Search com ✕ funciona corretamente em mobile (teclado não quebra layout)
+- [ ] Tab "Recentes" aparece somente quando há histórico, lista até 10 itens únicos
+- [ ] Food grid limitado à área do drawer, sem scroll da página
+- [ ] "Alimento personalizado" sempre visível ao rolar o grid
+- [ ] Peek "Adicionados hoje" expande/colapsa sem fechar o drawer
+- [ ] Funciona em 375px sem overflow horizontal
+- [ ] Nenhuma storage key alterada
+- [ ] `#foodModal` (modal de porção) continua funcionando sem mudanças
