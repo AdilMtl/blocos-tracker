@@ -5,6 +5,26 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v1.10.2] — 2026-03-02
+
+### Melhorado
+- [improve] **Aba "Mais" reestruturada**: Card "🍎 Nutrição" no topo (metas + calculadora unificada) e Card "⚙️ Configurações" abaixo (equivalência de blocos + kcal estimada). Ordem invertida para fluxo mais natural.
+- [improve] **Calculadora unificada**: dados básicos + dobras + alvo de dieta em um único accordion `#accCalcFull` (era 3 accordions separados).
+- [improve] **Kcal alvo auto-calculado**: campo "Kcal alvo" nas Metas diárias agora é readonly e mostra P×4+C×4+G×9 em tempo real ao digitar os macros.
+- [improve] **Banner de perfil (`#nutriBanner`)**: exibe BMR / BF% / Massa magra quando perfil configurado, ou aviso de primeiro acesso quando não.
+- [improve] **Calculadora auto-abre** no primeiro acesso (quando CALC_KEY === null).
+- [improve] **"Aplicar nas metas"**: botão `btnSendToSettings` agora atualiza visualmente os campos de metas após enviar (chama `fillSettingsForm()`).
+- [improve] **Labels do seletor de atividade**: renomeadas para descrever estilo de vida (ex.: "Moderadamente ativo") em vez de multiplier TDEE. Valores numéricos preservados (compatibilidade com dados existentes).
+
+### Corrigido
+- [fix] **Dupla contagem no balanço energético**: `balance` agora usa `BMR + treino logado` como base (não mais `TDEE × fator + treino`). KPI "gasto" renomeado para "basal".
+
+### Notas técnicas
+- `total` do gráfico semanal ainda usa `tdee + exercise` para normalização visual das barras (altura proporcional). ⚠️ Isso causou as barras ficarem altas demais e a projeção parar — **pendente correção na próxima sessão** (ver pendências abaixo).
+- Nenhum storage key alterado — dados existentes preservados.
+
+---
+
 ## [v1.10.1] — 2026-03-01
 
 ### Melhorado
