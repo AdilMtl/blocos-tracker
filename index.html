@@ -654,6 +654,15 @@ body::after {
 }
 .ref-item b { color: var(--text); }
 
+.calc-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
 /* ════════════════════ FORM ELEMENTS ════════════════════ */
 .form-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
 @media(min-width: 480px) { .form-grid.cols-2 { grid-template-columns: repeat(2, 1fr); } }
@@ -1962,18 +1971,24 @@ tr:active { background: var(--surface2); }
 
   <!-- ═══════════════ VIEW: MAIS ═══════════════ -->
   <div id="viewMais" class="view">
+
+    <!-- ── Card 1: Nutrição ── -->
     <div class="card">
       <div class="card-header">
         <div class="ch-info">
-          <b>⚙️ Ajustes</b>
-          <span>Configure metas e equivalências (salvo localmente).</span>
+          <b>🍎 Nutrição</b>
+          <span>Perfil corporal, metas e calculadora.</span>
         </div>
       </div>
       <div class="card-body">
 
+        <!-- Banner de estado (preenchido por JS) -->
+        <div id="nutriBanner" style="margin-bottom:12px;"></div>
+
+        <!-- Metas diárias -->
         <div class="accordion open" id="accGoals">
           <button class="acc-trigger" type="button" onclick="toggleAcc('accGoals')">
-            🎯 Metas diárias (g)
+            🎯 Metas diárias
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-content"><div class="acc-inner">
@@ -1981,10 +1996,133 @@ tr:active { background: var(--surface2); }
               <div class="form-row"><label>🥩 Proteína (g/dia)</label><input id="setGoalP" inputmode="decimal" /><small>Ex.: 152</small></div>
               <div class="form-row"><label>🥔 Carbo (g/dia)</label><input id="setGoalC" inputmode="decimal" /><small>Ex.: 228</small></div>
               <div class="form-row"><label>🥑 Gordura (g/dia)</label><input id="setGoalG" inputmode="decimal" /><small>Ex.: 31</small></div>
-              <div class="form-row"><label>🔥 Calorias alvo</label><input id="setGoalKcal" inputmode="decimal" /><small>Referência visual.</small></div>
+              <div class="form-row">
+                <label>🔥 Kcal alvo</label>
+                <input id="setGoalKcal" inputmode="decimal" readonly
+                  style="background:var(--surface3);color:var(--text2);cursor:default;" />
+                <small>P×4 + C×4 + G×9 (calculado)</small>
+              </div>
+            </div>
+            <div class="btn-group" style="margin-top:12px;">
+              <button class="btn primary" id="btnApplySettings" type="button">Salvar metas</button>
             </div>
           </div></div>
         </div>
+
+        <!-- Calculadora de perfil -->
+        <div class="accordion" id="accCalcFull">
+          <button class="acc-trigger" type="button" onclick="toggleAcc('accCalcFull')">
+            🧮 Calculadora de perfil
+            <span class="acc-chevron">▾</span>
+          </button>
+          <div class="acc-content"><div class="acc-inner">
+            <p class="hint" style="margin-bottom:12px;">Preencha ao menos os dados básicos. Dobras são opcionais — sem elas usamos Mifflin-St Jeor como estimativa de BMR.</p>
+
+            <div class="calc-section-label">1) Dados básicos</div>
+            <div class="form-grid cols-2">
+              <div class="form-row"><label>Sexo</label>
+                <select id="calcSex"><option value="male" selected>Homem</option><option value="female">Mulher</option></select>
+              </div>
+              <div class="form-row"><label>Idade (anos)</label><input id="calcAge" inputmode="decimal" placeholder="37" /></div>
+              <div class="form-row"><label>Peso (kg)</label><input id="calcWeight" inputmode="decimal" placeholder="76" /></div>
+              <div class="form-row"><label>Altura (cm)</label><input id="calcHeight" inputmode="decimal" placeholder="177" /></div>
+            </div>
+
+            <div class="calc-section-label" style="margin-top:14px;">
+              2) Dobras (mm) • 7 pontos
+              <span style="font-size:10px;font-weight:400;color:var(--text3);margin-left:4px;">opcional</span>
+            </div>
+            <div class="grid3">
+              <div class="form-row"><label>Peito (mm)</label><input id="sfChest" inputmode="decimal" /></div>
+              <div class="form-row"><label>Axilar média</label><input id="sfAx" inputmode="decimal" /></div>
+              <div class="form-row"><label>Tríceps</label><input id="sfTri" inputmode="decimal" /></div>
+              <div class="form-row"><label>Subescapular</label><input id="sfSub" inputmode="decimal" /></div>
+              <div class="form-row"><label>Abdominal</label><input id="sfAb" inputmode="decimal" /></div>
+              <div class="form-row"><label>Supra-ilíaca</label><input id="sfSup" inputmode="decimal" /></div>
+              <div class="form-row"><label>Coxa</label><input id="sfTh" inputmode="decimal" /></div>
+            </div>
+
+            <div class="calc-section-label" style="margin-top:14px;">3) Alvo de dieta</div>
+            <div class="form-grid cols-2">
+              <div class="form-row"><label>Estilo de vida</label>
+                <select id="calcActivity">
+                  <option value="1.2">Sedentário — trabalho sentado</option>
+                  <option value="1.375">Levemente ativo — caminhadas</option>
+                  <option value="1.55" selected>Moderadamente ativo</option>
+                  <option value="1.725">Bastante ativo</option>
+                  <option value="1.9">Muito ativo — trabalho físico</option>
+                </select>
+              </div>
+              <div class="form-row"><label>Déficit (%)</label><input id="calcDef" inputmode="decimal" placeholder="25" /></div>
+              <div class="form-row"><label>Proteína (g/kg)</label><input id="calcPKG" inputmode="decimal" placeholder="2.0" /></div>
+              <div class="form-row"><label>Carbo (g/kg)</label><input id="calcCKG" inputmode="decimal" placeholder="3.0" /></div>
+              <div class="form-row"><label>Gordura mín (g/kg)</label><input id="calcMinFatKG" inputmode="decimal" placeholder="0.6" /></div>
+              <div class="form-row"><label>kcal fixo (opcional)</label><input id="calcFixedKcal" inputmode="decimal" /></div>
+            </div>
+
+            <div class="btn-group" style="margin-top:12px;">
+              <button class="btn primary" id="btnCalcRun" type="button">Calcular</button>
+              <button class="btn ghost" id="btnCalcSave" type="button">Salvar</button>
+            </div>
+
+            <!-- Resultados -->
+            <div style="height:12px"></div>
+            <div class="card" style="box-shadow:none; margin-bottom:0;">
+              <div class="card-header">
+                <div class="ch-info">
+                  <b>📌 Resultados</b>
+                  <span class="mono" id="calcStamp">—</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="kpi-grid">
+                  <div class="kpi"><div class="kpi-label">🧍 BF%</div><div class="kpi-value"><span class="num" id="outBF">—</span><span class="den">%</span></div></div>
+                  <div class="kpi"><div class="kpi-label">💪 Magra</div><div class="kpi-value"><span class="num" id="outLM">—</span><span class="den">kg</span></div></div>
+                  <div class="kpi"><div class="kpi-label">🔥 BMR</div><div class="kpi-value"><span class="num" id="outBMR">—</span><span class="den">kcal</span></div></div>
+                </div>
+                <div style="height:10px"></div>
+                <div class="ref-item"><b>Macros sugeridos (g/dia):</b><div class="mono" id="outMacros" style="margin-top:4px;">—</div></div>
+              </div>
+            </div>
+
+            <div class="btn-group" style="margin-top:12px;">
+              <button class="btn sm" id="btnSendToSettings" type="button">➡️ Aplicar nas metas</button>
+              <button class="btn sm ghost" id="btnSendToMeasure" type="button">➡️ BF% → Medição</button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- AI Export -->
+        <div style="height:16px"></div>
+        <div class="card" style="box-shadow:none; margin-bottom:0;">
+          <div class="card-header">
+            <div class="ch-info">
+              <b>🤖 Exportar para IA</b>
+              <span>Coach personalizado (GPT / Gemini)</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="ai-export-desc">Baixe seus dados dos últimos 60 dias e carregue em um GPT personalizado ou Gemini Gem para receber análises e sugestões de treino e nutrição.</p>
+            <div class="ai-export-actions">
+              <button class="btn sm primary" id="btnExportAI" type="button">⬇️ Baixar JSON</button>
+              <button class="btn sm ghost" id="btnCopyAIPrompt" type="button">📋 Copiar prompt do sistema</button>
+            </div>
+            <div class="ai-export-status" id="aiExportStatus"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Card 2: Configurações ── -->
+    <div class="card">
+      <div class="card-header">
+        <div class="ch-info">
+          <b>⚙️ Configurações</b>
+          <span>Equivalências de bloco e kcal estimadas.</span>
+        </div>
+      </div>
+      <div class="card-body">
 
         <div class="accordion" id="accBlockEq">
           <button class="acc-trigger" type="button" onclick="toggleAcc('accBlockEq')">
@@ -2002,7 +2140,7 @@ tr:active { background: var(--surface2); }
 
         <div class="accordion" id="accKcalBlock">
           <button class="acc-trigger" type="button" onclick="toggleAcc('accKcalBlock')">
-            🧾 kcal estimadas por bloco
+            🔢 kcal estimadas por bloco
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-content"><div class="acc-inner">
@@ -2016,131 +2154,12 @@ tr:active { background: var(--surface2); }
 
         <div style="height:12px"></div>
         <div class="btn-group">
-          <button class="btn primary" id="btnApplySettings" type="button">Aplicar ajustes</button>
+          <button class="btn primary" id="btnApplyBlockConfig" type="button">Salvar configurações</button>
           <button class="btn ghost" id="btnResetSettings" type="button">Reset</button>
         </div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header">
-        <div class="ch-info">
-          <b>🧮 Macros & Dobras</b>
-          <span>JP7 + Siri • BF%, massa magra, BMR</span>
-        </div>
-      </div>
-      <div class="card-body">
-
-        <div class="accordion open" id="accCalcBasic">
-          <button class="acc-trigger" type="button" onclick="toggleAcc('accCalcBasic')">
-            1) Dados básicos
-            <span class="acc-chevron">▾</span>
-          </button>
-          <div class="acc-content"><div class="acc-inner">
-            <div class="form-grid cols-2">
-              <div class="form-row"><label>Sexo</label>
-                <select id="calcSex"><option value="male" selected>Homem</option><option value="female">Mulher</option></select>
-              </div>
-              <div class="form-row"><label>Idade (anos)</label><input id="calcAge" inputmode="decimal" placeholder="37" /></div>
-              <div class="form-row"><label>Peso (kg)</label><input id="calcWeight" inputmode="decimal" placeholder="76" /></div>
-              <div class="form-row"><label>Altura (cm)</label><input id="calcHeight" inputmode="decimal" placeholder="177" /></div>
-            </div>
-          </div></div>
-        </div>
-
-        <div class="accordion open" id="accCalcFolds">
-          <button class="acc-trigger" type="button" onclick="toggleAcc('accCalcFolds')">
-            2) Dobras (mm) • 7 pontos
-            <span class="acc-chevron">▾</span>
-          </button>
-          <div class="acc-content"><div class="acc-inner">
-            <div class="grid3">
-              <div class="form-row"><label>Peito (mm)</label><input id="sfChest" inputmode="decimal" /></div>
-              <div class="form-row"><label>Axilar média</label><input id="sfAx" inputmode="decimal" /></div>
-              <div class="form-row"><label>Tríceps</label><input id="sfTri" inputmode="decimal" /></div>
-              <div class="form-row"><label>Subescapular</label><input id="sfSub" inputmode="decimal" /></div>
-              <div class="form-row"><label>Abdominal</label><input id="sfAb" inputmode="decimal" /></div>
-              <div class="form-row"><label>Supra-ilíaca</label><input id="sfSup" inputmode="decimal" /></div>
-              <div class="form-row"><label>Coxa</label><input id="sfTh" inputmode="decimal" /></div>
-            </div>
-            <div class="btn-group" style="margin-top:12px;">
-              <button class="btn primary" id="btnCalcRun" type="button">Calcular</button>
-              <button class="btn ghost" id="btnCalcSave" type="button">Salvar</button>
-            </div>
-          </div></div>
-        </div>
-
-        <div class="accordion open" id="accCalcTarget">
-          <button class="acc-trigger" type="button" onclick="toggleAcc('accCalcTarget')">
-            3) Alvo de dieta / macros
-            <span class="acc-chevron">▾</span>
-          </button>
-          <div class="acc-content"><div class="acc-inner">
-            <div class="form-grid cols-2">
-              <div class="form-row"><label>Atividade (TDEE)</label>
-                <select id="calcActivity">
-                  <option value="1.2">Sedentário (1.2)</option>
-                  <option value="1.375">Leve (1.375)</option>
-                  <option value="1.55" selected>Moderado (1.55)</option>
-                  <option value="1.725">Alto (1.725)</option>
-                  <option value="1.9">Muito alto (1.9)</option>
-                </select>
-              </div>
-              <div class="form-row"><label>Déficit (%)</label><input id="calcDef" inputmode="decimal" placeholder="25" /></div>
-              <div class="form-row"><label>Proteína (g/kg)</label><input id="calcPKG" inputmode="decimal" placeholder="2.0" /></div>
-              <div class="form-row"><label>Carbo (g/kg)</label><input id="calcCKG" inputmode="decimal" placeholder="3.0" /></div>
-              <div class="form-row"><label>Gordura mín (g/kg)</label><input id="calcMinFatKG" inputmode="decimal" placeholder="0.6" /></div>
-              <div class="form-row"><label>kcal fixo (opcional)</label><input id="calcFixedKcal" inputmode="decimal" placeholder="" /></div>
-            </div>
-            <div class="btn-group" style="margin-top:12px;">
-              <button class="btn sm" id="btnSendToSettings" type="button">➡️ Enviar para Ajustes</button>
-              <button class="btn sm ghost" id="btnSendToMeasure" type="button">➡️ BF% → Medição</button>
-            </div>
-          </div></div>
-        </div>
-
-        <div style="height:12px"></div>
-
-        <!-- Results -->
-        <div class="card" style="box-shadow:none; margin-bottom:0;">
-          <div class="card-header">
-            <div class="ch-info">
-              <b>📌 Resultados</b>
-              <span class="mono" id="calcStamp">—</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="kpi-grid">
-              <div class="kpi"><div class="kpi-label">🧍 BF%</div><div class="kpi-value"><span class="num" id="outBF">—</span><span class="den">%</span></div></div>
-              <div class="kpi"><div class="kpi-label">💪 Magra</div><div class="kpi-value"><span class="num" id="outLM">—</span><span class="den">kg</span></div></div>
-              <div class="kpi"><div class="kpi-label">🔥 BMR</div><div class="kpi-value"><span class="num" id="outBMR">—</span><span class="den">kcal</span></div></div>
-            </div>
-            <div style="height:10px"></div>
-            <div class="ref-item"><b>Macros finais (g/dia):</b><div class="mono" id="outMacros" style="margin-top:4px;">—</div></div>
-          </div>
-        </div>
-
-        <div style="height:16px"></div>
-
-        <!-- AI Export -->
-        <div class="card" style="box-shadow:none; margin-bottom:0;">
-          <div class="card-header">
-            <div class="ch-info">
-              <b>🤖 Exportar para IA</b>
-              <span>Coach personalizado (GPT / Gemini)</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <p class="ai-export-desc">Baixe seus dados dos últimos 60 dias e carregue em um GPT personalizado ou Gemini Gem para receber análises e sugestões de treino e nutrição.</p>
-            <div class="ai-export-actions">
-              <button class="btn sm primary" id="btnExportAI" type="button">⬇️ Baixar JSON</button>
-              <button class="btn sm ghost" id="btnCopyAIPrompt" type="button">📋 Copiar prompt do sistema</button>
-            </div>
-            <div class="ai-export-status" id="aiExportStatus"></div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- ═══════════════ VIEW: CORPO ═══════════════ -->
@@ -3380,9 +3399,11 @@ tr:active { background: var(--surface2); }
 
     const tdee     = bmr != null ? Math.round(bmr * (calc.activity || 1.55)) : null;
     const exercise = Math.round((treinoData.days[date] || {}).kcal || 0);
-    // Balanço usa BMR puro + treino logado (tdee fica só p/ referência no calculador)
-    const total    = bmr != null ? bmr + exercise : null;
-    const balance  = (consumed > 0 && total != null) ? consumed - total : null;
+    // total usa TDEE para normalizar altura das barras do gráfico (comportamento inalterado)
+    const total    = tdee != null ? tdee + exercise : null;
+    // balance usa BMR puro + treino (fix dupla contagem: tdee não soma exercício logado)
+    const basalTotal = bmr != null ? bmr + exercise : null;
+    const balance  = (consumed > 0 && basalTotal != null) ? consumed - basalTotal : null;
     return { consumed, bmr, tdee, exercise, total, balance };
   };
 
@@ -5870,6 +5891,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
 
     // settings
     $("#btnApplySettings").addEventListener("click", applySettingsFromForm);
+    $("#btnApplyBlockConfig").addEventListener("click", applySettingsFromForm);
     $("#btnResetSettings").addEventListener("click", resetSettings);
 
     // calc
