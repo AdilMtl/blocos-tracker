@@ -931,7 +931,7 @@ tr:active { background: var(--surface2); }
 
 .fd-search-wrap {
   position: relative;
-  padding: 12px 12px 0;
+  padding: 10px 12px;
   flex-shrink: 0;
 }
 .fd-search {
@@ -1029,7 +1029,7 @@ tr:active { background: var(--surface2); }
   overflow: hidden;
   transition: max-height .3s ease;
 }
-.fd-peek.open { max-height: 33vh; }
+.fd-peek.open { max-height: 50vh; }
 
 .fd-peek-header {
   display: flex;
@@ -1946,10 +1946,9 @@ tr:active { background: var(--surface2); }
         <div class="status-pills" id="statusBadges"></div>
 
         <!-- ─── Adicionar alimentos ─── -->
-        <div style="margin-top:4px;border-top:1px solid var(--line);padding-top:4px;">
-          <button class="acc-trigger" type="button" onclick="openFoodDrawer()">
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line);">
+          <button class="btn ghost" type="button" onclick="openFoodDrawer()" style="width:100%;">
             🍽️ Adicionar alimentos
-            <span style="margin-left:auto;font-size:14px;color:var(--text3);">▸</span>
           </button>
         </div>
 
