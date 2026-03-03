@@ -5,6 +5,30 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.3.0] — 2026-03-03
+
+### Adicionado
+- [feat] **Histórico de Check-ins** (`blocos_tracker_checkins_v1`): snapshots periódicos que capturam corpo (peso, cintura, BF%, massa magra), energia (BMR, TDEE, meta calórica), objetivo, e resumo automático dos últimos 7 dias de treino e nutrição.
+- [feat] **Formulário de registro de check-in** (`#checkinFormModal`, z-index 323): pré-preenche peso/cintura com dados do dia em `measure.days`, calcula automaticamente o período (treino: sessões, kcal avg, tipo; nutrição: kcal média, % aderência à meta). Campo de nota livre.
+- [feat] **Bottom sheet de histórico** (`#checkinHistorySheet`, z-index 319): lista de cards do mais recente ao mais antigo — data, objetivo (badge), peso + delta vs check-in anterior, cintura, BF%, BMR/meta, resumo treino/nutrição e nota.
+- [feat] **Seção "Último check-in"** no modal de perfil: exibe peso registrado, delta colorido (▲/▼) em relação ao peso atual do perfil, data e dias passados. Link "📋 Histórico" abre o histórico diretamente.
+- [improve] **exportAIJson**: campo `goalType` adicionado em `profile.bodyData`; campo `checkins` (array completo) adicionado no topo do JSON exportado — IA agora tem acesso ao histórico de progresso e ao objetivo real do usuário.
+
+### Corrigido
+- [fix] `textarea` do formulário de check-in com `font-size: 14px` (iOS zoom) — corrigido para herdar `16px` da regra combinada.
+
+### Notas técnicas
+- Z-index hierarquia atualizada: historySheet overlay/sheet 318/319 · customFood 320/321 (intacto) · checkinForm overlay/modal 322/323.
+- `btnOpenCheckinHistory` é gerado dinamicamente via `innerHTML` em `openProfileCheckin()` — re-bind feito explicitamente após o render.
+- `WZ_GOAL_LABELS_LOCAL` em `renderCheckinHistory` é intencional: versão sem emojis/texto longo para caber no badge compacto.
+- CACHE_NAME bumped: `kcalix-v7` → `kcalix-v8`.
+- Spec completa implementada: `memory/spec-checkin-history.md`.
+
+### Planejado para v2.4.0
+- Gráfico de linha peso/BF% ao longo dos check-ins registrados.
+
+---
+
 ## [v2.2.0] — 2026-03-03
 
 ### Adicionado

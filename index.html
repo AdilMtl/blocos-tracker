@@ -1853,6 +1853,58 @@ tr:active { background: var(--surface2); }
 .profile-checkin-footer { display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--line); background:var(--bg); flex-shrink:0; }
 .profile-checkin-footer .btn { flex:1; }
 
+/* ── Check-in: seção "último registrado" no body ── */
+.checkin-last-section { background:var(--surface2); border-radius:12px; padding:11px 14px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.checkin-last-info { display:flex; flex-direction:column; gap:2px; }
+.checkin-last-label { font-size:10px; font-weight:700; letter-spacing:.7px; text-transform:uppercase; color:var(--text3); }
+.checkin-last-value { font-size:14px; font-weight:700; color:var(--text); }
+.checkin-last-sub { font-size:12px; color:var(--text2); }
+.checkin-delta { font-size:12px; font-weight:600; }
+.checkin-delta.pos { color:#4caf50; }
+.checkin-delta.neg { color:#f44336; }
+.checkin-history-link { background:none; border:1px solid var(--line); border-radius:8px; padding:6px 10px; font-size:12px; color:var(--text2); cursor:pointer; white-space:nowrap; flex-shrink:0; }
+
+/* ── Checkin History Sheet ── */
+.checkin-history-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:318; }
+.checkin-history-overlay.open { display:block; }
+.checkin-history-sheet { display:none; position:fixed; bottom:0; left:0; right:0; max-height:88dvh; background:var(--bg); border-radius:18px 18px 0 0; z-index:319; flex-direction:column; overflow:hidden; }
+.checkin-history-sheet.open { display:flex; }
+.checkin-history-handle { width:36px; height:4px; border-radius:2px; background:var(--line); margin:10px auto 0; flex-shrink:0; }
+.checkin-history-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px 10px; border-bottom:1px solid var(--line); flex-shrink:0; }
+.checkin-history-title { font-weight:700; font-size:15px; color:var(--text); }
+.checkin-history-body { flex:1; overflow-y:auto; padding:12px 16px; overscroll-behavior:contain; display:flex; flex-direction:column; gap:10px; }
+.checkin-history-empty { text-align:center; color:var(--text3); font-size:14px; padding:32px 0; }
+.checkin-hcard { background:var(--surface2); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:7px; }
+.checkin-hcard-top { display:flex; align-items:center; justify-content:space-between; }
+.checkin-hcard-date { font-size:13px; font-weight:700; color:var(--text); }
+.checkin-hcard-goal { font-size:11px; font-weight:600; color:var(--accent); background:rgba(124,92,255,.12); border:1px solid rgba(124,92,255,.25); border-radius:20px; padding:2px 8px; }
+.checkin-hcard-metrics { display:flex; gap:14px; flex-wrap:wrap; }
+.checkin-hcard-metric { font-size:13px; color:var(--text2); }
+.checkin-hcard-metric strong { color:var(--text); }
+.checkin-hcard-stat { font-size:12px; color:var(--text2); line-height:1.5; }
+.checkin-hcard-note { font-size:12px; color:var(--text3); font-style:italic; border-top:1px solid var(--line); padding-top:6px; }
+
+/* ── Checkin Form Modal ── */
+.checkin-form-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:322; }
+.checkin-form-overlay.open { display:block; }
+.checkin-form-modal { display:none; position:fixed; bottom:0; left:0; right:0; max-height:90dvh; background:var(--bg); border-radius:18px 18px 0 0; z-index:323; flex-direction:column; overflow:hidden; }
+.checkin-form-modal.open { display:flex; }
+.checkin-form-handle { width:36px; height:4px; border-radius:2px; background:var(--line); margin:10px auto 0; flex-shrink:0; }
+.checkin-form-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px 10px; border-bottom:1px solid var(--line); flex-shrink:0; }
+.checkin-form-title { font-weight:700; font-size:15px; color:var(--text); }
+.checkin-form-close { background:none; border:none; font-size:22px; color:var(--text3); padding:2px 6px; cursor:pointer; line-height:1; }
+.checkin-form-body { flex:1; overflow-y:auto; padding:14px 16px; overscroll-behavior:contain; display:flex; flex-direction:column; gap:12px; }
+.checkin-form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.checkin-form-field { display:flex; flex-direction:column; gap:5px; }
+.checkin-form-field label { font-size:12px; color:var(--text2); font-weight:600; }
+.checkin-form-field input, .checkin-form-field textarea { background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-size:16px; color:var(--text); font-family:var(--font); width:100%; box-sizing:border-box; }
+.checkin-form-field textarea { resize:none; height:72px; }
+.checkin-period-preview { background:var(--surface2); border-radius:10px; padding:11px 13px; display:flex; flex-direction:column; gap:5px; }
+.checkin-period-label { font-size:10px; font-weight:700; letter-spacing:.7px; text-transform:uppercase; color:var(--text3); margin-bottom:2px; }
+.checkin-period-line { font-size:13px; color:var(--text2); }
+.checkin-form-footer { display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--line); background:var(--bg); flex-shrink:0; }
+.checkin-form-footer .btn { flex:1; }
+
 /* ════════════════════ DESKTOP ════════════════════ */
 /* btn hoje */
 .btn-hoje {
@@ -2622,7 +2674,61 @@ tr:active { background: var(--surface2); }
   <div class="profile-checkin-body" id="profileCheckinContent"></div>
   <div class="profile-checkin-footer">
     <button class="btn ghost" id="btnCheckinClose2" type="button">Fechar</button>
-    <button class="btn primary" id="btnCheckinUpdate" type="button">Atualizar dados →</button>
+    <button class="btn ghost" id="btnCheckinUpdate" type="button">Atualizar →</button>
+    <button class="btn primary" id="btnRegisterCheckin" type="button">Check-in ✅</button>
+  </div>
+</div>
+
+<!-- ═══════════════ CHECKIN HISTORY SHEET ═══════════════ -->
+<div class="checkin-history-overlay" id="checkinHistoryOverlay"></div>
+<div class="checkin-history-sheet" id="checkinHistorySheet">
+  <div class="checkin-history-handle"></div>
+  <div class="checkin-history-header">
+    <span class="checkin-history-title">📋 Histórico de Check-ins</span>
+    <button class="profile-checkin-close" id="btnCheckinHistoryClose" type="button">✕</button>
+  </div>
+  <div class="checkin-history-body" id="checkinHistoryBody"></div>
+</div>
+
+<!-- ═══════════════ CHECKIN FORM MODAL ═══════════════ -->
+<div class="checkin-form-overlay" id="checkinFormOverlay"></div>
+<div class="checkin-form-modal" id="checkinFormModal">
+  <div class="checkin-form-handle"></div>
+  <div class="checkin-form-header">
+    <span class="checkin-form-title">📸 Novo check-in</span>
+    <button class="checkin-form-close" id="btnCheckinFormClose" type="button">✕</button>
+  </div>
+  <div class="checkin-form-body">
+    <div class="checkin-form-row">
+      <div class="checkin-form-field">
+        <label for="checkinFormWeight">⚖️ Peso (kg)</label>
+        <input type="number" id="checkinFormWeight" inputmode="decimal" step="0.1" min="30" max="300" placeholder="76.0">
+      </div>
+      <div class="checkin-form-field">
+        <label for="checkinFormWaist">📏 Cintura (cm)</label>
+        <input type="number" id="checkinFormWaist" inputmode="decimal" step="0.5" min="40" max="200" placeholder="88">
+      </div>
+    </div>
+    <div class="checkin-form-row">
+      <div class="checkin-form-field">
+        <label for="checkinFormBF">🧍 BF% (opcional)</label>
+        <input type="number" id="checkinFormBF" inputmode="decimal" step="0.1" min="3" max="60" placeholder="—">
+      </div>
+      <div></div>
+    </div>
+    <div class="checkin-form-field">
+      <label for="checkinFormNote">📝 Como foi sua semana?</label>
+      <textarea id="checkinFormNote" placeholder="Semana boa, dormi bem..."></textarea>
+    </div>
+    <div class="checkin-period-preview" id="checkinFormPeriodPreview">
+      <div class="checkin-period-label">Resumo dos últimos 7 dias</div>
+      <div class="checkin-period-line" id="checkinPeriodTraining">💪 Calculando...</div>
+      <div class="checkin-period-line" id="checkinPeriodNutrition">🥗 Calculando...</div>
+    </div>
+  </div>
+  <div class="checkin-form-footer">
+    <button class="btn ghost" id="btnCheckinFormCancel" type="button">Cancelar</button>
+    <button class="btn primary" id="btnCheckinFormSave" type="button">Salvar check-in ✅</button>
   </div>
 </div>
 
@@ -2980,6 +3086,7 @@ tr:active { background: var(--surface2); }
   const TREINO_TMPL_KEY = "blocos_tracker_treino_templates_v1";
   const PRESETS_KEY         = "blocos_tracker_presets_v1";
   const TIMER_PRESETS_KEY   = "blocos_tracker_timer_presets_v1";
+  const CHECKINS_KEY        = "blocos_tracker_checkins_v1";
 
   // ══════════ EXERCISE DATABASE ══════════
   const EXERCISE_DB = {
@@ -4414,7 +4521,35 @@ tr:active { background: var(--surface2); }
         </div>
       </div>`;
 
-    $("#profileCheckinContent").innerHTML = bodySection + energySection + macrosSection + goalSection;
+    // seção "último check-in registrado"
+    const lastCi = getLastCheckin();
+    let lastCheckinSection = "";
+    if (lastCi) {
+      const lastDate = new Date(lastCi.date + "T12:00:00").toLocaleDateString("pt-BR", { day:"2-digit", month:"short", year:"numeric" });
+      const daysDiff = Math.round((Date.now() - new Date(lastCi.date + "T12:00:00")) / 86400000);
+      const daysLabel = daysDiff === 0 ? "hoje" : daysDiff === 1 ? "há 1 dia" : `há ${daysDiff} dias`;
+      let deltaStr = "";
+      if (lastCi.weightKg && calc.weightKg) {
+        const d = (calc.weightKg - lastCi.weightKg).toFixed(1);
+        const cls = d > 0 ? "pos" : "neg";
+        const sign = d > 0 ? "▲ +" : "▼ ";
+        deltaStr = ` <span class="checkin-delta ${cls}">${sign}${d} kg</span>`;
+      }
+      lastCheckinSection = `
+      <div class="checkin-last-section">
+        <div class="checkin-last-info">
+          <span class="checkin-last-label">Último check-in</span>
+          <span class="checkin-last-value">${lastCi.weightKg ? lastCi.weightKg + " kg" : "—"}${deltaStr}</span>
+          <span class="checkin-last-sub">${lastDate} · ${daysLabel}</span>
+        </div>
+        <button class="checkin-history-link" id="btnOpenCheckinHistory" type="button">📋 Histórico</button>
+      </div>`;
+    }
+
+    $("#profileCheckinContent").innerHTML = lastCheckinSection + bodySection + energySection + macrosSection + goalSection;
+    // re-bind do botão gerado dinamicamente
+    const btnHist = $("#btnOpenCheckinHistory");
+    if (btnHist) btnHist.addEventListener("click", openCheckinHistory);
     $("#profileCheckinOverlay").classList.add("open");
     $("#profileCheckinModal").classList.add("open");
   }
@@ -4422,6 +4557,166 @@ tr:active { background: var(--surface2); }
   function closeProfileCheckin(){
     $("#profileCheckinOverlay").classList.remove("open");
     $("#profileCheckinModal").classList.remove("open");
+  }
+
+  // ── Histórico de Check-ins ──────────────────────────────
+  function _loadCheckins(){
+    return loadJSON(CHECKINS_KEY, { checkins: [] });
+  }
+
+  function getLastCheckin(){
+    const { checkins } = _loadCheckins();
+    return checkins.length ? checkins[checkins.length - 1] : null;
+  }
+
+  function saveCheckin(entry){
+    const store = _loadCheckins();
+    store.checkins.push(entry);
+    localStorage.setItem(CHECKINS_KEY, JSON.stringify(store));
+  }
+
+  function buildCheckinPeriod(days){
+    days = days || 7;
+    const today = new Date();
+    let trainingSessions = 0, totalTrainingKcal = 0;
+    let consumedDays = 0, totalConsumed = 0, adherentDays = 0;
+    let hasExercicios = false, hasCardio = false;
+    const kcalTarget = (settings.goals && settings.goals.kcal) || 0;
+
+    for (let i = 0; i < days; i++){
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().slice(0, 10);
+
+      // treino
+      const td = treinoData.days && treinoData.days[dateStr];
+      if (td) {
+        const tKcal = td.kcal || 0;
+        if (tKcal > 0) {
+          trainingSessions++;
+          totalTrainingKcal += tKcal;
+        }
+        if (td.exercicios && td.exercicios.length) hasExercicios = true;
+        if (td.cardio && td.cardio.length) hasCardio = true;
+      }
+
+      // nutrição
+      const en = getEnergyForDate(dateStr);
+      if (en && en.consumed > 0) {
+        consumedDays++;
+        totalConsumed += en.consumed;
+        if (kcalTarget > 0) {
+          const ratio = en.consumed / kcalTarget;
+          if (ratio >= 0.9 && ratio <= 1.10) adherentDays++;
+        }
+      }
+    }
+
+    let activityType = "—";
+    if (hasExercicios && hasCardio) activityType = "musculação+cardio";
+    else if (hasExercicios) activityType = "musculação";
+    else if (hasCardio) activityType = "cardio";
+
+    const avgTrainingKcal = trainingSessions > 0 ? Math.round(totalTrainingKcal / trainingSessions) : 0;
+    const avgConsumed     = consumedDays > 0 ? Math.round(totalConsumed / consumedDays) : 0;
+    const adherencePct    = consumedDays > 0 ? Math.round((adherentDays / consumedDays) * 100) : 0;
+
+    return { trainingSessions, avgTrainingKcal, activityType, avgConsumed, adherencePct, period: days };
+  }
+
+  function openCheckinForm(){
+    const today = new Date().toISOString().slice(0, 10);
+    const m = measure.days && measure.days[today];
+
+    // pré-preenche com dados de hoje se disponíveis
+    $("#checkinFormWeight").value = (m && m.weightKg) ? m.weightKg : (calc.weightKg || "");
+    $("#checkinFormWaist").value  = (m && m.waistCm)  ? m.waistCm  : "";
+    $("#checkinFormBF").value     = "";
+    $("#checkinFormNote").value   = "";
+
+    // calcula período
+    const p = buildCheckinPeriod(7);
+    const trainLine = p.trainingSessions > 0
+      ? `💪 ${p.trainingSessions} treino${p.trainingSessions > 1 ? "s" : ""} · avg ${p.avgTrainingKcal} kcal · ${p.activityType}`
+      : "💪 Sem treinos registrados nos últimos 7 dias";
+    const nutrLine = p.avgConsumed > 0
+      ? `🥗 avg ${p.avgConsumed.toLocaleString("pt-BR")} kcal · ${p.adherencePct}% aderência`
+      : "🥗 Sem logs de nutrição nos últimos 7 dias";
+
+    $("#checkinPeriodTraining").textContent = trainLine;
+    $("#checkinPeriodNutrition").textContent = nutrLine;
+
+    // fecha o modal de perfil e abre o form
+    closeProfileCheckin();
+    $("#checkinFormOverlay").classList.add("open");
+    $("#checkinFormModal").classList.add("open");
+  }
+
+  function closeCheckinForm(){
+    $("#checkinFormOverlay").classList.remove("open");
+    $("#checkinFormModal").classList.remove("open");
+  }
+
+  function openCheckinHistory(){
+    renderCheckinHistory();
+    closeProfileCheckin();
+    $("#checkinHistoryOverlay").classList.add("open");
+    $("#checkinHistorySheet").classList.add("open");
+  }
+
+  function closeCheckinHistory(){
+    $("#checkinHistoryOverlay").classList.remove("open");
+    $("#checkinHistorySheet").classList.remove("open");
+  }
+
+  function renderCheckinHistory(){
+    const { checkins } = _loadCheckins();
+    const body = $("#checkinHistoryBody");
+    if (!checkins.length){
+      body.innerHTML = `<div class="checkin-history-empty">Nenhum check-in registrado ainda.<br>Use "Check-in ✅" no perfil para começar.</div>`;
+      return;
+    }
+    const WZ_GOAL_LABELS_LOCAL = { cut:"Cut", bulk:"Bulk", recomp:"Recomp", maintain:"Manutenção" };
+    // exibe do mais recente para o mais antigo
+    const items = [...checkins].reverse();
+    body.innerHTML = items.map((c, i) => {
+      const prev = items[i + 1];
+      const dateLabel = new Date(c.date + "T12:00:00").toLocaleDateString("pt-BR", { day:"2-digit", month:"short", year:"numeric" });
+      const goalLabel = WZ_GOAL_LABELS_LOCAL[c.goalType] || c.goalType || "—";
+
+      let deltaHTML = "";
+      if (prev && prev.weightKg && c.weightKg) {
+        const d = (c.weightKg - prev.weightKg).toFixed(1);
+        const cls = d > 0 ? "pos" : "neg";
+        const sign = d > 0 ? "▲ +" : "▼ ";
+        deltaHTML = ` <span class="checkin-delta ${cls}">${sign}${d} kg</span>`;
+      }
+
+      const trainStr = c.trainingSessions > 0
+        ? `💪 ${c.trainingSessions} treino${c.trainingSessions > 1 ? "s" : ""} · avg ${c.avgTrainingKcal} kcal · ${c.activityType}`
+        : "💪 Sem treinos registrados";
+      const nutrStr = c.avgConsumed > 0
+        ? `🥗 avg ${(c.avgConsumed).toLocaleString("pt-BR")} kcal · ${c.adherencePct}% aderência`
+        : "🥗 Sem dados de nutrição";
+      const noteHTML = c.note ? `<div class="checkin-hcard-note">📝 "${c.note}"</div>` : "";
+
+      return `
+        <div class="checkin-hcard">
+          <div class="checkin-hcard-top">
+            <span class="checkin-hcard-date">📅 ${dateLabel}</span>
+            <span class="checkin-hcard-goal">${goalLabel}</span>
+          </div>
+          <div class="checkin-hcard-metrics">
+            <span class="checkin-hcard-metric"><strong>${c.weightKg ? c.weightKg + " kg" : "—"}</strong>${deltaHTML}</span>
+            ${c.waistCm ? `<span class="checkin-hcard-metric">📏 <strong>${c.waistCm} cm</strong></span>` : ""}
+            ${c.bfPct   ? `<span class="checkin-hcard-metric">🧍 <strong>${c.bfPct}%</strong> BF</span>` : ""}
+          </div>
+          ${c.bmr ? `<div class="checkin-hcard-stat">🔥 BMR ${Math.round(c.bmr).toLocaleString("pt-BR")} · Meta ${Math.round(c.kcalTarget).toLocaleString("pt-BR")} kcal</div>` : ""}
+          <div class="checkin-hcard-stat">${trainStr}</div>
+          <div class="checkin-hcard-stat">${nutrStr}</div>
+          ${noteHTML}
+        </div>`;
+    }).join("");
   }
 
   function wzSaveStep1(){
@@ -5004,9 +5299,11 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
           sex: calc.sex || null, age: calc.age || null,
           weightKg: calc.weightKg || null, heightCm: calc.heightCm || null,
           activity: calc.activity || null,
-          deficitPct: calc.deficitPct || null
+          deficitPct: calc.deficitPct || null,
+          goalType: calc.goalType || "maintain"
         }
       },
+      checkins: _loadCheckins().checkins,
       measurements: measureEntries,
       nutrition: {
         days: nutritionDays,
@@ -6731,6 +7028,60 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     $("#btnCheckinClose2").addEventListener("click", closeProfileCheckin);
     $("#profileCheckinOverlay").addEventListener("click", closeProfileCheckin);
     $("#btnCheckinUpdate").addEventListener("click", () => { closeProfileCheckin(); openCalcWizard(); });
+    $("#btnRegisterCheckin").addEventListener("click", openCheckinForm);
+
+    // check-in form
+    $("#btnCheckinFormClose").addEventListener("click", closeCheckinForm);
+    $("#btnCheckinFormCancel").addEventListener("click", closeCheckinForm);
+    $("#checkinFormOverlay").addEventListener("click", closeCheckinForm);
+    $("#btnCheckinFormSave").addEventListener("click", () => {
+      const weightKg = parseFloat($("#checkinFormWeight").value) || null;
+      const waistCm  = parseFloat($("#checkinFormWaist").value)  || null;
+      const bfPct    = parseFloat($("#checkinFormBF").value)      || null;
+      const note     = $("#checkinFormNote").value.trim();
+      const p        = buildCheckinPeriod(7);
+      const today    = new Date().toISOString().slice(0, 10);
+      const c        = calc;
+      let leanKg = null, bmr = null, tdee = null, kcalTarget = null;
+      const sf = c.skinfolds || {};
+      const sum7 = (sf.chest||0)+(sf.ax||0)+(sf.tri||0)+(sf.sub||0)+(sf.ab||0)+(sf.sup||0)+(sf.th||0);
+      if (c.age > 0 && sum7 > 0) {
+        const bd = bodyDensityJP7(c.sex, c.age, sum7);
+        const bf2 = bfSiri(bd);
+        if (Number.isFinite(bf2) && bf2 > 0 && (weightKg || c.weightKg) > 0)
+          leanKg = (weightKg || c.weightKg) - ((weightKg || c.weightKg) * (bf2 / 100));
+      }
+      if (leanKg) bmr = bmrKatch(leanKg);
+      else if (c.weightKg > 0 && c.heightCm > 0 && c.age > 0) bmr = bmrMifflin(c.sex, weightKg || c.weightKg, c.heightCm, c.age);
+      if (bmr) {
+        const act = parseFloat(c.activity) || 1.55;
+        tdee = bmr * act;
+        const preset = GOAL_PRESETS[c.goalType || "maintain"] || GOAL_PRESETS.maintain;
+        kcalTarget = c.fixedKcal > 0 ? c.fixedKcal : Math.round(tdee * (1 - (preset.def||0)/100));
+      }
+      const entry = {
+        date: today,
+        weightKg, waistCm, bfPct, leanKg: leanKg ? Math.round(leanKg * 10) / 10 : null,
+        bmr: bmr ? Math.round(bmr) : null,
+        tdee: tdee ? Math.round(tdee) : null,
+        kcalTarget: kcalTarget || null,
+        goalType: c.goalType || "maintain",
+        period: p.period,
+        trainingSessions: p.trainingSessions,
+        avgTrainingKcal: p.avgTrainingKcal,
+        activityType: p.activityType,
+        avgConsumed: p.avgConsumed,
+        adherencePct: p.adherencePct,
+        note: note || null,
+      };
+      saveCheckin(entry);
+      closeCheckinForm();
+      showToast("Check-in registrado ✅");
+    });
+
+    // check-in history
+    $("#btnCheckinHistoryClose").addEventListener("click", closeCheckinHistory);
+    $("#checkinHistoryOverlay").addEventListener("click", closeCheckinHistory);
 
     // wizard — open/close
     $("#btnOpenWizard").addEventListener("click", (e) => { e.stopPropagation(); _openProfileOrWizard(); });
