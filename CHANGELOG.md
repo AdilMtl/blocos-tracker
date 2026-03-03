@@ -5,6 +5,35 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.4.0] — 2026-03-03
+
+### Adicionado
+- [feat] **Histórico de Hábitos** (`#habitHistorySheet`, z-index 325): bottom sheet acessível pelo botão 📊 no cabeçalho do card de hábitos.
+- [feat] **Aba "📅 Mês"** (heatmap calendário): círculos coloridos por score (0–5 hábitos, escala roxa → accent), navegação ‹ › entre meses, tooltip com detalhes ao tocar em cada dia (hábitos feitos/não feitos), rodapé com % aderência e dias com ≥3 hábitos.
+- [feat] **Aba "📈 Por hábito"** (tendência 8 semanas): uma linha por hábito com 8 mini-barras proporcionais (% da semana cumprido), % de aderência das últimas 4 semanas e streak de dias consecutivos 🔥.
+- [feat] **Botão 📊** no trigger do card de hábitos — abre o histórico sem abrir/fechar o accordion.
+
+### Corrigido
+- [fix] **HTML inválido: `<button>` dentro de `<button>`** no trigger do card de hábitos — causava o botão 📊 aparecer em linha separada. Trigger convertido para `<div>` mantendo comportamento idêntico.
+- [fix] **Células do heatmap com ~46px** (aspect-ratio + colunas 1fr em 375px) — corrigido para tamanho fixo 28×28px com `margin: 0 auto`.
+- [fix] **Aderência calculada sobre período fixo** — agora usa o 1º registro do usuário como início do denominador. Usuário com 7 dias de dados vê aderência real daqueles 7 dias, não 7/28.
+- [fix] **Timezone bug em `_habitStreak` e `_habitAdherence`** — `toISOString()` (UTC) substituído por helper `_localISO()` que usa data local, consistente com `todayISO()` e as chaves do storage.
+
+### Melhorado
+- [improve] Meses sem nenhum registro exibem "Sem registros neste mês" em vez de "0%".
+
+### Notas técnicas
+- Zero mudança de schema — lê `blocos_tracker_habits_v1` existente.
+- Z-index hierarquia: habitHistory overlay/sheet 324/325.
+- `#btnOpenHabitHistory` gerado via `innerHTML` em `renderHabitTracker()` — re-bind explícito após render (não no INIT).
+- Nav ‹ › do heatmap re-bind a cada `renderHabitMonth()` (gerado dentro de `#habitHistBody`).
+- CACHE_NAME bumped: `kcalix-v8` → `kcalix-v9`.
+
+### Pendências
+- v2.5.0: próxima feature a definir.
+
+---
+
 ## [v2.3.0] — 2026-03-03
 
 ### Adicionado
