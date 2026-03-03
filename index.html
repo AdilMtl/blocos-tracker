@@ -1768,6 +1768,57 @@ tr:active { background: var(--surface2); }
 .timer-ctrl .btn { flex:1; }
 .timer-notify-hint { font-size:11px; color:var(--text3); text-align:center; margin-top:10px; min-height:16px; }
 
+.calc-goal-hint { font-size:12px; color:var(--text3); line-height:1.45; padding:6px 8px; background:var(--surface2); border-radius:6px; margin-top:4px; }
+.calc-goal-hint:empty { display:none; }
+
+/* ── Calc Wizard ── */
+.calc-wizard-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:314; }
+.calc-wizard-overlay.open { display:block; }
+.calc-wizard { display:none; position:fixed; inset:0; background:var(--bg); z-index:315; flex-direction:column; overflow:hidden; }
+.calc-wizard.open { display:flex; }
+.calc-wizard-header { display:flex; align-items:center; justify-content:space-between; padding:16px 16px 10px; border-bottom:1px solid var(--line); }
+.calc-wizard-title { font-weight:700; font-size:16px; color:var(--text); }
+.calc-wizard-close { background:none; border:none; font-size:22px; color:var(--text3); padding:2px 6px; cursor:pointer; line-height:1; }
+.calc-wizard-progress { display:flex; gap:7px; justify-content:center; padding:10px 16px 2px; }
+.wz-dot { width:8px; height:8px; border-radius:50%; background:var(--surface3); transition:background .2s; }
+.wz-dot.active { background:var(--accent); }
+.wz-dot.done { background:var(--accent); opacity:.4; }
+.calc-wizard-step { display:none; flex-direction:column; flex:1; overflow:hidden; }
+.calc-wizard-step.active { display:flex; }
+.wz-step-content { flex:1; overflow-y:auto; padding:18px 16px; overscroll-behavior:contain; }
+.wz-headline { font-size:18px; font-weight:700; margin-bottom:14px; color:var(--text); }
+.calc-wizard-footer { display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--line); background:var(--bg); }
+.calc-wizard-footer .btn { flex:1; }
+/* sex buttons */
+.wz-sex-row { display:flex; gap:10px; margin-bottom:16px; }
+.wz-sex-btn { flex:1; padding:14px 10px; border-radius:10px; border:2px solid var(--line); background:var(--surface2); font-size:16px; font-weight:600; color:var(--text); cursor:pointer; transition:border-color .15s, background .15s; }
+.wz-sex-btn.selected { border-color:var(--accent); background:rgba(124,92,255,.15); }
+/* choice cards (skinfolds) */
+.wz-choice-row { display:flex; flex-direction:column; gap:10px; margin:12px 0; }
+.wz-choice-card { display:flex; align-items:center; gap:12px; padding:14px; border-radius:10px; border:2px solid var(--line); background:var(--surface2); cursor:pointer; transition:border-color .15s; }
+.wz-choice-card.selected { border-color:var(--accent); }
+.wz-choice-icon { font-size:22px; }
+.wz-choice-label { font-size:15px; font-weight:600; color:var(--text); }
+/* goal cards */
+.wz-goal-cards { display:flex; flex-direction:column; gap:10px; }
+.wz-goal-card { display:flex; align-items:center; gap:12px; padding:13px 14px; border-radius:10px; border:2px solid var(--line); background:var(--surface2); cursor:pointer; transition:border-color .15s; }
+.wz-goal-card[data-goal="maintain"].selected { border-color:#f59e0b; }
+.wz-goal-card[data-goal="cut"].selected      { border-color:#ef4444; }
+.wz-goal-card[data-goal="recomp"].selected   { border-color:#22c55e; }
+.wz-goal-card[data-goal="bulk"].selected     { border-color:#3b82f6; }
+.wz-goal-icon { font-size:20px; flex-shrink:0; }
+.wz-goal-name { font-size:14px; font-weight:700; color:var(--text); }
+.wz-goal-desc { font-size:12px; color:var(--text3); margin-top:2px; line-height:1.4; }
+.wz-goal-check { margin-left:auto; font-size:16px; color:var(--accent); display:none; flex-shrink:0; }
+.wz-goal-card.selected .wz-goal-check { display:block; }
+/* bmr preview + summary */
+.wz-bmr-preview { padding:12px; border-radius:8px; background:var(--surface2); font-size:13px; color:var(--text2); min-height:44px; margin-top:8px; line-height:1.6; }
+.wz-summary-card { padding:14px; border-radius:10px; background:var(--surface2); border:1px solid var(--line); margin-bottom:14px; font-size:14px; line-height:1.9; color:var(--text); }
+.wz-question { font-size:15px; font-weight:600; color:var(--text2); margin-bottom:12px; }
+/* entry banner inside accordion */
+.wz-entry-banner { display:flex; align-items:center; justify-content:space-between; background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:14px; gap:10px; }
+.wz-entry-banner span { font-size:13px; color:var(--text2); }
+
 /* ════════════════════ DESKTOP ════════════════════ */
 /* btn hoje */
 .btn-hoje {
@@ -1887,6 +1938,10 @@ tr:active { background: var(--surface2); }
       <button class="home-action-card" type="button" onclick="document.getElementById('btnExportAI').click()">
         <span class="home-action-icon">🤖</span>
         <span class="home-action-label">IA Export</span>
+      </button>
+      <button class="home-action-card" id="btnHomeWizard" type="button" style="grid-column:1/-1;">
+        <span class="home-action-icon">🎯</span>
+        <span class="home-action-label">Meu Perfil Nutricional</span>
       </button>
     </div>
 
@@ -2050,7 +2105,11 @@ tr:active { background: var(--surface2); }
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-content"><div class="acc-inner">
-            <p class="hint" style="margin-bottom:12px;">Preencha ao menos os dados básicos. Dobras são opcionais — sem elas usamos Mifflin-St Jeor como estimativa de BMR.</p>
+            <div class="wz-entry-banner">
+              <span>Configure seu perfil passo a passo</span>
+              <button class="btn sm primary" id="btnOpenWizard" type="button">🧭 Configurar</button>
+            </div>
+            <p class="hint" style="margin-bottom:12px;">Ou preencha manualmente abaixo. Dobras são opcionais — sem elas usamos Mifflin-St Jeor.</p>
 
             <div class="calc-section-label">1) Dados básicos</div>
             <div class="form-grid cols-2">
@@ -2078,6 +2137,15 @@ tr:active { background: var(--surface2); }
 
             <div class="calc-section-label" style="margin-top:14px;">3) Alvo de dieta</div>
             <div class="form-grid cols-2">
+              <div class="form-row" style="grid-column:1/-1;"><label>Objetivo</label>
+                <select id="calcGoalType">
+                  <option value="maintain">🟡 Manutenção — manter peso atual</option>
+                  <option value="cut">🔴 Cut — emagrecer com preservação muscular</option>
+                  <option value="recomp">🟢 Recomp — recomposição corporal</option>
+                  <option value="bulk">🔵 Bulk — ganho de massa com mínimo de gordura</option>
+                </select>
+              </div>
+              <div class="calc-goal-hint" id="calcGoalHint" style="grid-column:1/-1;"></div>
               <div class="form-row"><label>Estilo de vida</label>
                 <select id="calcActivity">
                   <option value="1.2">Sedentário — trabalho sentado</option>
@@ -2662,6 +2730,143 @@ tr:active { background: var(--surface2); }
 
 <div class="toast" id="toast">OK</div>
 
+<!-- ═══════════════ CALC WIZARD ═══════════════ -->
+<div id="calcWizardOverlay" class="calc-wizard-overlay"></div>
+<div id="calcWizard" class="calc-wizard">
+
+  <div class="calc-wizard-header">
+    <div class="calc-wizard-title" id="wzTitle">Configurar perfil</div>
+    <button class="calc-wizard-close" id="btnWzClose" type="button">✕</button>
+  </div>
+  <div class="calc-wizard-progress" id="wzProgress">
+    <div class="wz-dot" data-dot="1"></div>
+    <div class="wz-dot" data-dot="2"></div>
+    <div class="wz-dot" data-dot="3"></div>
+    <div class="wz-dot" data-dot="4"></div>
+  </div>
+
+  <!-- Passo 0: revisão (usuários existentes) -->
+  <div class="calc-wizard-step" data-step="0">
+    <div class="wz-step-content">
+      <div class="wz-headline">Seu perfil atual</div>
+      <div class="wz-summary-card" id="wizardSummary"></div>
+      <div class="wz-question">Tem algo que queira atualizar?</div>
+    </div>
+    <div class="calc-wizard-footer">
+      <button class="btn ghost" id="btnWzReviewAll" type="button">Revisar tudo →</button>
+      <button class="btn primary" id="btnWzRecalc" type="button">Recalcular assim ✅</button>
+    </div>
+  </div>
+
+  <!-- Passo 1: dados básicos -->
+  <div class="calc-wizard-step" data-step="1">
+    <div class="wz-step-content">
+      <div class="wz-headline">Quem é você?</div>
+      <div class="wz-sex-row">
+        <button class="wz-sex-btn" data-sex="male" type="button">♂ Homem</button>
+        <button class="wz-sex-btn" data-sex="female" type="button">♀ Mulher</button>
+      </div>
+      <div class="form-grid cols-2">
+        <div class="form-row"><label>Idade (anos)</label><input id="wzAge" inputmode="decimal" placeholder="37" /></div>
+        <div class="form-row"><label>Peso (kg)</label><input id="wzWeight" inputmode="decimal" placeholder="76" /></div>
+        <div class="form-row" style="grid-column:1/-1;"><label>Altura (cm)</label><input id="wzHeight" inputmode="decimal" placeholder="177" /></div>
+      </div>
+    </div>
+    <div class="calc-wizard-footer">
+      <button class="btn primary" id="btnWzStep1Next" type="button">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- Passo 2: dobras -->
+  <div class="calc-wizard-step" data-step="2">
+    <div class="wz-step-content">
+      <div class="wz-headline">Composição corporal</div>
+      <p class="hint">Com as dobras cutâneas (JP7) o BMR é mais preciso. Sem elas, usamos Mifflin-St Jeor — funciona bem para a maioria.</p>
+      <div class="wz-choice-row">
+        <div class="wz-choice-card" id="wzChoiceYes" data-choice="yes">
+          <span class="wz-choice-icon">📐</span>
+          <span class="wz-choice-label">Sim, tenho os 7 pontos</span>
+        </div>
+        <div class="wz-choice-card" id="wzChoiceNo" data-choice="no">
+          <span class="wz-choice-icon">📊</span>
+          <span class="wz-choice-label">Não, usar estimativa (Mifflin)</span>
+        </div>
+      </div>
+      <div id="wzSkinfoldFields" style="display:none; margin-top:14px;">
+        <div class="grid3">
+          <div class="form-row"><label>Peito (mm)</label><input id="wzSfChest" inputmode="decimal" /></div>
+          <div class="form-row"><label>Axilar média</label><input id="wzSfAx" inputmode="decimal" /></div>
+          <div class="form-row"><label>Tríceps</label><input id="wzSfTri" inputmode="decimal" /></div>
+          <div class="form-row"><label>Subescapular</label><input id="wzSfSub" inputmode="decimal" /></div>
+          <div class="form-row"><label>Abdominal</label><input id="wzSfAb" inputmode="decimal" /></div>
+          <div class="form-row"><label>Supra-ilíaca</label><input id="wzSfSup" inputmode="decimal" /></div>
+          <div class="form-row"><label>Coxa</label><input id="wzSfTh" inputmode="decimal" /></div>
+        </div>
+      </div>
+    </div>
+    <div class="calc-wizard-footer">
+      <button class="btn ghost" id="btnWzStep2Back" type="button">← Voltar</button>
+      <button class="btn primary" id="btnWzStep2Next" type="button">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- Passo 3: objetivo -->
+  <div class="calc-wizard-step" data-step="3">
+    <div class="wz-step-content">
+      <div class="wz-headline">Qual é o seu objetivo?</div>
+      <div class="wz-goal-cards">
+        <div class="wz-goal-card" data-goal="maintain">
+          <span class="wz-goal-icon">🟡</span>
+          <div><div class="wz-goal-name">Manutenção</div><div class="wz-goal-desc">Manter o peso atual — sem déficit ou superávit</div></div>
+          <span class="wz-goal-check">✓</span>
+        </div>
+        <div class="wz-goal-card" data-goal="cut">
+          <span class="wz-goal-icon">🔴</span>
+          <div><div class="wz-goal-name">Cut — Emagrecer</div><div class="wz-goal-desc">Déficit 22% com proteína elevada para preservar músculo</div></div>
+          <span class="wz-goal-check">✓</span>
+        </div>
+        <div class="wz-goal-card" data-goal="recomp">
+          <span class="wz-goal-icon">🟢</span>
+          <div><div class="wz-goal-name">Recomp — Recomposição</div><div class="wz-goal-desc">Déficit leve + proteína alta — perde gordura e ganha músculo</div></div>
+          <span class="wz-goal-check">✓</span>
+        </div>
+        <div class="wz-goal-card" data-goal="bulk">
+          <span class="wz-goal-icon">🔵</span>
+          <div><div class="wz-goal-name">Bulk — Ganho de massa</div><div class="wz-goal-desc">Superávit +10% priorizando carboidratos para síntese muscular</div></div>
+          <span class="wz-goal-check">✓</span>
+        </div>
+      </div>
+    </div>
+    <div class="calc-wizard-footer">
+      <button class="btn ghost" id="btnWzStep3Back" type="button">← Voltar</button>
+      <button class="btn primary" id="btnWzStep3Next" type="button">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- Passo 4: atividade + resumo -->
+  <div class="calc-wizard-step" data-step="4">
+    <div class="wz-step-content">
+      <div class="wz-headline">Nível de atividade</div>
+      <div class="form-row" style="margin-bottom:12px;">
+        <label>Estilo de vida</label>
+        <select id="wzActivity">
+          <option value="1.2">Sedentário — trabalho sentado</option>
+          <option value="1.375">Levemente ativo — caminhadas</option>
+          <option value="1.55" selected>Moderadamente ativo</option>
+          <option value="1.725">Bastante ativo</option>
+          <option value="1.9">Muito ativo — trabalho físico</option>
+        </select>
+      </div>
+      <div class="wz-bmr-preview" id="wzBmrPreview"></div>
+    </div>
+    <div class="calc-wizard-footer">
+      <button class="btn ghost" id="btnWzStep4Back" type="button">← Voltar</button>
+      <button class="btn primary" id="btnWzFinish" type="button">Calcular e Salvar ✅</button>
+    </div>
+  </div>
+
+</div>
+
 <script>
 (() => {
   // ══════════ UTILS ══════════
@@ -2917,7 +3122,7 @@ tr:active { background: var(--surface2); }
 
   const DEFAULT_CALC = {
     sex: "male", age: 37, weightKg: 76, heightCm: 177,
-    activity: 1.55, deficitPct: 25, pKg: 2.0, cKg: 3.0, minFatKg: 0.6, fixedKcal: "",
+    activity: 1.55, goalType: "maintain", deficitPct: 0, pKg: 1.6, cKg: 3.0, minFatKg: 0.6, fixedKcal: "",
     skinfolds: { chest:16, ax:20, tri:11, sub:34, ab:40, sup:25, th:15 }
   };
 
@@ -3861,6 +4066,203 @@ tr:active { background: var(--surface2); }
     showToast("Ajustes resetados ♻️");
   };
 
+  // ══════════ GOAL PRESETS ══════════
+  const GOAL_PRESETS = {
+    maintain: { def:0,   pKg:1.6, cKg:3.0, minFatKg:0.6, hint:"Sem déficit — manter o peso atual. Proteína moderada, carboidrato normal." },
+    cut:      { def:22,  pKg:2.2, cKg:2.5, minFatKg:0.6, hint:"Déficit ~22% com proteína elevada para preservar músculo durante o emagrecimento." },
+    recomp:   { def:10,  pKg:2.2, cKg:3.0, minFatKg:0.7, hint:"Déficit leve + proteína alta — perde gordura e ganha músculo ao mesmo tempo. Processo mais lento." },
+    bulk:     { def:-10, pKg:1.6, cKg:4.0, minFatKg:0.8, hint:"Superávit +10% para síntese muscular máxima. Prioriza carboidratos e gorduras como 'coringas' calóricos." },
+  };
+
+  function applyGoalPreset(type){
+    const p = GOAL_PRESETS[type];
+    if(!p) return;
+    $("#calcDef").value      = p.def;
+    $("#calcPKG").value      = p.pKg;
+    $("#calcCKG").value      = p.cKg;
+    $("#calcMinFatKG").value = p.minFatKg;
+    $("#calcGoalHint").textContent = p.hint;
+  }
+
+  // ══════════ CALC WIZARD ══════════
+  const WZ_ACTIVITY_LABELS = { "1.2":"Sedentário", "1.375":"Levemente ativo", "1.55":"Moderadamente ativo", "1.725":"Bastante ativo", "1.9":"Muito ativo" };
+  const WZ_GOAL_LABELS     = { maintain:"🟡 Manutenção", cut:"🔴 Cut — Emagrecer", recomp:"🟢 Recomp", bulk:"🔵 Bulk — Ganho de massa" };
+  let wizardData = {};
+  let wzCurrentStep = 1;
+
+  function openCalcWizard(){
+    const isNew = localStorage.getItem(CALC_KEY) === null;
+    if(isNew){
+      wizardData = { sex:"male", hasSkinfolds:false, skinfolds:{}, goalType:"maintain", activity:"1.55" };
+    } else {
+      const sf = calc.skinfolds || {};
+      wizardData = {
+        sex: calc.sex || "male",
+        age: calc.age || "",
+        weightKg: calc.weightKg || "",
+        heightCm: calc.heightCm || "",
+        hasSkinfolds: Object.values(sf).some(v => v > 0),
+        skinfolds: { ...sf },
+        goalType: calc.goalType || "maintain",
+        activity: String(calc.activity || 1.55),
+      };
+    }
+    $("#calcWizardOverlay").classList.add("open");
+    $("#calcWizard").classList.add("open");
+    if(!isNew){ renderWizardSummary(); wizardGoTo(0); }
+    else { wizardGoTo(1); }
+    $("#wzTitle").textContent = isNew ? "Configurar perfil" : "Editando perfil";
+  }
+
+  function closeCalcWizard(){
+    $("#calcWizardOverlay").classList.remove("open");
+    $("#calcWizard").classList.remove("open");
+  }
+
+  function wizardGoTo(step){
+    wzCurrentStep = step;
+    $$(".calc-wizard-step").forEach(el => el.classList.remove("active"));
+    const stepEl = $(`.calc-wizard-step[data-step="${step}"]`);
+    if(stepEl) stepEl.classList.add("active");
+    // progress dots only for steps 1-4
+    const prog = $("#wzProgress");
+    prog.style.display = step === 0 ? "none" : "flex";
+    $$(".wz-dot").forEach(dot => {
+      const n = parseInt(dot.dataset.dot);
+      dot.classList.remove("active","done");
+      if(n === step) dot.classList.add("active");
+      else if(n < step) dot.classList.add("done");
+    });
+    fillWizardStep(step);
+  }
+
+  function fillWizardStep(step){
+    if(step === 1){
+      $$(".wz-sex-btn").forEach(btn => btn.classList.toggle("selected", btn.dataset.sex === (wizardData.sex || "male")));
+      $("#wzAge").value    = wizardData.age    || "";
+      $("#wzWeight").value = wizardData.weightKg || "";
+      $("#wzHeight").value = wizardData.heightCm || "";
+    } else if(step === 2){
+      const has = !!wizardData.hasSkinfolds;
+      $("#wzChoiceYes").classList.toggle("selected", has);
+      $("#wzChoiceNo").classList.toggle("selected", !has);
+      $("#wzSkinfoldFields").style.display = has ? "block" : "none";
+      if(has){
+        const sf = wizardData.skinfolds || {};
+        $("#wzSfChest").value = sf.chest || "";
+        $("#wzSfAx").value    = sf.ax    || "";
+        $("#wzSfTri").value   = sf.tri   || "";
+        $("#wzSfSub").value   = sf.sub   || "";
+        $("#wzSfAb").value    = sf.ab    || "";
+        $("#wzSfSup").value   = sf.sup   || "";
+        $("#wzSfTh").value    = sf.th    || "";
+      }
+    } else if(step === 3){
+      $$(".wz-goal-card").forEach(c => c.classList.toggle("selected", c.dataset.goal === (wizardData.goalType || "maintain")));
+    } else if(step === 4){
+      $("#wzActivity").value = wizardData.activity || "1.55";
+      updateWzBmrPreview();
+    }
+  }
+
+  function updateWzBmrPreview(){
+    const sex  = wizardData.sex || "male";
+    const age  = parseFloat(wizardData.age) || 0;
+    const w    = parseFloat(wizardData.weightKg) || 0;
+    const h    = parseFloat(wizardData.heightCm) || 0;
+    const act  = parseFloat($("#wzActivity").value) || 1.55;
+    let bmr = null;
+    if(wizardData.hasSkinfolds && wizardData.skinfolds){
+      const sf   = wizardData.skinfolds;
+      const sum7 = (sf.chest||0)+(sf.ax||0)+(sf.tri||0)+(sf.sub||0)+(sf.ab||0)+(sf.sup||0)+(sf.th||0);
+      if(age > 0 && sum7 > 0){
+        const bd = bodyDensityJP7(sex, age, sum7);
+        const bf = bfSiri(bd);
+        if(Number.isFinite(bf) && bf > 0 && w > 0) bmr = bmrKatch(w - w*(bf/100));
+      }
+    }
+    if(bmr === null && w > 0 && h > 0 && age > 0) bmr = bmrMifflin(sex, w, h, age);
+    const el = $("#wzBmrPreview");
+    if(bmr){
+      const tdee   = bmr * act;
+      const preset = GOAL_PRESETS[wizardData.goalType || "maintain"];
+      const target = preset ? Math.round(tdee * (1 - preset.def/100)) : Math.round(tdee);
+      el.innerHTML = `🔥 <b>BMR ≈ ${Math.round(bmr)} kcal</b> &nbsp;·&nbsp; TDEE ≈ ${Math.round(tdee)} kcal<br>🎯 Meta (${WZ_GOAL_LABELS[wizardData.goalType] || "—"}): <b>${target} kcal/dia</b>`;
+    } else {
+      el.textContent = "Preencha peso e altura no passo 1 para ver a estimativa.";
+    }
+  }
+
+  function renderWizardSummary(){
+    const c = calc;
+    const goalLabel = WZ_GOAL_LABELS[c.goalType || "maintain"] || "—";
+    const actLabel  = WZ_ACTIVITY_LABELS[String(c.activity)] || String(c.activity);
+    const sexLabel  = c.sex === "female" ? "♀ Mulher" : "♂ Homem";
+    const hasSF     = c.skinfolds && Object.values(c.skinfolds).some(v => v > 0);
+    $("#wizardSummary").innerHTML =
+      `<div>${sexLabel} &nbsp;·&nbsp; ${c.age||"—"} anos &nbsp;·&nbsp; ${c.weightKg||"—"} kg &nbsp;·&nbsp; ${c.heightCm||"—"} cm</div>` +
+      `<div>${goalLabel}</div>` +
+      `<div>${actLabel}</div>` +
+      `<div style="font-size:11px;color:var(--text3);margin-top:2px;">${hasSF ? "Dobras JP7 configuradas" : "Estimativa Mifflin-St Jeor"}</div>`;
+  }
+
+  function wzSaveStep1(){
+    wizardData.sex      = ($$(".wz-sex-btn").find(b => b.classList.contains("selected")) || {}).dataset?.sex || "male";
+    wizardData.age      = parseFloat($("#wzAge").value) || 0;
+    wizardData.weightKg = parseFloat($("#wzWeight").value) || 0;
+    wizardData.heightCm = parseFloat($("#wzHeight").value) || 0;
+  }
+
+  function wzSaveStep2(){
+    if(wizardData.hasSkinfolds){
+      wizardData.skinfolds = {
+        chest: parseFloat($("#wzSfChest").value)||0,
+        ax:    parseFloat($("#wzSfAx").value)||0,
+        tri:   parseFloat($("#wzSfTri").value)||0,
+        sub:   parseFloat($("#wzSfSub").value)||0,
+        ab:    parseFloat($("#wzSfAb").value)||0,
+        sup:   parseFloat($("#wzSfSup").value)||0,
+        th:    parseFloat($("#wzSfTh").value)||0,
+      };
+    } else {
+      wizardData.skinfolds = {};
+    }
+  }
+
+  function wizardFinish(){
+    wizardData.activity = $("#wzActivity").value || "1.55";
+    // transfere para o form principal
+    $("#calcSex").value     = wizardData.sex || "male";
+    $("#calcAge").value     = wizardData.age || "";
+    $("#calcWeight").value  = wizardData.weightKg || "";
+    $("#calcHeight").value  = wizardData.heightCm || "";
+    $("#calcActivity").value = wizardData.activity;
+    const sf = wizardData.skinfolds || {};
+    $("#sfChest").value = sf.chest || ""; $("#sfAx").value  = sf.ax  || "";
+    $("#sfTri").value   = sf.tri   || ""; $("#sfSub").value = sf.sub || "";
+    $("#sfAb").value    = sf.ab    || ""; $("#sfSup").value = sf.sup || "";
+    $("#sfTh").value    = sf.th    || "";
+    // aplica preset do objetivo
+    $("#calcGoalType").value = wizardData.goalType || "maintain";
+    applyGoalPreset(wizardData.goalType || "maintain");
+    // calcula, salva e aplica nas metas diárias automaticamente
+    const r = calcAll();
+    if(r && r.pG && r.cG && r.fatG != null && r.kcalTarget){
+      settings.goals.pG   = Math.round(r.pG);
+      settings.goals.cG   = Math.round(r.cG);
+      settings.goals.gG   = Math.round(r.fatG);
+      settings.goals.kcal = Math.round(r.kcalTarget);
+      saveJSON(SETTINGS_KEY, settings);
+      fillSettingsForm();
+    }
+    renderNutriBanner();
+    closeCalcWizard();
+    // abre accordion para mostrar resultado
+    const acc = $("#accCalcFull");
+    if(acc && !acc.classList.contains("open")) toggleAcc("accCalcFull");
+    showToast("Perfil configurado e metas aplicadas ✅");
+  }
+
   // ══════════ CALC (JP7 + Siri) ══════════
   function bodyDensityJP7(sex, age, sum7){
     const s = sum7;
@@ -3943,7 +4345,8 @@ tr:active { background: var(--surface2); }
       $("#outMacros").textContent = `P ${Math.round(pG)}g | C ${Math.round(cG)}g | G ${Math.round(fatG)}g\nKcal ≈ ${kcalCheck}`;
     } else $("#outMacros").textContent = "—";
 
-    calc = { sex, age, weightKg:w, heightCm:h, activity, deficitPct:def, pKg, cKg, minFatKg, fixedKcal: fixedRaw, skinfolds: sf };
+    const goalType = $("#calcGoalType").value || "maintain";
+    calc = { sex, age, weightKg:w, heightCm:h, activity, goalType, deficitPct:def, pKg, cKg, minFatKg, fixedKcal: fixedRaw, skinfolds: sf };
     saveJSON(CALC_KEY, calc);
     return { bf, leanKg, bmr, tdee, kcalTarget, pG, cG, fatG, sum7, sf };
   }
@@ -3954,8 +4357,11 @@ tr:active { background: var(--surface2); }
     $("#calcWeight").value = calc.weightKg ?? "";
     $("#calcHeight").value = calc.heightCm ?? "";
     $("#calcActivity").value = String(calc.activity ?? 1.55);
-    $("#calcDef").value = calc.deficitPct ?? 25;
-    $("#calcPKG").value = calc.pKg ?? 2.0;
+    const savedGoal = calc.goalType || "maintain";
+    $("#calcGoalType").value = savedGoal;
+    $("#calcGoalHint").textContent = (GOAL_PRESETS[savedGoal] || GOAL_PRESETS.maintain).hint;
+    $("#calcDef").value = calc.deficitPct ?? 0;
+    $("#calcPKG").value = calc.pKg ?? 1.6;
     $("#calcCKG").value = calc.cKg ?? 3.0;
     $("#calcMinFatKG").value = calc.minFatKg ?? 0.6;
     $("#calcFixedKcal").value = (calc.fixedKcal ?? "");
@@ -6093,8 +6499,83 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     );
 
     // calc
+    $("#calcGoalType").addEventListener("change", () => applyGoalPreset($("#calcGoalType").value));
     $("#btnCalcRun").addEventListener("click", () => { calcAll(); renderNutriBanner(); showToast("Calculado ✅"); });
     $("#btnCalcSave").addEventListener("click", () => { calcAll(); renderNutriBanner(); showToast("Parâmetros salvos 💾"); });
+
+    // wizard — open/close
+    $("#btnOpenWizard").addEventListener("click", (e) => { e.stopPropagation(); openCalcWizard(); });
+    $("#btnHomeWizard").addEventListener("click", () => openCalcWizard());
+    $("#btnWzClose").addEventListener("click", closeCalcWizard);
+    $("#calcWizardOverlay").addEventListener("click", closeCalcWizard);
+
+    // wizard — passo 0
+    $("#btnWzReviewAll").addEventListener("click", () => wizardGoTo(1));
+    $("#btnWzRecalc").addEventListener("click", () => {
+      const r = calcAll();
+      if(r && r.pG && r.cG && r.fatG != null && r.kcalTarget){
+        settings.goals.pG   = Math.round(r.pG);
+        settings.goals.cG   = Math.round(r.cG);
+        settings.goals.gG   = Math.round(r.fatG);
+        settings.goals.kcal = Math.round(r.kcalTarget);
+        saveJSON(SETTINGS_KEY, settings);
+        fillSettingsForm();
+      }
+      renderNutriBanner();
+      closeCalcWizard();
+      showToast("Recalculado e metas aplicadas ✅");
+    });
+
+    // wizard — passo 1
+    $$(".wz-sex-btn").forEach(btn => btn.addEventListener("click", () => {
+      $$(".wz-sex-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      wizardData.sex = btn.dataset.sex;
+    }));
+    $("#btnWzStep1Next").addEventListener("click", () => {
+      if(!parseFloat($("#wzWeight").value) || !parseFloat($("#wzHeight").value)){
+        showToast("Preencha peso e altura"); return;
+      }
+      wzSaveStep1();
+      wizardGoTo(2);
+    });
+
+    // wizard — passo 2
+    $("#wzChoiceYes").addEventListener("click", () => {
+      wizardData.hasSkinfolds = true;
+      $("#wzChoiceYes").classList.add("selected");
+      $("#wzChoiceNo").classList.remove("selected");
+      $("#wzSkinfoldFields").style.display = "block";
+    });
+    $("#wzChoiceNo").addEventListener("click", () => {
+      wizardData.hasSkinfolds = false;
+      $("#wzChoiceNo").classList.add("selected");
+      $("#wzChoiceYes").classList.remove("selected");
+      $("#wzSkinfoldFields").style.display = "none";
+    });
+    $("#btnWzStep2Back").addEventListener("click", () => wizardGoTo(1));
+    $("#btnWzStep2Next").addEventListener("click", () => {
+      if(wizardData.hasSkinfolds === undefined){ showToast("Selecione uma opção"); return; }
+      wzSaveStep2();
+      wizardGoTo(3);
+    });
+
+    // wizard — passo 3
+    $$(".wz-goal-card").forEach(card => card.addEventListener("click", () => {
+      $$(".wz-goal-card").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      wizardData.goalType = card.dataset.goal;
+    }));
+    $("#btnWzStep3Back").addEventListener("click", () => wizardGoTo(2));
+    $("#btnWzStep3Next").addEventListener("click", () => {
+      if(!wizardData.goalType){ showToast("Selecione um objetivo"); return; }
+      wizardGoTo(4);
+    });
+
+    // wizard — passo 4
+    $("#wzActivity").addEventListener("change", updateWzBmrPreview);
+    $("#btnWzStep4Back").addEventListener("click", () => wizardGoTo(3));
+    $("#btnWzFinish").addEventListener("click", wizardFinish);
 
     // ai export
     $("#btnExportAI").addEventListener("click", exportAIJson);
@@ -6153,10 +6634,9 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     fillSettingsForm();
     try{ calcAll(); }catch(e){}
     renderNutriBanner();
-    // primeiro acesso: abre calculadora automaticamente
+    // primeiro acesso: abre wizard automaticamente
     if (localStorage.getItem(CALC_KEY) === null) {
-      const accCalc = $("#accCalcFull");
-      if (accCalc && !accCalc.classList.contains("open")) toggleAcc("accCalcFull");
+      setTimeout(() => openCalcWizard(), 400);
     }
     fillMeasureFormForDate(currentDate());
     renderFoodPanel();
@@ -6262,5 +6742,6 @@ if ('serviceWorker' in navigator) {
   });
 })();
 </script>
+
 </body>
 </html>

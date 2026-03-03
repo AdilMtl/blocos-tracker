@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kcalix-v5';
+const CACHE_NAME = 'kcalix-v6';
 const ASSETS = [
   './',
   './index.html',
