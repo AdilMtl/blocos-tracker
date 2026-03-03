@@ -1789,6 +1789,18 @@ tr:active { background: var(--surface2); }
 .wz-headline { font-size:18px; font-weight:700; margin-bottom:14px; color:var(--text); }
 .calc-wizard-footer { display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--line); background:var(--bg); }
 .calc-wizard-footer .btn { flex:1; }
+/* welcome step */
+.wz-welcome-content { display:flex; flex-direction:column; align-items:center; text-align:center; padding:24px 20px; }
+.wz-welcome-logo { font-size:3.2rem; margin-bottom:4px; line-height:1; }
+.wz-welcome-brand { font-size:1.45rem; font-weight:800; color:var(--text); margin-bottom:6px; letter-spacing:-.5px; }
+.wz-welcome-tagline { font-size:1rem; color:var(--text2); line-height:1.55; margin-bottom:22px; max-width:280px; }
+.wz-welcome-props { display:flex; flex-direction:column; gap:10px; width:100%; margin-bottom:8px; }
+.wz-welcome-prop { display:flex; align-items:center; gap:12px; background:var(--surface2); border-radius:12px; padding:13px 14px; text-align:left; }
+.wz-welcome-prop-icon { font-size:1.4rem; flex-shrink:0; }
+.wz-welcome-prop-text { display:flex; flex-direction:column; gap:1px; }
+.wz-welcome-prop-title { font-size:.9rem; font-weight:700; color:var(--text); }
+.wz-welcome-prop-desc { font-size:.78rem; color:var(--text3); line-height:1.4; }
+.wz-welcome-fine { font-size:.72rem; color:var(--text3); margin-top:14px; }
 /* sex buttons */
 .wz-sex-row { display:flex; gap:10px; margin-bottom:16px; }
 .wz-sex-btn { flex:1; padding:14px 10px; border-radius:10px; border:2px solid var(--line); background:var(--surface2); font-size:16px; font-weight:600; color:var(--text); cursor:pointer; transition:border-color .15s, background .15s; }
@@ -1818,6 +1830,28 @@ tr:active { background: var(--surface2); }
 /* entry banner inside accordion */
 .wz-entry-banner { display:flex; align-items:center; justify-content:space-between; background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:14px; gap:10px; }
 .wz-entry-banner span { font-size:13px; color:var(--text2); }
+
+/* ── Profile Check-in Modal ── */
+.profile-checkin-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:316; }
+.profile-checkin-overlay.open { display:block; }
+.profile-checkin-modal { display:none; position:fixed; bottom:0; left:0; right:0; max-height:90dvh; background:var(--bg); border-radius:18px 18px 0 0; z-index:317; flex-direction:column; overflow:hidden; }
+.profile-checkin-modal.open { display:flex; }
+.profile-checkin-handle { width:36px; height:4px; border-radius:2px; background:var(--line); margin:10px auto 0; flex-shrink:0; }
+.profile-checkin-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px 10px; border-bottom:1px solid var(--line); flex-shrink:0; }
+.profile-checkin-title { font-weight:700; font-size:15px; color:var(--text); }
+.profile-checkin-date { font-size:11px; color:var(--text3); margin-top:2px; }
+.profile-checkin-close { background:none; border:none; font-size:22px; color:var(--text3); padding:2px 6px; cursor:pointer; line-height:1; }
+.profile-checkin-body { flex:1; overflow-y:auto; padding:14px 16px; overscroll-behavior:contain; display:flex; flex-direction:column; gap:10px; }
+.checkin-section { background:var(--surface2); border-radius:12px; padding:13px 14px; }
+.checkin-section-label { font-size:10px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
+.checkin-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; }
+.checkin-row + .checkin-row { border-top:1px solid var(--line); }
+.checkin-row-label { font-size:13px; color:var(--text2); }
+.checkin-row-value { font-size:14px; font-weight:700; color:var(--text); }
+.checkin-row-value.accent { color:var(--accent); }
+.checkin-tag { display:inline-block; background:rgba(124,92,255,.15); border:1px solid rgba(124,92,255,.3); color:var(--accent); border-radius:20px; padding:3px 10px; font-size:12px; font-weight:600; }
+.profile-checkin-footer { display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--line); background:var(--bg); flex-shrink:0; }
+.profile-checkin-footer .btn { flex:1; }
 
 /* ════════════════════ DESKTOP ════════════════════ */
 /* btn hoje */
@@ -2574,6 +2608,24 @@ tr:active { background: var(--surface2); }
   </div>
 </div>
 
+<!-- ═══════════════ PROFILE CHECK-IN MODAL ═══════════════ -->
+<div class="profile-checkin-overlay" id="profileCheckinOverlay"></div>
+<div class="profile-checkin-modal" id="profileCheckinModal">
+  <div class="profile-checkin-handle"></div>
+  <div class="profile-checkin-header">
+    <div>
+      <div class="profile-checkin-title">🧬 Seu perfil nutricional</div>
+      <div class="profile-checkin-date" id="checkinDate"></div>
+    </div>
+    <button class="profile-checkin-close" id="btnCheckinClose" type="button">✕</button>
+  </div>
+  <div class="profile-checkin-body" id="profileCheckinContent"></div>
+  <div class="profile-checkin-footer">
+    <button class="btn ghost" id="btnCheckinClose2" type="button">Fechar</button>
+    <button class="btn primary" id="btnCheckinUpdate" type="button">Atualizar dados →</button>
+  </div>
+</div>
+
 <!-- ═══════════════ CUSTOM FOOD MINI-MODAL ═══════════════ -->
 <div class="modal-overlay" id="customFoodOverlay" style="z-index:320;"></div>
 <div class="modal-sheet" id="customFoodModal" style="z-index:321;">
@@ -2755,6 +2807,42 @@ tr:active { background: var(--surface2); }
     <div class="calc-wizard-footer">
       <button class="btn ghost" id="btnWzReviewAll" type="button">Revisar tudo →</button>
       <button class="btn primary" id="btnWzRecalc" type="button">Recalcular assim ✅</button>
+    </div>
+  </div>
+
+  <!-- Passo welcome: primeiro acesso -->
+  <div class="calc-wizard-step" data-step="welcome">
+    <div class="wz-step-content wz-welcome-content">
+      <div class="wz-welcome-logo">🔥</div>
+      <div class="wz-welcome-brand">Kcal.ix</div>
+      <div class="wz-welcome-tagline">Seu parceiro diário para uma vida mais saudável, forte e consistente.</div>
+      <div class="wz-welcome-props">
+        <div class="wz-welcome-prop">
+          <span class="wz-welcome-prop-icon">🎯</span>
+          <div class="wz-welcome-prop-text">
+            <span class="wz-welcome-prop-title">Metas feitas para você</span>
+            <span class="wz-welcome-prop-desc">Calorias, proteína e macros calculados com base no seu corpo e objetivo real.</span>
+          </div>
+        </div>
+        <div class="wz-welcome-prop">
+          <span class="wz-welcome-prop-icon">📈</span>
+          <div class="wz-welcome-prop-text">
+            <span class="wz-welcome-prop-title">Progresso que você vê</span>
+            <span class="wz-welcome-prop-desc">Gráficos de energia, balanço semanal e evolução corporal em tempo real.</span>
+          </div>
+        </div>
+        <div class="wz-welcome-prop">
+          <span class="wz-welcome-prop-icon">💪</span>
+          <div class="wz-welcome-prop-text">
+            <span class="wz-welcome-prop-title">Treino + nutrição juntos</span>
+            <span class="wz-welcome-prop-desc">Registre treinos, alimentos e medidas num só lugar, sem complicação.</span>
+          </div>
+        </div>
+      </div>
+      <div class="wz-welcome-fine">Leva menos de 2 minutos para configurar. Sem cadastro, seus dados ficam no seu aparelho.</div>
+    </div>
+    <div class="calc-wizard-footer">
+      <button class="btn primary" id="btnWzWelcome" type="button">Começar minha jornada →</button>
     </div>
   </div>
 
@@ -4089,9 +4177,12 @@ tr:active { background: var(--surface2); }
   const WZ_GOAL_LABELS     = { maintain:"🟡 Manutenção", cut:"🔴 Cut — Emagrecer", recomp:"🟢 Recomp", bulk:"🔵 Bulk — Ganho de massa" };
   let wizardData = {};
   let wzCurrentStep = 1;
+  // true apenas se o usuário já configurou o perfil explicitamente
+  // (capturado antes do calcAll() do INIT para não ser afetado pelo save de defaults)
+  let _profileConfigured = localStorage.getItem(CALC_KEY) !== null;
 
   function openCalcWizard(){
-    const isNew = localStorage.getItem(CALC_KEY) === null;
+    const isNew = !_profileConfigured;
     if(isNew){
       wizardData = { sex:"male", hasSkinfolds:false, skinfolds:{}, goalType:"maintain", activity:"1.55" };
     } else {
@@ -4110,8 +4201,8 @@ tr:active { background: var(--surface2); }
     $("#calcWizardOverlay").classList.add("open");
     $("#calcWizard").classList.add("open");
     if(!isNew){ renderWizardSummary(); wizardGoTo(0); }
-    else { wizardGoTo(1); }
-    $("#wzTitle").textContent = isNew ? "Configurar perfil" : "Editando perfil";
+    else { wizardGoTo("welcome"); }
+    $("#wzTitle").textContent = isNew ? "Bem-vindo! 🎉" : "Editando perfil";
   }
 
   function closeCalcWizard(){
@@ -4126,7 +4217,7 @@ tr:active { background: var(--surface2); }
     if(stepEl) stepEl.classList.add("active");
     // progress dots only for steps 1-4
     const prog = $("#wzProgress");
-    prog.style.display = step === 0 ? "none" : "flex";
+    prog.style.display = (step === 0 || step === "welcome") ? "none" : "flex";
     $$(".wz-dot").forEach(dot => {
       const n = parseInt(dot.dataset.dot);
       dot.classList.remove("active","done");
@@ -4206,6 +4297,133 @@ tr:active { background: var(--surface2); }
       `<div style="font-size:11px;color:var(--text3);margin-top:2px;">${hasSF ? "Dobras JP7 configuradas" : "Estimativa Mifflin-St Jeor"}</div>`;
   }
 
+  // ── Profile Check-in Modal ──
+  function openProfileCheckin(){
+    const c = calc;
+    const sf = c.skinfolds || {};
+    const sum7 = (sf.chest||0)+(sf.ax||0)+(sf.tri||0)+(sf.sub||0)+(sf.ab||0)+(sf.sup||0)+(sf.th||0);
+    let leanKg = null, bf = null, bmr = null, tdee = null, kcalTarget = null;
+    let pG = null, cG = null, fatG = null;
+
+    if (c.age > 0 && sum7 > 0) {
+      const bd = bodyDensityJP7(c.sex, c.age, sum7);
+      bf = bfSiri(bd);
+      if (Number.isFinite(bf) && bf > 0 && c.weightKg > 0)
+        leanKg = c.weightKg - (c.weightKg * (bf / 100));
+    }
+    if (leanKg != null && leanKg > 0) bmr = bmrKatch(leanKg);
+    else if (c.weightKg > 0 && c.heightCm > 0 && c.age > 0) bmr = bmrMifflin(c.sex, c.weightKg, c.heightCm, c.age);
+
+    if (bmr != null) {
+      const act = parseFloat(c.activity) || 1.55;
+      tdee = bmr * act;
+      const preset = GOAL_PRESETS[c.goalType || "maintain"] || GOAL_PRESETS.maintain;
+      kcalTarget = c.fixedKcal > 0 ? c.fixedKcal : Math.round(tdee * (1 - (preset.def||0)/100));
+      const wKg = c.weightKg || 0;
+      pG   = wKg * (c.pKg || preset.pKg || 1.6);
+      fatG = wKg * (c.minFatKg || preset.minFatKg || 0.6);
+      cG   = (kcalTarget - pG*4 - fatG*9) / 4;
+      if (cG < 0) cG = 0;
+    }
+
+    // data do último check-in
+    let dateStr = "—";
+    if (c.updatedAt) {
+      const d = new Date(c.updatedAt);
+      dateStr = d.toLocaleDateString("pt-BR", { day:"2-digit", month:"short", year:"numeric" });
+    }
+    $("#checkinDate").textContent = `Último check-in: ${dateStr}`;
+
+    const sexLabel  = c.sex === "female" ? "♀ Mulher" : "♂ Homem";
+    const goalLabel = WZ_GOAL_LABELS[c.goalType || "maintain"] || "—";
+    const actLabel  = WZ_ACTIVITY_LABELS[String(c.activity)] || String(c.activity);
+    const hasSF     = sum7 > 0;
+
+    let bodySection = `
+      <div class="checkin-section">
+        <div class="checkin-section-label">Corpo</div>
+        <div class="checkin-row">
+          <span class="checkin-row-label">Sexo / Idade</span>
+          <span class="checkin-row-value">${sexLabel} · ${c.age||"—"} anos</span>
+        </div>
+        <div class="checkin-row">
+          <span class="checkin-row-label">Peso / Altura</span>
+          <span class="checkin-row-value">${c.weightKg||"—"} kg · ${c.heightCm||"—"} cm</span>
+        </div>`;
+    if (bf != null && Number.isFinite(bf)) bodySection += `
+        <div class="checkin-row">
+          <span class="checkin-row-label">🧍 Gordura corporal</span>
+          <span class="checkin-row-value">${bf.toFixed(1)}%</span>
+        </div>`;
+    if (leanKg != null) bodySection += `
+        <div class="checkin-row">
+          <span class="checkin-row-label">💪 Massa magra</span>
+          <span class="checkin-row-value">${leanKg.toFixed(1)} kg</span>
+        </div>`;
+    bodySection += `
+        <div class="checkin-row">
+          <span class="checkin-row-label">Método BMR</span>
+          <span class="checkin-row-value">${hasSF ? "JP7 (Katch-McArdle)" : "Mifflin-St Jeor"}</span>
+        </div>
+      </div>`;
+
+    let energySection = bmr != null ? `
+      <div class="checkin-section">
+        <div class="checkin-section-label">Energia</div>
+        <div class="checkin-row">
+          <span class="checkin-row-label">🔥 BMR (metabolismo basal)</span>
+          <span class="checkin-row-value">${Math.round(bmr)} kcal</span>
+        </div>
+        <div class="checkin-row">
+          <span class="checkin-row-label">⚡ TDEE (gasto total)</span>
+          <span class="checkin-row-value">${Math.round(tdee)} kcal</span>
+        </div>
+        <div class="checkin-row">
+          <span class="checkin-row-label">🎯 Meta diária</span>
+          <span class="checkin-row-value accent">${Math.round(kcalTarget)} kcal</span>
+        </div>
+      </div>` : "";
+
+    let macrosSection = (pG != null) ? `
+      <div class="checkin-section">
+        <div class="checkin-section-label">Macros diários</div>
+        <div class="checkin-row">
+          <span class="checkin-row-label">🥩 Proteína</span>
+          <span class="checkin-row-value">${Math.round(pG)} g</span>
+        </div>
+        <div class="checkin-row">
+          <span class="checkin-row-label">🥔 Carboidrato</span>
+          <span class="checkin-row-value">${Math.round(cG)} g</span>
+        </div>
+        <div class="checkin-row">
+          <span class="checkin-row-label">🥑 Gordura</span>
+          <span class="checkin-row-value">${Math.round(fatG)} g</span>
+        </div>
+      </div>` : "";
+
+    let goalSection = `
+      <div class="checkin-section">
+        <div class="checkin-section-label">Perfil</div>
+        <div class="checkin-row">
+          <span class="checkin-row-label">Objetivo</span>
+          <span class="checkin-tag">${goalLabel}</span>
+        </div>
+        <div class="checkin-row">
+          <span class="checkin-row-label">Estilo de vida</span>
+          <span class="checkin-row-value">${actLabel}</span>
+        </div>
+      </div>`;
+
+    $("#profileCheckinContent").innerHTML = bodySection + energySection + macrosSection + goalSection;
+    $("#profileCheckinOverlay").classList.add("open");
+    $("#profileCheckinModal").classList.add("open");
+  }
+
+  function closeProfileCheckin(){
+    $("#profileCheckinOverlay").classList.remove("open");
+    $("#profileCheckinModal").classList.remove("open");
+  }
+
   function wzSaveStep1(){
     wizardData.sex      = ($$(".wz-sex-btn").find(b => b.classList.contains("selected")) || {}).dataset?.sex || "male";
     wizardData.age      = parseFloat($("#wzAge").value) || 0;
@@ -4247,6 +4465,7 @@ tr:active { background: var(--surface2); }
     applyGoalPreset(wizardData.goalType || "maintain");
     // calcula, salva e aplica nas metas diárias automaticamente
     const r = calcAll();
+    _profileConfigured = true;
     if(r && r.pG && r.cG && r.fatG != null && r.kcalTarget){
       settings.goals.pG   = Math.round(r.pG);
       settings.goals.cG   = Math.round(r.cG);
@@ -4346,7 +4565,7 @@ tr:active { background: var(--surface2); }
     } else $("#outMacros").textContent = "—";
 
     const goalType = $("#calcGoalType").value || "maintain";
-    calc = { sex, age, weightKg:w, heightCm:h, activity, goalType, deficitPct:def, pKg, cKg, minFatKg, fixedKcal: fixedRaw, skinfolds: sf };
+    calc = { sex, age, weightKg:w, heightCm:h, activity, goalType, deficitPct:def, pKg, cKg, minFatKg, fixedKcal: fixedRaw, skinfolds: sf, updatedAt: new Date().toISOString() };
     saveJSON(CALC_KEY, calc);
     return { bf, leanKg, bmr, tdee, kcalTarget, pG, cG, fatG, sum7, sf };
   }
@@ -6500,15 +6719,27 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
 
     // calc
     $("#calcGoalType").addEventListener("change", () => applyGoalPreset($("#calcGoalType").value));
-    $("#btnCalcRun").addEventListener("click", () => { calcAll(); renderNutriBanner(); showToast("Calculado ✅"); });
-    $("#btnCalcSave").addEventListener("click", () => { calcAll(); renderNutriBanner(); showToast("Parâmetros salvos 💾"); });
+    $("#btnCalcRun").addEventListener("click", () => { calcAll(); _profileConfigured = true; renderNutriBanner(); showToast("Calculado ✅"); });
+    $("#btnCalcSave").addEventListener("click", () => { calcAll(); _profileConfigured = true; renderNutriBanner(); showToast("Parâmetros salvos 💾"); });
+
+    // profile check-in modal
+    const _openProfileOrWizard = () => {
+      if (_profileConfigured) openProfileCheckin();
+      else openCalcWizard();
+    };
+    $("#btnCheckinClose").addEventListener("click", closeProfileCheckin);
+    $("#btnCheckinClose2").addEventListener("click", closeProfileCheckin);
+    $("#profileCheckinOverlay").addEventListener("click", closeProfileCheckin);
+    $("#btnCheckinUpdate").addEventListener("click", () => { closeProfileCheckin(); openCalcWizard(); });
 
     // wizard — open/close
-    $("#btnOpenWizard").addEventListener("click", (e) => { e.stopPropagation(); openCalcWizard(); });
-    $("#btnHomeWizard").addEventListener("click", () => openCalcWizard());
+    $("#btnOpenWizard").addEventListener("click", (e) => { e.stopPropagation(); _openProfileOrWizard(); });
+    $("#btnHomeWizard").addEventListener("click", () => _openProfileOrWizard());
     $("#btnWzClose").addEventListener("click", closeCalcWizard);
     $("#calcWizardOverlay").addEventListener("click", closeCalcWizard);
 
+    // wizard — passo welcome (primeiro acesso)
+    $("#btnWzWelcome").addEventListener("click", () => wizardGoTo(1));
     // wizard — passo 0
     $("#btnWzReviewAll").addEventListener("click", () => wizardGoTo(1));
     $("#btnWzRecalc").addEventListener("click", () => {
@@ -6635,7 +6866,8 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     try{ calcAll(); }catch(e){}
     renderNutriBanner();
     // primeiro acesso: abre wizard automaticamente
-    if (localStorage.getItem(CALC_KEY) === null) {
+    // (usa _profileConfigured capturado ANTES do calcAll() que salva defaults)
+    if (!_profileConfigured) {
       setTimeout(() => openCalcWizard(), 400);
     }
     fillMeasureFormForDate(currentDate());
