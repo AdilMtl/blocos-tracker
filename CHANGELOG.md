@@ -5,6 +5,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v1.10.4] — 2026-03-02
+
+### Corrigido
+- [fix] **Scroll da lista "Adicionados hoje" no food drawer**: lista não rolava — `.fd-peek` ganhou `display:flex; flex-direction:column`, `.fd-peek.open .fd-log` ganhou `max-height: calc(50vh - 44px)` para ativar o `overflow-y:auto`, e `overscroll-behavior:contain` impede o scroll vazar para o drawer.
+
+### Adicionado
+- [docs] **AI_Assistant.md**: guia completo para configurar coach IA personalizado (Gemini Gem ou GPT). Inclui system prompt com persona de coach/nutricionista data-driven, algoritmos de diagnóstico, formato de resposta e recomendações de knowledge base.
+- [docs] **knowledge/**: 4 documentos baseados nos protocolos de Lucas Campos para upload como base de conhecimento no Gem/GPT — `protocolo-cut.md`, `protocolo-bulk.md`, `protocolo-recomp.md`, `interpretacao-kcalix-json.md`.
+
+### Notas técnicas
+- Spec v1.11.0 (seletor de objetivo cut/bulk/recomp/maintain) finalizada com valores reais derivados dos protocolos de Lucas Campos. GOAL_PRESETS validados em `memory/algoritmo-consulta-nutricional.md`. Pronta para implementação.
+
+---
+
 ## [v1.10.3] — 2026-03-02
 
 ### Adicionado
