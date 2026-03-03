@@ -5,6 +5,27 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.0.0] — 2026-03-02
+
+### Adicionado
+- [feat] **Wizard de configuração guiada do perfil** (`#calcWizard`, z-index 315): fluxo conversacional de 4 passos para configurar o perfil nutricional — dados básicos → dobras cutâneas (JP7 ou estimativa Mifflin) → objetivo → nível de atividade. Abre automaticamente no primeiro acesso.
+- [feat] **Passo 0 — revisão de perfil**: usuários com perfil salvo veem um resumo legível ("♂ Homem · 37 anos · 76 kg", objetivo, atividade) e escolhem entre revisar tudo ou recalcular direto.
+- [feat] **Seletor de objetivo** (`#calcGoalType`): maintain / cut / recomp / bulk com `GOAL_PRESETS` baseados nos protocolos de Lucas Campos. Preenchem déficit, proteína, carbo e gordura mín automaticamente.
+- [feat] **Atalho na Home** — botão "🎯 Meu Perfil Nutricional" no grid de atalhos (home-action-card, full-width), abre o wizard diretamente.
+- [feat] **Aplicação automática de metas**: `wizardFinish()` e "Recalcular assim ✅" capturam o resultado de `calcAll()` e atualizam `settings.goals.{pG, cG, gG, kcal}` sem passo extra.
+
+### Corrigido
+- [fix] **Erro: Cannot read properties of null (addEventListener)**: HTML do wizard estava após o `</script>`, sendo parseado depois do IIFE. Movido para antes do `<script>` principal (~linha 2729).
+- [fix] **Wizard com fundo transparente**: variáveis CSS inexistentes (`--bg1`, `--bg2`, `--border`, `--text1`) substituídas pelas variáveis reais do projeto (`--bg`, `--surface2`, `--line`, `--text`).
+
+### Notas
+- O perfil configurado pelo wizard é a fonte de dados primária para o coach IA (GPT/Gemini Gem) — quanto mais completo o perfil, mais precisa a análise do coach.
+- CACHE_NAME bumped: `kcalix-v5` → `kcalix-v6`.
+- Commit: `02e2837` — deploy realizado via GitHub Pages.
+- Arquitetura crítica: wizard HTML deve sempre estar **antes do `<script>`** no arquivo.
+
+---
+
 ## [v1.10.4] — 2026-03-02
 
 ### Corrigido
