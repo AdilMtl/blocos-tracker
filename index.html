@@ -1053,8 +1053,11 @@ tr:active { background: var(--surface2); }
   max-height: 44px;
   overflow: hidden;
   transition: max-height .3s ease;
+  display: flex;
+  flex-direction: column;
 }
 .fd-peek.open { max-height: 50vh; }
+.fd-peek.open .fd-log { max-height: calc(50vh - 44px); }
 
 .fd-peek-header {
   display: flex;
@@ -1077,6 +1080,7 @@ tr:active { background: var(--surface2); }
 .fd-log {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 0 12px 12px;
   display: flex;
   flex-direction: column;
