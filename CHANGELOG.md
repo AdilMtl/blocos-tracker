@@ -5,6 +5,26 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.2.0] — 2026-03-03
+
+### Adicionado
+- [feat] **Tela de boas-vindas para 1º acesso** (`data-step="welcome"` no wizard): abre automaticamente quando o app é aberto pela primeira vez, com copy motivacional, 3 cards de proposta de valor (Metas, Progresso, Treino+Nutrição) e botão "Começar minha jornada →". Apenas para novos usuários — usuários com perfil existente não veem esta tela.
+- [feat] **Modal de check-in do perfil nutricional** (`#profileCheckinModal`, z-index 317): abre ao clicar "Meu Perfil Nutricional" ou "🧭 Configurar" quando perfil já existe. Exibe snapshot completo: corpo (peso/altura/idade/sexo, BF%, massa magra, método BMR), energia (BMR, TDEE, meta calórica), macros diários (P/C/G) e data do último check-in. Botão "Atualizar dados →" abre o wizard.
+- [feat] **Campo `updatedAt`** no objeto `calc` (ISO string): salvo automaticamente em cada `calcAll()`. Exibido no modal de check-in como "Último check-in: DD mmm AAAA". Retrocompatível — usuários sem o campo veem "—".
+
+### Corrigido
+- [fix] **Bug crítico: wizard de 1º acesso nunca abria**: `DEFAULT_CALC` tem valores completos (76 kg, 177 cm, 37a, 7 dobras), então `calcAll()` no INIT rodava com sucesso e gravava no `CALC_KEY` antes do check `=== null` — o wizard jamais era acionado. Solução: flag `_profileConfigured` capturada **antes** do INIT (`let _profileConfigured = localStorage.getItem(CALC_KEY) !== null`), usada tanto no trigger do INIT quanto em `openCalcWizard()`.
+- [fix] **openCalcWizard() tratava novo usuário como existente**: a função re-checava `localStorage.getItem(CALC_KEY)` internamente — mas após o INIT, CALC_KEY sempre existe (defaults salvos). Corrigido para usar `!_profileConfigured`, garantindo que novo usuário sempre veja o step "welcome".
+
+### Notas técnicas
+- `_profileConfigured` é uma variável de módulo (let, ~linha 4182). É setada `true` em `wizardFinish()`, `btnCalcRun` e `btnCalcSave`.
+- A função `_openProfileOrWizard()` centraliza o roteamento dos botões: `_profileConfigured → check-in modal`, senão `openCalcWizard()`.
+- CACHE_NAME bumped: `kcalix-v6` → `kcalix-v7`.
+- Commit: `a5da23b` — deploy realizado via GitHub Pages.
+- **Ideia futura**: histórico de check-ins — guardar múltiplos snapshots do perfil com data para visualizar evolução corporal ao longo do tempo.
+
+---
+
 ## [v2.0.0] — 2026-03-02
 
 ### Adicionado
