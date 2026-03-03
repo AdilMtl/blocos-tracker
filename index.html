@@ -6977,7 +6977,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
   function renderHabitMonth(year, month) {
     const hData = loadJSON(HABITS_KEY, {});
     const today = new Date();
-    const todayStr = today.toISOString().slice(0, 10);
+    const todayStr = _localISO(today);
     const firstDay = new Date(year, month, 1);
     // segunda=0 … domingo=6
     let startOffset = firstDay.getDay() - 1;
@@ -7062,15 +7062,16 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       const dayOfWeek = today.getDay();
       const mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
       for (let w = 7; w >= 0; w--) {
-        let done = 0;
+        let done = 0, validDays = 0;
         for (let d = 0; d < 7; d++) {
           const day = new Date(today);
           day.setDate(today.getDate() - mondayOffset - w * 7 + d);
           if (day > today) continue;
-          const key = day.toISOString().slice(0, 10);
+          validDays++;
+          const key = _localISO(day);
           if (hData[key] && hData[key][hab.id]) done++;
         }
-        const pct = Math.round((done / 7) * 100);
+        const pct = validDays > 0 ? Math.round((done / validDays) * 100) : 0;
         bars += `<div class="habit-tr-bar-wrap"><div class="habit-tr-bar" style="height:${Math.max(pct, 3)}%"></div></div>`;
       }
       return `<div class="habit-tr-row">

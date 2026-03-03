@@ -5,6 +5,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.4.1] — 2026-03-03
+
+### Corrigido
+- [fix] **Barras da tendência de hábitos não refletiam dados reais** — `renderHabitTrend` usava `toISOString()` (data UTC) para lookup, mas os hábitos são salvos com `todayISO()` (data local). Corrigido para `_localISO()`, consistente com `_habitStreak` e `_habitAdherence`.
+- [fix] **Barra da semana atual sempre muito baixa** — divisor fixo `7` substituído por `validDays` (dias não-futuros da semana), normalizando corretamente semanas parciais.
+- [fix] **`renderHabitMonth` com `todayStr` em UTC** — `today.toISOString().slice(0,10)` substituído por `_localISO(today)` para consistência.
+
+---
+
 ## [v2.4.0] — 2026-03-03
 
 ### Adicionado
