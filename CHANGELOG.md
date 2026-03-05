@@ -5,6 +5,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.7.0] — 2026-03-04
+
+### Melhorado
+- [improve] **FAB 💾 substitui status bar global** — barra full-width fixa em todas as abas removida; substituída por botão flutuante circular (52×52px) no canto inferior direito, visível apenas na aba Diário. Com autosave OFF fica destacado em roxo.
+- [improve] **Kcal estimadas inline no Diário** — valor movido para o card de Progresso (abaixo dos status pills), eliminando a duplicação com a Home.
+- [improve] **Toggle auto-salvar em Mais > Configurações** — saiu do rodapé global e foi para o lugar correto, com descrição contextual.
+- [feat] **Atalho exercício → histórico** — clicar em qualquer linha de exercício na tabela de comparação do histórico de treino navega direto para a aba "🏋️ Por equipamento" já filtrada naquele exercício.
+
+### Notas
+- Decisão de design: barra global contextual → FAB contextual (seguindo padrão Material/iOS).
+- Atalho exercício → histórico é base para melhorias futuras (ex: mini-gráfico inline de progressão por exercício).
+- Sem mudanças em schema de localStorage ou storage keys.
+- sw.js: mantém `kcalix-v11` (sem mudança de cache necessária para UX only).
+
+---
+
 ## [v2.6.0] — 2026-03-04
 
 ### Corrigido

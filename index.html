@@ -80,7 +80,7 @@ body::after {
   position: relative; z-index: 1;
   max-width: 600px;
   margin: 0 auto;
-  padding: 16px 16px 180px;
+  padding: 16px 16px 140px;
   min-height: 100dvh;
 }
 
@@ -271,52 +271,65 @@ body::after {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ════════════════════ FOOTER STATUS BAR ════════════════════ */
-.status-bar {
+/* ════════════════════ FAB SALVAR ════════════════════ */
+.fab-save {
   position: fixed;
-  left: 0; right: 0;
-  bottom: calc(58px + var(--safe-bottom));
-  z-index: 99;
-  background: rgba(10,14,24,.88);
+  right: 16px;
+  bottom: calc(70px + var(--safe-bottom));
+  z-index: 150;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1.5px solid var(--line);
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  font-size: 24px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .2s, background .2s;
+}
+.fab-save:active { transform: scale(.88); }
+.fab-save.unsaved {
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 4px 20px rgba(99,102,241,.5);
+}
+/* ════════════════════ KCAL INLINE (DIÁRIO) ════════════════════ */
+.kcal-inline-row {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 8px;
+  padding-top: 8px;
   border-top: 1px solid var(--line);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  padding: 8px 16px;
 }
-.status-bar-inner {
-  max-width: 600px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.kcal-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text);
-}
-.kcal-badge .kcal-num {
-  font-size: 18px;
+.kcal-inline-num {
+  font-size: 20px;
   font-weight: 800;
   background: linear-gradient(135deg, var(--accent2), var(--good));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-.kcal-badge .kcal-unit {
+.kcal-inline-unit {
   font-size: 11px;
   color: var(--text3);
   font-weight: 600;
 }
-.status-actions {
+/* autosave toggle row (Mais > Configurações) */
+.autosave-row {
   display: flex;
-  gap: 8px;
   align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
 }
+.autosave-row-info { display: flex; flex-direction: column; gap: 2px; }
+.autosave-row-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.autosave-row-sub { font-size: 11px; color: var(--text3); }
 
 /* ════════════════════ CARDS ════════════════════ */
 .card {
@@ -2193,6 +2206,10 @@ tr:active { background: var(--surface2); }
         </div>
 
         <div class="status-pills" id="statusBadges"></div>
+        <div class="kcal-inline-row">
+          <span class="kcal-inline-num" id="kcalEst">0</span>
+          <span class="kcal-inline-unit">kcal estimadas</span>
+        </div>
 
         <!-- ─── Adicionar alimentos ─── -->
         <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line);">
@@ -2405,6 +2422,13 @@ tr:active { background: var(--surface2); }
           </div></div>
         </div>
 
+        <div class="autosave-row">
+          <div class="autosave-row-info">
+            <span class="autosave-row-title">Auto-salvar</span>
+            <span class="autosave-row-sub">Salva automaticamente a cada alteração no Diário</span>
+          </div>
+          <button class="btn sm ghost" id="btnAutoSave" type="button"><span id="autoState">ON</span></button>
+        </div>
         <div style="height:12px"></div>
         <div class="btn-group">
           <button class="btn primary" id="btnApplyBlockConfig" type="button">Salvar configurações</button>
@@ -2916,19 +2940,8 @@ tr:active { background: var(--surface2); }
   </div>
 </div>
 
-<!-- STATUS BAR -->
-<div class="status-bar">
-  <div class="status-bar-inner">
-    <div class="kcal-badge">
-      <span class="kcal-num" id="kcalEst">0</span>
-      <span class="kcal-unit">kcal</span>
-    </div>
-    <div class="status-actions">
-      <button class="btn sm ghost" id="btnAutoSave" type="button">Auto: <span id="autoState">ON</span></button>
-      <button class="btn sm primary" id="btnSave" type="button">Salvar</button>
-    </div>
-  </div>
-</div>
+<!-- FAB SALVAR -->
+<button class="fab-save" id="fabSave" type="button" aria-label="Salvar">💾</button>
 
 <!-- PRESET EDIT MODAL -->
 <div class="modal-overlay" id="presetEditOverlay"></div>
@@ -3542,6 +3555,8 @@ tr:active { background: var(--surface2); }
     autosave = v;
     localStorage.setItem(AUTO_KEY, v ? "1" : "0");
     $("#autoState").textContent = autosave ? "ON" : "OFF";
+    const fab = $("#fabSave");
+    if(fab) fab.classList.toggle("unsaved", !autosave);
   };
 
   const goalsInBlocks = () => ({
@@ -4300,6 +4315,8 @@ tr:active { background: var(--surface2); }
     if(which === "diario") renderFoodPanel();
     if(which === "home") renderHomeDashboard();
     updateUI();
+    const fab = $("#fabSave");
+    if(fab) fab.style.display = (which === "diario") ? "flex" : "none";
   };
   window.openTab = openTab;
 
@@ -6883,7 +6900,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       for(const exId of allExIds) {
         const exInfo = exById(exId);
         const exName = exInfo ? exInfo.nome.split("(")[0].trim() : exId;
-        html += `<tr><td class="comp-exname">${exName}</td>`;
+        html += `<tr data-exid="${exId}" style="cursor:pointer;" title="Ver histórico de ${exName}"><td class="comp-exname">${exName}</td>`;
         // Find best carga across displayed sessions for this exercise
         let bestForEx = 0;
         for(const sess of displaySessions) {
@@ -6908,6 +6925,14 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       }
       html += `</tbody></table>`;
       wrapEl.innerHTML = html;
+      wrapEl.querySelectorAll("tr[data-exid]").forEach(row => {
+        row.addEventListener("click", () => {
+          switchThTab("Equip");
+          buildEquipSelect();
+          $("#thEquipSelect").value = row.dataset.exid;
+          renderEquipmentHistory(row.dataset.exid);
+        });
+      });
     }
 
     // Wire tabs
@@ -7637,7 +7662,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       updateDayBanner();
     });
 
-    $("#btnSave").addEventListener("click", () => {
+    $("#fabSave").addEventListener("click", () => {
       syncFromInputsToState();
       saveJSON(STORAGE_KEY, data);
       saveJSON(FOOD_LOG_KEY, foodLog);
