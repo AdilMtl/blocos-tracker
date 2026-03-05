@@ -1513,6 +1513,29 @@ tr:active { background: var(--surface2); }
 .comp-table .comp-exname { text-align: left; font-weight: 700; font-size: 11px; white-space: nowrap; }
 .comp-best { color: var(--warn); font-weight: 800; }
 
+/* template history tabs */
+.th-tabs { display:flex;gap:6px;margin-bottom:12px; }
+.th-tab-btn { flex:1;padding:7px 4px;font-size:12px;font-weight:700;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--text3);cursor:pointer;transition:background .15s,color .15s;min-height:40px; }
+.th-tab-btn.active { background:var(--accent);color:#fff;border-color:var(--accent); }
+.th-panel { display:none; }
+.th-panel.active { display:block; }
+.th-eq-select { width:100%;font-size:16px;font-weight:700;font-family:var(--font);background:rgba(0,0,0,.15);color:var(--text);border:1px solid var(--line);border-radius:var(--radius-xs);padding:8px;outline:none;-webkit-appearance:none;appearance:none;margin-bottom:12px; }
+.eqhist-pr td { color:#fbbf24;font-weight:800; }
+
+/* custom exercise tag + rename */
+.tei-custom-tag { font-size:9px;font-weight:700;color:var(--accent);background:rgba(124,92,255,.12);border:1px solid rgba(124,92,255,.25);border-radius:4px;padding:1px 5px;flex-shrink:0; }
+.tei-rename-btn { background:transparent;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0 4px;flex-shrink:0; }
+.tei-rename-row { display:flex;gap:6px;align-items:center;padding:4px 0; }
+.tei-rename-row input { flex:1;font-size:16px; }
+.tei-rename-row button { font-size:12px;padding:0 10px;min-height:32px; }
+.custom-ex-create-btn { width:100%;background:transparent;border:1px dashed rgba(124,92,255,.4);color:var(--accent);font-size:13px;font-weight:700;padding:10px;border-radius:var(--radius-xs);cursor:pointer;margin-top:8px; }
+.custom-ex-create-btn:active { background:rgba(124,92,255,.1); }
+/* swap + add exercise during workout */
+.eih-swap-btn { background:transparent;border:none;color:var(--text3);font-size:13px;line-height:1;cursor:pointer;padding:0 5px;flex-shrink:0;-webkit-tap-highlight-color:transparent; }
+.eih-swap-btn:active { color:var(--accent); }
+.ex-add-btn { width:100%;background:transparent;border:1px dashed rgba(255,255,255,.12);color:var(--text3);font-size:13px;font-weight:700;padding:10px;border-radius:var(--radius-xs);cursor:pointer;margin-top:6px; }
+.ex-add-btn:active { background:rgba(255,255,255,.06);color:var(--text); }
+
 /* ════════════════════ DAY NAVIGATION ════════════════════ */
 .date-nav-btn {
   background: transparent;
@@ -2596,16 +2619,30 @@ tr:active { background: var(--surface2); }
       <button class="modal-close" id="tmplHistClose" type="button">✕</button>
     </div>
     <div class="modal-body">
-      <!-- Summary evolution -->
-      <div id="tmplHistSummary" style="margin-bottom:12px;"></div>
-      <div class="hint" style="margin-bottom:6px;">Sessões:</div>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>Data</th><th>Séries</th><th>Volume</th><th>kcal</th><th>Δ vol</th></tr></thead>
-        <tbody id="tmplHistTable"></tbody>
-      </table></div>
-      <div style="height:12px;"></div>
-      <div class="hint" style="margin-bottom:6px;">Progressão por exercício (carga max):</div>
-      <div class="tbl-wrap" id="tmplHistExWrap"></div>
+      <!-- Abas -->
+      <div class="th-tabs">
+        <button class="th-tab-btn active" id="thTabTreino" type="button">📋 Por treino</button>
+        <button class="th-tab-btn" id="thTabEquip" type="button">🏋️ Por equipamento</button>
+      </div>
+      <!-- Painel: Por treino (comportamento atual) -->
+      <div class="th-panel active" id="thPanelTreino">
+        <div id="tmplHistSummary" style="margin-bottom:12px;"></div>
+        <div class="hint" style="margin-bottom:6px;">Sessões:</div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Data</th><th>Séries</th><th>Volume</th><th>kcal</th><th>Δ vol</th></tr></thead>
+          <tbody id="tmplHistTable"></tbody>
+        </table></div>
+        <div style="height:12px;"></div>
+        <div class="hint" style="margin-bottom:6px;">Progressão por exercício (carga max):</div>
+        <div class="tbl-wrap" id="tmplHistExWrap"></div>
+      </div>
+      <!-- Painel: Por equipamento -->
+      <div class="th-panel" id="thPanelEquip">
+        <select class="th-eq-select" id="thEquipSelect">
+          <option value="">— Selecione o exercício —</option>
+        </select>
+        <div id="thEquipTable"></div>
+      </div>
     </div>
   </div>
 
@@ -2656,6 +2693,42 @@ tr:active { background: var(--surface2); }
 
 
 </div><!-- /app -->
+
+<!-- ═══════════════ CUSTOM EXERCISE MODAL ═══════════════ -->
+<div class="modal-overlay" id="customExOverlay"></div>
+<div class="modal-sheet" id="customExModal" style="z-index:327;">
+  <div class="modal-handle"></div>
+  <div class="modal-header">
+    <b>＋ Criar exercício</b>
+    <button class="modal-close" id="customExClose" type="button">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-row" style="margin-bottom:12px;">
+      <label>Nome do exercício</label>
+      <input id="cexName" placeholder="Ex: Supino máquina Academia A" autocomplete="off" style="font-size:16px;" />
+    </div>
+    <div class="form-row" style="margin-bottom:20px;">
+      <label>Grupo muscular</label>
+      <select id="cexGrupo" style="width:100%;border:1px solid var(--line);background:rgba(0,0,0,.15);color:var(--text);font-family:var(--font);font-size:16px;font-weight:700;padding:8px;border-radius:var(--radius-xs);outline:none;-webkit-appearance:none;appearance:none;"></select>
+    </div>
+    <button class="btn primary" id="customExSave" type="button" style="width:100%;min-height:44px;font-size:15px;">✅ Criar exercício</button>
+  </div>
+</div>
+
+<!-- ═══════════════ EXERCISE SELECTOR MODAL ═══════════════ -->
+<div class="modal-overlay" id="exSelectorOverlay" style="z-index:328;"></div>
+<div class="modal-sheet modal-full" id="exSelectorModal" style="z-index:329;">
+  <div class="modal-handle"></div>
+  <div class="modal-header">
+    <b id="exSelTitle">Adicionar exercício</b>
+    <button class="modal-close" id="exSelClose" type="button">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="cat-tabs" id="exSelCatTabs" style="margin-bottom:8px;"></div>
+    <div class="food-grid" id="exSelGrid" style="max-height:55vh;overflow-y:auto;"></div>
+    <div style="height:20px;"></div>
+  </div>
+</div>
 
 <!-- ═══════════════ FOOD DRAWER ═══════════════ -->
 <div class="food-drawer-overlay" id="foodDrawerOverlay"></div>
@@ -3141,6 +3214,7 @@ tr:active { background: var(--surface2); }
   const FOOD_LOG_KEY = "blocos_tracker_food_log_v1";
   const TREINO_KEY   = "blocos_tracker_treino_v1";
   const TREINO_TMPL_KEY = "blocos_tracker_treino_templates_v1";
+  const CUSTOM_EX_KEY   = "blocos_tracker_custom_exercises_v1";
   const PRESETS_KEY         = "blocos_tracker_presets_v1";
   const TIMER_PRESETS_KEY   = "blocos_tracker_timer_presets_v1";
   const CHECKINS_KEY        = "blocos_tracker_checkins_v1";
@@ -5319,7 +5393,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       .map(([date, day]) => {
         const tmpl = templates.find(t => t.id === day.templateId);
         const exercicios = (day.exercicios || []).map(e => ({
-          nome: e.exercicioId,
+          nome: exById(e.exercicioId)?.nome || e.exercicioId,
           series: (e.series || []).map(s => ({ reps: s.reps, carga: s.carga }))
         }));
         const cardio = (day.cardio || []).map(c => ({
@@ -5371,6 +5445,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       },
       workouts: {
         templates: templates.map(t => ({ id: t.id, nome: t.nome, exercicios: t.exercicios || [] })),
+        customExercises: customExercises.filter(e => !e.arquivado).map(e => ({ id: e.id, nome: e.nome, grupo: e.grupo || "" })),
         days: treinoDays
       }
     };
@@ -5843,13 +5918,55 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     return Math.max(5, Math.min(14, r * 0.5 + (Number(carga) || 0) * 0.03));
   };
 
+  // ── Custom exercises ──
+  let customExercises = [];
+  const CUSTOM_EX_GROUP = "⭐ Meus exercícios";
+
+  const loadCustomExercises = () => {
+    try {
+      const raw = localStorage.getItem(CUSTOM_EX_KEY);
+      customExercises = raw ? (JSON.parse(raw).exercises || []) : [];
+    } catch(e) { customExercises = []; }
+  };
+
+  const saveCustomExercises = () => {
+    localStorage.setItem(CUSTOM_EX_KEY, JSON.stringify({ exercises: customExercises }));
+  };
+
+  // Retorna todos os exercícios: built-in + custom (não arquivados)
+  const getAllExercises = () => {
+    const db = {};
+    for(const [grp, exs] of Object.entries(EXERCISE_DB)) db[grp] = exs;
+    const active = customExercises.filter(e => !e.arquivado);
+    if(active.length > 0) db[CUSTOM_EX_GROUP] = active;
+    return db;
+  };
+
+  // Verifica se exercício custom está em algum dia de treino salvo
+  const isExUsedInHistory = (exId) => {
+    try {
+      const td = JSON.parse(localStorage.getItem(TREINO_KEY) || "{}");
+      for(const day of Object.values(td.days || {})) {
+        if((day.exercicios || []).some(e => e.exercicioId === exId)) return true;
+      }
+    } catch(e) {}
+    return false;
+  };
+
   const exById = (id) => {
+    // Built-in
     for(const [grp, exs] of Object.entries(EXERCISE_DB)) {
       const found = exs.find(e => e.id === id);
       if(found) return { ...found, grupo: grp };
     }
+    // Custom (incluindo arquivados — para exibir no histórico)
+    const cust = customExercises.find(e => e.id === id);
+    if(cust) return { ...cust, grupo: CUSTOM_EX_GROUP };
     return null;
   };
+
+  // Inicializa após as definições
+  loadCustomExercises();
 
   const calcTreinoKcal = () => {
     let kcalMusc = 0, kcalCardio = 0;
@@ -5984,6 +6101,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
           ${prevHTML ? `<span style="margin-right:4px;">${prevHTML}</span>` : ""}
           ${volHTML}
           <span class="eih-badge">${badgeText}</span>
+          <button class="eih-swap-btn" type="button" title="Trocar exercício">🔄</button>
           <button class="eih-del-btn" type="button" title="Remover exercício">✕</button>
         </div>
         <div class="ex-item-body"><div class="ex-item-inner">
@@ -5996,6 +6114,8 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       `;
       // Chart button → open progression modal
       el.querySelector(".eih-chart-btn").addEventListener("click", ((eid) => (e) => { e.stopPropagation(); openExProgModal(eid); })(exEntry.exercicioId));
+      // Swap exercise button
+      el.querySelector(".eih-swap-btn").addEventListener("click", ((i) => (e) => { e.stopPropagation(); openExSelectorModal("swap", i); })(idx));
       // Delete exercise from active workout
       el.querySelector(".eih-del-btn").addEventListener("click", ((i) => (e) => {
         e.stopPropagation();
@@ -6008,9 +6128,9 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
         renderExList();
         updateWorkoutSummary();
       })(idx));
-      // Header click to toggle (but not on chart btn)
+      // Header click to toggle (but not on action buttons)
       el.querySelector(".ex-item-header").addEventListener("click", ((i) => (e) => {
-        if(e.target.closest(".eih-chart-btn")) return;
+        if(e.target.closest(".eih-chart-btn") || e.target.closest(".eih-swap-btn") || e.target.closest(".eih-del-btn")) return;
         toggleEx(i);
       })(idx));
       el.querySelector(".add-set-btn").addEventListener("click", ((i) => () => {
@@ -6038,6 +6158,107 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
         tbody.appendChild(tr);
       });
     });
+    // "＋ Exercício" button at bottom of list
+    const addExBtn = document.createElement("button");
+    addExBtn.className = "ex-add-btn";
+    addExBtn.textContent = "＋ Exercício";
+    addExBtn.addEventListener("click", () => openExSelectorModal("add", null));
+    list.appendChild(addExBtn);
+  };
+
+  // ── Exercise Selector Modal (add / swap during workout) ──
+  let exSelectorMode = null;   // "add" | "swap"
+  let exSelectorSwapIdx = null;
+  let exSelectorCat = null;
+
+  const openExSelectorModal = (mode, swapIdx) => {
+    exSelectorMode = mode;
+    exSelectorSwapIdx = swapIdx;
+    exSelectorCat = null;
+    $("#exSelTitle").textContent = mode === "swap" ? "🔄 Trocar exercício" : "＋ Adicionar exercício";
+    renderExSelectorCatalog(null);
+    $("#exSelectorOverlay").classList.add("open");
+    $("#exSelectorModal").classList.add("open");
+  };
+
+  const closeExSelectorModal = () => {
+    $("#exSelectorOverlay").classList.remove("open");
+    $("#exSelectorModal").classList.remove("open");
+  };
+
+  const renderExSelectorCatalog = (grp) => {
+    exSelectorCat = grp;
+    const tabsEl = $("#exSelCatTabs");
+    const gridEl = $("#exSelGrid");
+    tabsEl.innerHTML = "";
+    gridEl.innerHTML = "";
+
+    // Build tabs: grupos built-in + "⭐ Meus" (se existir)
+    const allGroups = Object.keys(EXERCISE_DB);
+    const hasCustom = customExercises.some(e => !e.arquivado);
+    if(hasCustom) allGroups.push(CUSTOM_EX_GROUP);
+
+    for(const g of allGroups) {
+      const tab = document.createElement("button");
+      tab.className = `cat-tab ${exSelectorCat === g ? "active" : ""}`;
+      tab.textContent = g;
+      ((gn) => tab.addEventListener("click", () => renderExSelectorCatalog(gn)))(g);
+      tabsEl.appendChild(tab);
+    }
+
+    if(!exSelectorCat) {
+      gridEl.innerHTML = `<div class="food-empty">Selecione um grupo muscular acima.</div>`;
+      return;
+    }
+
+    // Get exercises for selected group
+    let exs;
+    if(exSelectorCat === CUSTOM_EX_GROUP) {
+      exs = customExercises.filter(e => !e.arquivado);
+    } else {
+      exs = EXERCISE_DB[exSelectorCat] || [];
+    }
+
+    if(exs.length === 0) {
+      gridEl.innerHTML = `<div class="food-empty">Nenhum exercício neste grupo.</div>`;
+      return;
+    }
+
+    for(const ex of exs) {
+      const isCustom = exSelectorCat === CUSTOM_EX_GROUP;
+      const el = document.createElement("div");
+      el.className = "food-item";
+      el.innerHTML = `
+        <div class="fi-info">
+          <div class="fi-name" style="display:flex;align-items:center;gap:6px;">
+            ${ex.nome}
+            ${isCustom ? `<span class="tei-custom-tag">custom</span>` : ""}
+          </div>
+        </div>
+        <div style="font-size:18px;color:var(--accent);">+</div>
+      `;
+      ((exId, exNome) => el.addEventListener("click", () => {
+        if(exSelectorMode === "add") {
+          treinoState.exercicios.push({
+            exercicioId: exId,
+            series: [{ reps: "", carga: "" }, { reps: "", carga: "" }, { reps: "", carga: "" }]
+          });
+          closeExSelectorModal();
+          renderExList();
+          updateWorkoutSummary();
+          showToast(`${exNome} adicionado ✅`);
+        } else if(exSelectorMode === "swap") {
+          const i = exSelectorSwapIdx;
+          const oldName = exById(treinoState.exercicios[i].exercicioId)?.nome || treinoState.exercicios[i].exercicioId;
+          if(!confirm(`Trocar "${oldName}" por "${exNome}"?\nAs séries registradas serão mantidas.`)) return;
+          treinoState.exercicios[i].exercicioId = exId;
+          closeExSelectorModal();
+          renderExList();
+          showToast(`Exercício trocado — séries mantidas ✅`);
+        }
+      }))(ex.id, ex.nome);
+      gridEl.appendChild(el);
+    }
   };
 
   // ─── Cardio ───
@@ -6429,6 +6650,88 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
   };
 
   // ══════════ TEMPLATE HISTORY MODAL ══════════
+
+  // Returns list of exercises that have ≥1 filled series in any saved day
+  const getExercisesWithHistory = () => {
+    const seen = new Map(); // exId → { nome, grupo }
+    for(const day of Object.values(treinoData.days)) {
+      for(const ex of (day.exercicios || [])) {
+        if(seen.has(ex.exercicioId)) continue;
+        const hasData = (ex.series || []).some(s => (Number(s.reps)||0) > 0);
+        if(hasData) {
+          const info = exById(ex.exercicioId);
+          seen.set(ex.exercicioId, { nome: info ? info.nome : ex.exercicioId, grupo: info ? (info.grupo || "") : "" });
+        }
+      }
+    }
+    // Sort: by grupo then nome
+    return [...seen.entries()]
+      .map(([id, v]) => ({ id, nome: v.nome, grupo: v.grupo }))
+      .sort((a,b) => (a.grupo+a.nome).localeCompare(b.grupo+b.nome));
+  };
+
+  // Populate #thEquipSelect with exercises that have history
+  const buildEquipSelect = () => {
+    const sel = $("#thEquipSelect");
+    const prevVal = sel.value;
+    sel.innerHTML = `<option value="">— Selecione o exercício —</option>`;
+    const exercises = getExercisesWithHistory();
+    let curGrp = "";
+    let optgrp = null;
+    for(const ex of exercises) {
+      const grpLabel = ex.grupo || "Outros";
+      if(grpLabel !== curGrp) {
+        if(optgrp) sel.appendChild(optgrp);
+        optgrp = document.createElement("optgroup");
+        optgrp.label = grpLabel;
+        curGrp = grpLabel;
+      }
+      const opt = document.createElement("option");
+      opt.value = ex.id;
+      opt.textContent = ex.nome.split("(")[0].trim();
+      optgrp.appendChild(opt);
+    }
+    if(optgrp) sel.appendChild(optgrp);
+    if(prevVal) sel.value = prevVal;
+  };
+
+  // Render equipment history table for a given exId
+  const renderEquipmentHistory = (exId) => {
+    const container = $("#thEquipTable");
+    if(!exId) { container.innerHTML = ""; return; }
+    const sessions = getAllExSessions(exId, 8); // newest first
+    if(sessions.length === 0) {
+      container.innerHTML = `<p style="font-size:12px;color:var(--text3);text-align:center;padding:16px 0;">Sem sessões registradas para este exercício.</p>`;
+      return;
+    }
+    // PR = session with highest maxCarga
+    const prCarga = Math.max(...sessions.map(s => s.maxCarga));
+    let html = `<div class="tbl-wrap"><table class="comp-table">
+      <thead><tr><th style="text-align:left;">Data</th><th>Sets</th><th>Melhor carga</th><th>Volume</th><th>Δ</th></tr></thead>
+      <tbody>`;
+    sessions.forEach((s, i) => {
+      const prev = sessions[i + 1];
+      let delta = "";
+      if(prev) {
+        const diff = s.maxCarga - prev.maxCarga;
+        if(diff > 0) delta = `<span class="delta-up">▲+${diff}</span>`;
+        else if(diff < 0) delta = `<span class="delta-down">▼${diff}</span>`;
+        else delta = `<span class="delta-same">=</span>`;
+      }
+      const isPR = s.maxCarga === prCarga && prCarga > 0;
+      const volFmt = s.volume > 999 ? (s.volume/1000).toFixed(1)+"k" : s.volume;
+      html += `<tr class="${isPR ? "eqhist-pr" : ""}">
+        <td class="mono">${s.date}${isPR ? " 🏆" : ""}</td>
+        <td>${s.sets}</td>
+        <td><b>${s.maxCarga}kg</b></td>
+        <td>${volFmt}</td>
+        <td>${delta}</td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+    container.innerHTML = html;
+  };
+
   const openTmplHistModal = () => {
     // If a template is active, filter by it; otherwise show all
     const tmplId = activeTmplId;
@@ -6528,6 +6831,21 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       html += `</tbody></table>`;
       wrapEl.innerHTML = html;
     }
+
+    // Wire tabs
+    const switchThTab = (tab) => {
+      ["thTabTreino","thTabEquip"].forEach(id => $("#"+id).classList.toggle("active", id === "thTab"+tab));
+      ["thPanelTreino","thPanelEquip"].forEach(id => $("#"+id).classList.toggle("active", id === "thPanel"+tab));
+      if(tab === "Equip") {
+        buildEquipSelect();
+        renderEquipmentHistory($("#thEquipSelect").value);
+      }
+    };
+    $("#thTabTreino").onclick = () => switchThTab("Treino");
+    $("#thTabEquip").onclick  = () => switchThTab("Equip");
+    $("#thEquipSelect").onchange = (e) => renderEquipmentHistory(e.target.value);
+    // Always open on "Por treino" tab
+    switchThTab("Treino");
 
     $("#tmplHistOverlay").classList.add("open");
     $("#tmplHistModal").classList.add("open");
@@ -6656,6 +6974,8 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     const gridEl = $("#tmplExGrid");
     tabsEl.innerHTML = "";
     gridEl.innerHTML = "";
+
+    // Tabs: grupos built-in + "⭐ Meus"
     const groups = Object.keys(EXERCISE_DB);
     for(const grp of groups) {
       const tab = document.createElement("button");
@@ -6664,10 +6984,70 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       ((g) => tab.addEventListener("click", () => { editCatActive = g; renderTmplCatalog(); }))(grp);
       tabsEl.appendChild(tab);
     }
+    // Tab "⭐ Meus"
+    const myTab = document.createElement("button");
+    myTab.className = `cat-tab ${editCatActive === CUSTOM_EX_GROUP ? "active" : ""}`;
+    myTab.textContent = CUSTOM_EX_GROUP;
+    myTab.addEventListener("click", () => { editCatActive = CUSTOM_EX_GROUP; renderTmplCatalog(); });
+    tabsEl.appendChild(myTab);
+
     if(!editCatActive) {
       gridEl.innerHTML = `<div class="food-empty">Selecione um grupo muscular acima.</div>`;
       return;
     }
+
+    // ── Tab "⭐ Meus exercícios" ──
+    if(editCatActive === CUSTOM_EX_GROUP) {
+      const already = new Set(editingTmplData.exercicios || []);
+      const active = customExercises.filter(e => !e.arquivado);
+
+      if(active.length === 0) {
+        gridEl.innerHTML = `<div class="food-empty" style="padding:16px;">Nenhum exercício personalizado ainda.</div>`;
+      } else {
+        for(const ex of active) {
+          const el = document.createElement("div");
+          el.className = "food-item";
+          el.style.opacity = already.has(ex.id) ? ".4" : "1";
+          el.innerHTML = `
+            <div class="fi-info">
+              <div class="fi-name" style="display:flex;align-items:center;gap:6px;">
+                ${ex.nome}
+                <span class="tei-custom-tag">custom</span>
+              </div>
+              <div style="font-size:11px;color:var(--text3);">${ex.grupo}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <button class="tei-rename-btn" title="Renomear" data-id="${ex.id}">✏️</button>
+              <span style="font-size:16px;">${already.has(ex.id) ? "✓" : "+"}</span>
+            </div>
+          `;
+          // Adicionar ao template
+          if(!already.has(ex.id)) {
+            ((exId) => el.querySelector("span:last-child").addEventListener("click", (e) => {
+              e.stopPropagation();
+              editingTmplData.exercicios.push(exId);
+              renderTmplExList();
+              renderTmplCatalog();
+            }))(ex.id);
+          }
+          // Rename inline
+          ((exObj) => el.querySelector(".tei-rename-btn").addEventListener("click", (e) => {
+            e.stopPropagation();
+            openCustomExRename(exObj);
+          }))(ex);
+          gridEl.appendChild(el);
+        }
+      }
+      // Botão criar
+      const createBtn = document.createElement("button");
+      createBtn.className = "custom-ex-create-btn";
+      createBtn.textContent = "＋ Criar exercício personalizado";
+      createBtn.addEventListener("click", () => openCustomExModal());
+      gridEl.appendChild(createBtn);
+      return;
+    }
+
+    // ── Grupos built-in ──
     const exs = EXERCISE_DB[editCatActive] || [];
     const already = new Set(editingTmplData.exercicios || []);
     for(const ex of exs) {
@@ -6687,6 +7067,65 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       }
       gridEl.appendChild(el);
     }
+  };
+
+  // ── Custom exercise modal ──
+  const openCustomExModal = () => {
+    const sel = $("#cexGrupo");
+    sel.innerHTML = "";
+    for(const grp of Object.keys(EXERCISE_DB)) {
+      const opt = document.createElement("option");
+      opt.value = grp; opt.textContent = grp;
+      sel.appendChild(opt);
+    }
+    $("#cexName").value = "";
+    $("#customExOverlay").classList.add("open");
+    $("#customExModal").classList.add("open");
+    setTimeout(() => $("#cexName").focus(), 150);
+  };
+
+  const closeCustomExModal = () => {
+    $("#customExOverlay").classList.remove("open");
+    $("#customExModal").classList.remove("open");
+  };
+
+  const saveCustomEx = () => {
+    const nome = ($("#cexName").value || "").trim();
+    if(!nome) { showToast("Digite um nome para o exercício"); return; }
+    const grupo = $("#cexGrupo").value;
+    const newEx = { id: "custom_" + Date.now(), nome, grupo };
+    customExercises.push(newEx);
+    saveCustomExercises();
+    closeCustomExModal();
+    editCatActive = CUSTOM_EX_GROUP;
+    renderTmplCatalog();
+    showToast(`"${nome}" criado ✅`);
+  };
+
+  // Rename inline: substitui o item no grid por row de edição
+  const openCustomExRename = (exObj) => {
+    const gridEl = $("#tmplExGrid");
+    gridEl.innerHTML = "";
+    const row = document.createElement("div");
+    row.className = "tei-rename-row";
+    row.innerHTML = `
+      <input id="cexRenameInput" value="${exObj.nome}" autocomplete="off" style="font-size:16px;" />
+      <button class="btn primary" id="cexRenameConfirm" type="button">OK</button>
+      <button class="btn" id="cexRenameCancel" type="button">✕</button>
+    `;
+    gridEl.appendChild(row);
+    const input = row.querySelector("#cexRenameInput");
+    input.focus(); input.select();
+    row.querySelector("#cexRenameConfirm").addEventListener("click", () => {
+      const newName = (input.value || "").trim();
+      if(!newName) return;
+      const idx = customExercises.findIndex(e => e.id === exObj.id);
+      if(idx >= 0) customExercises[idx].nome = newName;
+      saveCustomExercises();
+      renderTmplCatalog();
+      showToast("Renomeado ✅");
+    });
+    row.querySelector("#cexRenameCancel").addEventListener("click", () => renderTmplCatalog());
   };
 
   const saveTmplEdit = () => {
@@ -7187,6 +7626,13 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     $("#tmplModalClose").addEventListener("click", closeTmplEditor);
     $("#tmplEditSave").addEventListener("click", saveTmplEdit);
     $("#tmplEditDelete").addEventListener("click", deleteTmpl);
+    // custom exercise modal
+    $("#customExOverlay").addEventListener("click", closeCustomExModal);
+    $("#customExClose").addEventListener("click", closeCustomExModal);
+    $("#customExSave").addEventListener("click", saveCustomEx);
+    // exercise selector modal
+    $("#exSelectorOverlay").addEventListener("click", closeExSelectorModal);
+    $("#exSelClose").addEventListener("click", closeExSelectorModal);
     // exercise progression modal
     $("#exProgOverlay").addEventListener("click", closeExProgModal);
     $("#exProgClose").addEventListener("click", closeExProgModal);
