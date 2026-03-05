@@ -1132,8 +1132,8 @@ tr:active { background: var(--surface2); }
   flex-shrink: 0;
 }
 .modal-sheet.modal-full .modal-body {
-  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  padding-bottom: 12px;
+  flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain; padding-bottom: 24px;
 }
 .modal-footer {
   flex-shrink: 0;
@@ -1466,7 +1466,7 @@ tr:active { background: var(--surface2); }
   padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
 }
 .pr-badge.gold { background: rgba(251,191,36,.15); color: #fbbf24; border: 1px solid rgba(251,191,36,.2); }
-.pr-chart-bar-wrap { display: flex; align-items: flex-end; gap: 3px; height: 80px; }
+.pr-chart-bar-wrap { display: flex; align-items: flex-end; gap: 3px; height: 80px; margin-top: 24px; }
 .pr-chart-bar {
   flex: 1; min-width: 0; border-radius: 4px 4px 0 0;
   background: linear-gradient(180deg, rgba(124,92,255,.6), rgba(124,92,255,.2));
@@ -6060,9 +6060,8 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     const list = $("#exList");
     list.innerHTML = "";
     if(!treinoState.exercicios || treinoState.exercicios.length === 0) {
-      list.innerHTML = `<div class="food-empty">Escolha um treino acima para começar.</div>`;
-      return;
-    }
+      list.innerHTML = `<div class="food-empty">Sem exercícios. Escolha um template acima ou adicione abaixo.</div>`;
+    } else {
     treinoState.exercicios.forEach((exEntry, idx) => {
       const exInfo = exById(exEntry.exercicioId);
       const nome = exInfo ? exInfo.nome : exEntry.exercicioId;
@@ -6158,6 +6157,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
         tbody.appendChild(tr);
       });
     });
+    } // end else (exercicios.length > 0)
     // "＋ Exercício" button at bottom of list
     const addExBtn = document.createElement("button");
     addExBtn.className = "ex-add-btn";
@@ -6193,10 +6193,9 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     tabsEl.innerHTML = "";
     gridEl.innerHTML = "";
 
-    // Build tabs: grupos built-in + "⭐ Meus" (se existir)
+    // Build tabs: grupos built-in + "⭐ Meus" (sempre visível)
     const allGroups = Object.keys(EXERCISE_DB);
-    const hasCustom = customExercises.some(e => !e.arquivado);
-    if(hasCustom) allGroups.push(CUSTOM_EX_GROUP);
+    allGroups.push(CUSTOM_EX_GROUP);
 
     for(const g of allGroups) {
       const tab = document.createElement("button");
@@ -6216,49 +6215,128 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     if(exSelectorCat === CUSTOM_EX_GROUP) {
       exs = customExercises.filter(e => !e.arquivado);
     } else {
-      exs = EXERCISE_DB[exSelectorCat] || [];
+      const customForGrp = customExercises.filter(e => !e.arquivado && e.grupo === exSelectorCat);
+      exs = [...(EXERCISE_DB[exSelectorCat] || []), ...customForGrp];
     }
 
     if(exs.length === 0) {
-      gridEl.innerHTML = `<div class="food-empty">Nenhum exercício neste grupo.</div>`;
+      if(exSelectorCat === CUSTOM_EX_GROUP) {
+        gridEl.innerHTML = `<div class="food-empty" style="display:flex;flex-direction:column;align-items:center;gap:12px;">Nenhum exercício personalizado ainda.<button class="btn primary" style="font-size:16px;padding:10px 20px;">＋ Criar exercício</button></div>`;
+        gridEl.querySelector("button").addEventListener("click", () => { closeExSelectorModal(); openCustomExModal(); });
+      } else {
+        gridEl.innerHTML = `<div class="food-empty">Nenhum exercício neste grupo.</div>`;
+      }
       return;
     }
 
     for(const ex of exs) {
-      const isCustom = exSelectorCat === CUSTOM_EX_GROUP;
+      const isCustom = !!customExercises.find(e => e.id === ex.id);
       const el = document.createElement("div");
       el.className = "food-item";
-      el.innerHTML = `
-        <div class="fi-info">
-          <div class="fi-name" style="display:flex;align-items:center;gap:6px;">
-            ${ex.nome}
-            ${isCustom ? `<span class="tei-custom-tag">custom</span>` : ""}
+      if(isCustom) {
+        el.innerHTML = `
+          <div class="fi-info">
+            <div class="fi-name" style="display:flex;align-items:center;gap:6px;">
+              ${ex.nome}<span class="tei-custom-tag">custom</span>
+            </div>
+            <div style="font-size:11px;color:var(--text3);">${ex.grupo}</div>
           </div>
-        </div>
-        <div style="font-size:18px;color:var(--accent);">+</div>
-      `;
-      ((exId, exNome) => el.addEventListener("click", () => {
-        if(exSelectorMode === "add") {
-          treinoState.exercicios.push({
-            exercicioId: exId,
-            series: [{ reps: "", carga: "" }, { reps: "", carga: "" }, { reps: "", carga: "" }]
-          });
-          closeExSelectorModal();
-          renderExList();
-          updateWorkoutSummary();
-          showToast(`${exNome} adicionado ✅`);
-        } else if(exSelectorMode === "swap") {
-          const i = exSelectorSwapIdx;
-          const oldName = exById(treinoState.exercicios[i].exercicioId)?.nome || treinoState.exercicios[i].exercicioId;
-          if(!confirm(`Trocar "${oldName}" por "${exNome}"?\nAs séries registradas serão mantidas.`)) return;
-          treinoState.exercicios[i].exercicioId = exId;
-          closeExSelectorModal();
-          renderExList();
-          showToast(`Exercício trocado — séries mantidas ✅`);
-        }
-      }))(ex.id, ex.nome);
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button class="eih-del-btn" title="Excluir" style="font-size:13px;">🗑️</button>
+            <button class="tei-rename-btn" title="Renomear">✏️</button>
+            <button class="ex-sel-add-btn" style="font-size:18px;color:var(--accent);background:none;border:none;cursor:pointer;padding:0 4px;">+</button>
+          </div>
+        `;
+        ((exId, exNome) => el.addEventListener("click", () => {
+          if(exSelectorMode === "add") {
+            treinoState.exercicios.push({
+              exercicioId: exId,
+              series: [{ reps: "", carga: "" }, { reps: "", carga: "" }, { reps: "", carga: "" }]
+            });
+            closeExSelectorModal(); renderExList(); updateWorkoutSummary();
+            showToast(`${exNome} adicionado ✅`);
+          } else if(exSelectorMode === "swap") {
+            const i = exSelectorSwapIdx;
+            const oldName = exById(treinoState.exercicios[i].exercicioId)?.nome || treinoState.exercicios[i].exercicioId;
+            if(!confirm(`Trocar "${oldName}" por "${exNome}"?\nAs séries registradas serão mantidas.`)) return;
+            treinoState.exercicios[i].exercicioId = exId;
+            closeExSelectorModal(); renderExList();
+            showToast(`Exercício trocado — séries mantidas ✅`);
+          }
+        }))(ex.id, ex.nome);
+        ((exObj) => el.querySelector(".tei-rename-btn").addEventListener("click", (e) => {
+          e.stopPropagation();
+          openExSelCustomRename(exObj);
+        }))(ex);
+        ((exObj) => el.querySelector(".eih-del-btn").addEventListener("click", (e) => {
+          e.stopPropagation();
+          if(!confirm(`Excluir "${exObj.nome}"?`)) return;
+          const idx = customExercises.findIndex(e2 => e2.id === exObj.id);
+          if(idx >= 0) customExercises.splice(idx, 1);
+          saveCustomExercises();
+          renderExSelectorCatalog(exSelectorCat);
+          showToast(`"${exObj.nome}" excluído 🗑️`);
+        }))(ex);
+      } else {
+        el.innerHTML = `
+          <div class="fi-info"><div class="fi-name">${ex.nome}</div></div>
+          <div style="font-size:18px;color:var(--accent);">+</div>
+        `;
+        ((exId, exNome) => el.addEventListener("click", () => {
+          if(exSelectorMode === "add") {
+            treinoState.exercicios.push({
+              exercicioId: exId,
+              series: [{ reps: "", carga: "" }, { reps: "", carga: "" }, { reps: "", carga: "" }]
+            });
+            closeExSelectorModal(); renderExList(); updateWorkoutSummary();
+            showToast(`${exNome} adicionado ✅`);
+          } else if(exSelectorMode === "swap") {
+            const i = exSelectorSwapIdx;
+            const oldName = exById(treinoState.exercicios[i].exercicioId)?.nome || treinoState.exercicios[i].exercicioId;
+            if(!confirm(`Trocar "${oldName}" por "${exNome}"?\nAs séries registradas serão mantidas.`)) return;
+            treinoState.exercicios[i].exercicioId = exId;
+            closeExSelectorModal(); renderExList();
+            showToast(`Exercício trocado — séries mantidas ✅`);
+          }
+        }))(ex.id, ex.nome);
+      }
       gridEl.appendChild(el);
     }
+    // Botão "＋ Criar exercício" sempre visível na aba "⭐ Meus"
+    if(exSelectorCat === CUSTOM_EX_GROUP) {
+      const createBtn = document.createElement("button");
+      createBtn.className = "btn primary";
+      createBtn.style.cssText = "width:100%;margin-top:8px;font-size:16px;padding:10px;";
+      createBtn.textContent = "＋ Criar exercício";
+      createBtn.addEventListener("click", () => { closeExSelectorModal(); openCustomExModal(); });
+      gridEl.appendChild(createBtn);
+    }
+  };
+
+  // ─── Rename custom exercise inline no exSelectorModal ───
+  const openExSelCustomRename = (exObj) => {
+    const gridEl = $("#exSelGrid");
+    gridEl.innerHTML = "";
+    const row = document.createElement("div");
+    row.className = "tei-rename-row";
+    row.innerHTML = `
+      <input id="exSelRenameInput" value="${exObj.nome}" autocomplete="off" style="font-size:16px;" />
+      <button class="btn primary" id="exSelRenameConfirm" type="button">OK</button>
+      <button class="btn" id="exSelRenameCancel" type="button">✕</button>
+    `;
+    gridEl.appendChild(row);
+    const input = row.querySelector("#exSelRenameInput");
+    input.focus(); input.select();
+    row.querySelector("#exSelRenameConfirm").addEventListener("click", () => {
+      const newName = (input.value || "").trim();
+      if(!newName) return;
+      const idx = customExercises.findIndex(e => e.id === exObj.id);
+      if(idx >= 0) customExercises[idx].nome = newName;
+      saveCustomExercises();
+      renderExSelectorCatalog(exSelectorCat);
+      showToast("Renomeado ✅");
+    });
+    row.querySelector("#exSelRenameCancel").addEventListener("click", () => renderExSelectorCatalog(exSelectorCat));
   };
 
   // ─── Cardio ───
@@ -6869,6 +6947,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
   // ══════════ TEMPLATE EDITOR ══════════
   let editingTmplId = null;
   let editingTmplData = null;
+  let editingIsNew = false;
   let editCatActive = null;
   const TMPL_COLORS = ["#f87171","#60a5fa","#34d399","#fbbf24","#a78bfa","#fb923c","#f472b6","#22d3ee"];
 
@@ -6878,7 +6957,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     const id = "treino_" + Date.now();
     const novo = { id, nome: "Novo Treino", cor: "#a78bfa", exercicios: [], cardio: { tipo: "bicicleta", min: 15 } };
     userTemplates.push(novo);
-    saveTemplates();
+    editingIsNew = true;
     openTmplEditor(id);
     showToast("Novo template criado ✨");
   };
@@ -6902,6 +6981,11 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
   const closeTmplEditor = () => {
     $("#tmplModalOverlay").classList.remove("open");
     $("#tmplModal").classList.remove("open");
+    if(editingIsNew) {
+      const idx = userTemplates.findIndex(t => t.id === editingTmplId);
+      if(idx !== -1) userTemplates.splice(idx, 1);
+      editingIsNew = false;
+    }
     editingTmplId = null;
     editingTmplData = null;
   };
@@ -7097,8 +7181,12 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     customExercises.push(newEx);
     saveCustomExercises();
     closeCustomExModal();
-    editCatActive = CUSTOM_EX_GROUP;
-    renderTmplCatalog();
+    if($("#exSelectorModal").classList.contains("open")) {
+      renderExSelectorCatalog(CUSTOM_EX_GROUP);
+    } else {
+      editCatActive = CUSTOM_EX_GROUP;
+      renderTmplCatalog();
+    }
     showToast(`"${nome}" criado ✅`);
   };
 
@@ -7138,6 +7226,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     const idx = userTemplates.findIndex(t => t.id === editingTmplId);
     if(idx >= 0) userTemplates[idx] = clone(editingTmplData);
     saveTemplates();
+    editingIsNew = false;
     closeTmplEditor();
     renderTmplGrid();
     showToast("Template salvo ✅");

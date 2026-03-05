@@ -5,6 +5,28 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.6.0] — 2026-03-04
+
+### Corrigido
+- [fix] **"＋ Exercício" invisível com lista vazia** — `renderExList()` fazia `return` prematuro antes de adicionar o botão; reestruturado para if/else.
+- [fix] **Gráfico de progressão** — labels de valor (`top:-16px`) colidiam com botões acima; corrigido com `margin-top:24px` no `.pr-chart-bar-wrap` (substituiu `padding-top` que quebrava o layout interno).
+- [fix] **Tab "⭐ Meus" no exSelectorModal** — aparecia apenas se já houvesse exercícios custom; agora sempre visível.
+- [fix] **Template fantasma** — `createNewTemplate()` persistia no localStorage antes do usuário salvar; corrigido com flag `editingIsNew` — template só persiste ao clicar "✅ Salvar".
+- [fix] **Botão "＋ Criar exercício" sumia após criar o 1º exercício** — só aparecia no estado vazio; agora sempre ao final da aba "⭐ Meus".
+- [fix] **Exercício custom não aparecia na aba do grupo muscular** — `renderExSelectorCatalog()` usava só `EXERCISE_DB`; agora mescla custom exercises pelo campo `grupo`.
+- [fix] **Clique no exercício custom não adicionava ao treino** — handler estava no botão "+" com `stopPropagation`; movido para o `el` inteiro (igual aos built-in).
+- [fix] **Scroll quebrado nos modais full** — `.modal-sheet.modal-full .modal-body` sem `min-height:0` impedia o `overflow-y:auto` de funcionar; adicionado `min-height:0` e `overscroll-behavior:contain`.
+- [fix] **`saveCustomEx` sempre refreshava template editor** — agora detecta se `#exSelectorModal` está aberto e chama `renderExSelectorCatalog()` no contexto correto.
+
+### Melhorado
+- [improve] **Exercícios custom no exSelectorModal** — aba "⭐ Meus" exibe botões ✏️ (rename inline) e 🗑️ (excluir com confirm) para cada exercício, com `openExSelCustomRename()` dedicado ao contexto do modal de treino.
+
+### Notas
+- Custom exercises: UX ainda pode melhorar (edição de grupo, reordenação, busca na lista).
+- sw.js: `kcalix-v10` → `kcalix-v11`
+
+---
+
 ## [v2.4.1] — 2026-03-03
 
 ### Corrigido
