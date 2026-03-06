@@ -6952,15 +6952,19 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       const lm = MUSCLE_LANDMARKS[grupo];
       if (!lm) continue;
 
-      // Gatilho A: volume cronicamente alto (4 das últimas 6 semanas acima do MAV)
+      // Gatilho A: volume cronicamente alto (4 das últimas 6 semanas ativas acima do MAV)
+      // Semanas sem treino registrado são ignoradas. Aguarda 6 semanas ativas (spec 5.4).
       let weeksAboveMav = 0;
+      let activeWeeksA = 0;
       for (let w = 0; w < 6; w++) {
         const wEnd   = shiftDateStr(today, -(w * 7));
         const wStart = shiftDateStr(today, -(w * 7 + 6));
+        if (!Object.keys(treinoData.days || {}).some(d => d >= wStart && d <= wEnd)) continue;
+        activeWeeksA++;
         const wVol = calcMuscleVolume(wStart, wEnd);
         if ((wVol[grupo] ? wVol[grupo].total : 0) > lm.mav) weeksAboveMav++;
       }
-      if (weeksAboveMav >= 4) {
+      if (activeWeeksA >= 6 && weeksAboveMav >= 4) {
         insights.push({
           nivel: "warning", icone: "⚠",
           titulo: `${grupo} — volume alto por ${weeksAboveMav} semanas`,
@@ -7079,9 +7083,9 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     const weekStart = shiftDateStr(today, -6);
     const vol = calcMuscleVolume(weekStart, today);
     const pairs = [
-      ["Peito", "Costas"],
-      ["Quad", "Posterior"],
-      ["Biceps", "Triceps"],
+      ["🏋️ Peito",  "🦅 Costas"],
+      ["🦵 Quad",   "🦵 Posterior"],
+      ["💪 Bíceps", "💪 Tríceps"],
     ];
     const insights = [];
     for (const [gA, gB] of pairs) {
@@ -7114,11 +7118,11 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
 
   // INSIGHT 5: Grupo negligenciado cronicamente (3+ das últimas 4 semanas abaixo do MEV)
   const CHRONIC_LOW_SUGGESTIONS = {
-    "Posterior": "Adicionar 1 mesa flexora + 1 stiff por semana já é suficiente.",
-    "Gluteos":   "Hip thrust é o exercício de maior retorno para glúteos. 3 séries 2x/semana.",
-    "Core":      "Prancha e abdominal crunch — 2–3 séries ao final de qualquer treino.",
-    "Biceps":    "Já vem de costas — verifique se suas remadas estão sendo contadas.",
-    "Triceps":   "Já vem do supino — verifique se seus exercícios compostos estão sendo contados.",
+    "🦵 Posterior": "Adicionar 1 mesa flexora + 1 stiff por semana já é suficiente.",
+    "🍑 Glúteos":   "Hip thrust é o exercício de maior retorno para glúteos. 3 séries 2x/semana.",
+    "🧱 Core":      "Prancha e abdominal crunch — 2–3 séries ao final de qualquer treino.",
+    "💪 Bíceps":    "Já vem de costas — verifique se suas remadas estão sendo contadas.",
+    "💪 Tríceps":   "Já vem do supino — verifique se seus exercícios compostos estão sendo contados.",
   };
 
   const detectChronicLowVolume = () => {
@@ -7127,21 +7131,25 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     for (const grupo of MUSCLE_ORDER) {
       const lm = MUSCLE_LANDMARKS[grupo];
       if (!lm) continue;
+      // Só conta semanas com treino registrado; aguarda acumular 3 semanas ativas.
       let weeksBelow = 0;
+      let activeWeeksC = 0;
       for (let w = 0; w < 4; w++) {
         const wEnd   = shiftDateStr(today, -(w * 7));
         const wStart = shiftDateStr(today, -(w * 7 + 6));
+        if (!Object.keys(treinoData.days || {}).some(d => d >= wStart && d <= wEnd)) continue;
+        activeWeeksC++;
         const wVol = calcMuscleVolume(wStart, wEnd);
         if ((wVol[grupo] ? wVol[grupo].total : 0) < lm.mev) weeksBelow++;
       }
-      if (weeksBelow < 3) continue;
+      if (activeWeeksC < 3 || weeksBelow < 3) continue;
       const suggestion = CHRONIC_LOW_SUGGESTIONS[grupo] ||
         `Adicione séries diretas de ${grupo} na sua rotina.`;
       insights.push({
         nivel: "warning", icone: "⚠",
         titulo: `${grupo} — abaixo do mínimo por ${weeksBelow} semanas`,
-        resumo: `${weeksBelow} das últimas 4 semanas abaixo de ${lm.mev} séries. ${suggestion}`,
-        detalhe: `<b>${grupo}</b> abaixo do mínimo por ${weeksBelow} semanas seguidas.<br>${suggestion}`,
+        resumo: `${weeksBelow} das últimas ${activeWeeksC} semanas abaixo de ${lm.mev} séries. ${suggestion}`,
+        detalhe: `<b>${grupo}</b> abaixo do mínimo por ${weeksBelow} das últimas ${activeWeeksC} semanas.<br>${suggestion}`,
         grupo,
         acao: null, acaoFn: null,
       });
