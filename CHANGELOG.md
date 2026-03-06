@@ -5,6 +5,26 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.8.0] — 2026-03-05
+
+### Adicionado
+- [feat] **Analytics de Volume Muscular** — 3ª aba "💪 Por grupo" no histórico de treino com cards por grupo muscular, barra de progresso MEV→MRV, breakdown diretos vs compostos, comparação com média das 4 semanas anteriores e alertas de fracionamento (>11 sets/dia num grupo).
+- [feat] **Grupos secundários em exercícios custom** — modal de criação agora tem chips de toggle para marcar grupos musculares sinergistas; persiste no schema como `secundarios:[]` (retrocompatível com exercícios existentes).
+- [feat] **Constantes de landmarks musculares** — `EX_SECONDARY`, `MUSCLE_LANDMARKS`, `MUSCLE_ORDER`, `QUAD_IDS`, `POST_IDS` baseados nos protocolos Lucas Campos / RP.
+- [feat] **Algoritmo de volume** — `calcMuscleVolume()`, `calcMuscleAvg4weeks()`, `calcFrequencyAlert()`, `shiftDateStr()`. Séries via compostos valem 0.5x; diretos 1.0x. Pernas separadas em Quad e Posterior.
+
+### Corrigido
+- [fix] Clique em exercício na tabela "Por treino" agora abre o modal de progressão individual (carga/volume/gráfico) em vez de redirecionar para aba "Por equipamento".
+- [fix] `#exProgModal` com z-index 303 para aparecer corretamente acima do `#tmplHistModal` (que usa 301 padrão).
+
+### Notas
+- Schema retrocompatível: `secundarios:[]` tratado como array vazio em exercícios sem o campo.
+- Glúteos MEV=15 (maior de todos), Pernas separadas para refletir protocolo Lucas Campos.
+- sw.js: bump para `kcalix-v12` necessário no próximo deploy (cache de service worker).
+- Infra: Edit e Write tools falham com EEXIST no Windows+OneDrive pausado; edições feitas via `py -c`.
+
+---
+
 ## [v2.7.0] — 2026-03-04
 
 ### Melhorado
