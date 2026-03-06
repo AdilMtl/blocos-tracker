@@ -5,6 +5,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.8.2] — 2026-03-05
+
+### Corrigido
+- [fix] **Barra de progresso invisível no analytics de grupo** — a spec usava `var(--ok)` que não existe no design system; a variável correta é `var(--good)` (`#34d399`). Causava borda e barra de progresso transparentes para grupos no range MEV–MRV (verde esperado).
+
+---
+
 ## [v2.8.1] — 2026-03-05
 
 ### Corrigido
