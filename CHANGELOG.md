@@ -5,6 +5,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.8.1] — 2026-03-05
+
+### Corrigido
+- [fix] **Janela temporal incorreta no analytics de grupo** — `renderMuscleVolume` e `calcMuscleAvg4weeks` usavam `currentDate()` (date picker) em vez de `todayISO()` (dia real); treinos da semana não apareciam se o picker estava em outra data.
+- [fix] **Delta "vs média 4sem" com dados inexistentes** — comparação agora só exibe quando há histórico real (`avg > 0`); sem 4 semanas de dados, o campo fica vazio em vez de mostrar "= média 4sem" enganoso.
+
+---
+
 ## [v2.8.0] — 2026-03-05
 
 ### Adicionado

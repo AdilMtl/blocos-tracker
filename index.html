@@ -6819,7 +6819,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
 
   // Media semanal das 4 semanas anteriores a hoje
   const calcMuscleAvg4weeks = () => {
-    const today = currentDate();
+    const today = todayISO();
     const end   = shiftDateStr(today, -1);
     const start = shiftDateStr(today, -28);
     const raw = calcMuscleVolume(start, end);
@@ -7150,7 +7150,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
 
     // Render: analytics de volume por grupo muscular
     const renderMuscleVolume = () => {
-      const today = currentDate();
+      const today = todayISO();
       const weekStart = shiftDateStr(today, -6);
       const current = calcMuscleVolume(weekStart, today);
       const avg4    = calcMuscleAvg4weeks();
@@ -7171,7 +7171,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
         const mevPct = Math.min(lm.mev / lm.mrv, 1) * 100;
         const delta  = +(total - a.total).toFixed(1);
         let deltaHtml = "";
-        if(a.total > 0 || total > 0) {
+        if(a.total > 0) {
           if(delta > 0)      deltaHtml = `<span class="mg-delta-up">+${delta} vs média 4sem</span>`;
           else if(delta < 0) deltaHtml = `<span class="mg-delta-down">${delta} vs média 4sem</span>`;
           else               deltaHtml = `<span style="color:var(--text3)">= média 4sem</span>`;
