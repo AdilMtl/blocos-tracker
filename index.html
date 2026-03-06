@@ -1561,6 +1561,14 @@ tr:active { background: var(--surface2); }
 .mg-delta-up { color:var(--good); }
 .mg-delta-down { color:var(--bad); }
 .mg-alert-chip { display:inline-block;background:rgba(248,113,113,.12);color:var(--bad);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;margin:4px 4px 0 0; }
+/* v2.9.0 insight chips inline */
+.mg-chips { display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line); }
+.mg-chip { display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;user-select:none;-webkit-user-select:none; }
+.mg-chip--ok { background:rgba(74,222,128,.12);color:var(--good); }
+.mg-chip--w  { background:rgba(248,113,113,.12);color:var(--bad); }
+.mg-chip--i  { background:rgba(139,92,246,.12);color:var(--accent); }
+.mg-chip.open { opacity:.7; }
+.mg-chip-detail { display:none;font-size:11px;color:var(--text3);line-height:1.5;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06); }
 /* swap + add exercise during workout */
 .eih-swap-btn { background:transparent;border:none;color:var(--text3);font-size:13px;line-height:1;cursor:pointer;padding:0 5px;flex-shrink:0;-webkit-tap-highlight-color:transparent; }
 .eih-swap-btn:active { color:var(--accent); }
@@ -6871,6 +6879,329 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     return results;
   };
 
+  // ══════════ v2.9.0 INSIGHTS AUTOMÁTICOS ══════════
+
+  // Determina nível pelo histórico de treino
+  const getUserLevel = () => {
+    const dates = Object.keys(treinoData.days || {}).sort();
+    if (dates.length === 0) return "iniciante";
+    const first = new Date(dates[0] + "T00:00:00");
+    const months = (new Date() - first) / (1000 * 60 * 60 * 24 * 30);
+    if (months < 3)  return "iniciante";
+    if (months < 12) return "intermediario";
+    return "avancado";
+  };
+
+  // INSIGHT 1: Plateau de carga por exercício
+  const detectPlateaus = () => {
+    const level = getUserLevel();
+    const nWeeks = level === "iniciante" ? 2 : 3;
+    const today = todayISO();
+    const cutoff = shiftDateStr(today, -(nWeeks * 7));
+
+    const allExIds = new Set();
+    for (const day of Object.values(treinoData.days || {})) {
+      for (const ex of (day.exercicios || [])) {
+        if (ex.exercicioId) allExIds.add(ex.exercicioId);
+      }
+    }
+
+    const insights = [];
+    for (const exId of allExIds) {
+      const sessions = getAllExSessions(exId, 20);
+      if (sessions.length < 2) continue;
+      const recent = sessions.filter(s => s.date >= cutoff);
+      const older  = sessions.filter(s => s.date < cutoff);
+      if (recent.length === 0 || older.length === 0) continue;
+      const currentMax    = Math.max(...recent.map(s => s.maxCarga));
+      const historicalMax = Math.max(...older.map(s => s.maxCarga));
+      if (currentMax > historicalMax) continue;
+      if (currentMax === 0 && historicalMax === 0) continue;
+      const exInfo = exById(exId);
+      const exNome = exInfo ? exInfo.nome : exId;
+      let detalhe;
+      if (level === "iniciante") {
+        detalhe = `<b>${exNome}</b> parado há ${nWeeks} semanas — incomum para iniciantes.<br>` +
+          `Verifique: as séries estão chegando perto da falha? A dieta está adequada?<br>` +
+          `Carga atual: ${currentMax}kg | Melhor anterior: ${historicalMax}kg`;
+      } else {
+        detalhe = `<b>${exNome}</b> sem progressão há ${nWeeks} semanas.<br>` +
+          `Seu corpo se acostumou com o desafio. É como ler as mesmas 10 páginas de um livro — hora de virar a página.<br>` +
+          `Considere: 3–4 séries/semana por 2 semanas, mantendo a carga (${currentMax}kg).`;
+      }
+      insights.push({
+        nivel: "warning",
+        icone: "⚠",
+        titulo: `${exNome} — sem progressão há ${nWeeks} sem.`,
+        resumo: level === "iniciante"
+          ? `Incomum para iniciantes. Verifique se as séries chegam perto da falha.`
+          : `Normal para seu nível. Considere um ciclo de redução de volume.`,
+        detalhe,
+        grupo: exInfo ? resolvePrimaryGroup(exInfo) : null,
+        acao: null, acaoFn: null,
+      });
+    }
+    return insights;
+  };
+
+  // INSIGHT 2: Sinal de Volume Cycling (necessidade de deload)
+  const detectVolumeCyclingNeed = () => {
+    const today = todayISO();
+    const insights = [];
+    for (const grupo of MUSCLE_ORDER) {
+      const lm = MUSCLE_LANDMARKS[grupo];
+      if (!lm) continue;
+
+      // Gatilho A: volume cronicamente alto (4 das últimas 6 semanas acima do MAV)
+      let weeksAboveMav = 0;
+      for (let w = 0; w < 6; w++) {
+        const wEnd   = shiftDateStr(today, -(w * 7));
+        const wStart = shiftDateStr(today, -(w * 7 + 6));
+        const wVol = calcMuscleVolume(wStart, wEnd);
+        if ((wVol[grupo] ? wVol[grupo].total : 0) > lm.mav) weeksAboveMav++;
+      }
+      if (weeksAboveMav >= 4) {
+        insights.push({
+          nivel: "warning", icone: "⚠",
+          titulo: `${grupo} — volume alto por ${weeksAboveMav} semanas`,
+          resumo: `Acima do ideal por ${weeksAboveMav} semanas. Hora de parar no posto.`,
+          detalhe: `<b>${grupo}</b> acima do volume ideal por ${weeksAboveMav} semanas seguidas.<br>` +
+            `Seu motor precisa parar no posto — não para desistir, mas para ir mais longe.<br>` +
+            `<b>Sugestão:</b> reduza para 3–4 séries/semana por 2 semanas. Mantenha a carga.`,
+          grupo,
+          acao: null, acaoFn: null,
+        });
+        continue;
+      }
+
+      // Gatilho B: queda de força em 2+ exercícios do mesmo grupo na semana
+      const thisWeekStart = shiftDateStr(today, -6);
+      const lastWeekStart = shiftDateStr(today, -13);
+      const lastWeekEnd   = shiftDateStr(today, -7);
+      const exIds = new Set();
+      for (const day of Object.values(treinoData.days || {})) {
+        for (const ex of (day.exercicios || [])) {
+          const info = exById(ex.exercicioId);
+          if (resolvePrimaryGroup(info) === grupo) exIds.add(ex.exercicioId);
+        }
+      }
+      let dropCount = 0;
+      for (const exId of exIds) {
+        const sessions = getAllExSessions(exId, 20);
+        const thisWeek = sessions.filter(s => s.date >= thisWeekStart);
+        const lastWeek = sessions.filter(s => s.date >= lastWeekStart && s.date <= lastWeekEnd);
+        if (thisWeek.length === 0 || lastWeek.length === 0) continue;
+        const thisMax = Math.max(...thisWeek.map(s => s.maxCarga));
+        const lastMax = Math.max(...lastWeek.map(s => s.maxCarga));
+        if (thisMax < lastMax && lastMax > 0) dropCount++;
+      }
+      if (dropCount >= 2) {
+        insights.push({
+          nivel: "warning", icone: "⚠",
+          titulo: `${grupo} — queda de força em ${dropCount} exercícios`,
+          resumo: `Sinal de fadiga acumulada. Semana de manutenção pode ajudar.`,
+          detalhe: `Queda de força em ${dropCount} exercícios de <b>${grupo}</b> esta semana.<br>` +
+            `Sinal de fadiga acumulada. Considere uma semana de manutenção:<br>` +
+            `3–4 séries, carga alta, sem chegar na falha.`,
+          grupo,
+          acao: null, acaoFn: null,
+        });
+      }
+    }
+    return insights;
+  };
+
+  // INSIGHT 3: Rep Range Monotonia
+  const detectRepMonotony = () => {
+    const allExIds = new Set();
+    for (const day of Object.values(treinoData.days || {})) {
+      for (const ex of (day.exercicios || [])) {
+        if (ex.exercicioId) allExIds.add(ex.exercicioId);
+      }
+    }
+    const insights = [];
+    for (const exId of allExIds) {
+      const sessions = getAllExSessions(exId, 8);
+      if (sessions.length < 4) continue;
+      const last4 = sessions.slice(0, 4);
+      const means = last4.map(s => {
+        const totalReps = s.series.reduce((a, s2) => a + (Number(s2.reps) || 0), 0);
+        return s.series.length > 0 ? totalReps / s.series.length : 0;
+      });
+      const avg = means.reduce((a, b) => a + b, 0) / means.length;
+      const variance = means.reduce((a, b) => a + (b - avg) ** 2, 0) / means.length;
+      const stdDev = Math.sqrt(variance);
+      const exInfo = exById(exId);
+      const exNome = exInfo ? exInfo.nome : exId;
+
+      // Sub-caso crítico: média < 8 reps em 6+ sessões consecutivas
+      if (sessions.length >= 6) {
+        const last6 = sessions.slice(0, 6);
+        const allHeavy = last6.every(s => {
+          const totalReps = s.series.reduce((a, s2) => a + (Number(s2.reps) || 0), 0);
+          return s.series.length > 0 && (totalReps / s.series.length) < 8;
+        });
+        if (allHeavy) {
+          insights.push({
+            nivel: "info", icone: "ℹ",
+            titulo: `${exNome} — cargas pesadas por 6 sessões`,
+            resumo: `Reps sempre abaixo de 8. Considere uma fase com reps mais altas.`,
+            detalhe: `<b>${exNome}</b> com cargas pesadas há 6 sessões.<br>` +
+              `Para proteger os tendões, considere uma fase com reps mais altas (12–15) por algumas semanas.`,
+            grupo: exInfo ? resolvePrimaryGroup(exInfo) : null,
+            acao: null, acaoFn: null,
+          });
+          continue;
+        }
+      }
+
+      // Monotonia simples: desvio padrão < 2
+      if (stdDev < 2 && avg > 0) {
+        const minR = Math.round(Math.min(...means));
+        const maxR = Math.round(Math.max(...means));
+        insights.push({
+          nivel: "info", icone: "ℹ",
+          titulo: `${exNome} — sempre ${minR}–${maxR} reps (${last4.length} sessões)`,
+          resumo: `Variar a faixa pode trazer novos estímulos e melhorar conforto articular.`,
+          detalhe: `<b>${exNome}</b> sempre entre ${minR}–${maxR} reps há ${last4.length} sessões.<br>` +
+            `Variar a faixa pode trazer novos estímulos e melhorar o conforto articular.`,
+          grupo: exInfo ? resolvePrimaryGroup(exInfo) : null,
+          acao: null, acaoFn: null,
+        });
+      }
+    }
+    return insights;
+  };
+
+  // INSIGHT 4: Desequilíbrio entre grupos antagonistas
+  const detectMuscleImbalance = () => {
+    const today = todayISO();
+    const weekStart = shiftDateStr(today, -6);
+    const vol = calcMuscleVolume(weekStart, today);
+    const pairs = [
+      ["Peito", "Costas"],
+      ["Quad", "Posterior"],
+      ["Biceps", "Triceps"],
+    ];
+    const insights = [];
+    for (const [gA, gB] of pairs) {
+      const vA = vol[gA] ? vol[gA].total : 0;
+      const vB = vol[gB] ? vol[gB].total : 0;
+      if (vA === 0 && vB === 0) continue;
+      const major    = vA >= vB ? gA : gB;
+      const minor    = vA >= vB ? gB : gA;
+      const volMajor = vA >= vB ? vA : vB;
+      const volMinor = vA >= vB ? vB : vA;
+      const lmMinor  = MUSCLE_LANDMARKS[minor];
+      if (!lmMinor) continue;
+      if (volMinor >= lmMinor.mev) continue;
+      if (volMajor === 0) continue;
+      const ratio = volMinor === 0 ? volMajor : +(volMajor / volMinor).toFixed(1);
+      if (ratio < 2.5) continue;
+      insights.push({
+        nivel: "warning", icone: "⚠",
+        titulo: `${major} com volume ${ratio}x maior que ${minor}`,
+        resumo: `${minor} abaixo do mínimo. Desequilíbrio pode afetar postura e progressão.`,
+        detalhe: `<b>${major}</b> com volume ${ratio}x maior que <b>${minor}</b> esta semana.<br>` +
+          `Treinar de forma desigual é como construir uma casa com paredes fortes e teto fraco.<br>` +
+          `<b>${minor}</b> abaixo do mínimo (${volMinor} de ${lmMinor.mev} séries) pode afetar postura e limitar o desenvolvimento de ${major}.`,
+        grupo: minor,
+        acao: null, acaoFn: null,
+      });
+    }
+    return insights;
+  };
+
+  // INSIGHT 5: Grupo negligenciado cronicamente (3+ das últimas 4 semanas abaixo do MEV)
+  const CHRONIC_LOW_SUGGESTIONS = {
+    "Posterior": "Adicionar 1 mesa flexora + 1 stiff por semana já é suficiente.",
+    "Gluteos":   "Hip thrust é o exercício de maior retorno para glúteos. 3 séries 2x/semana.",
+    "Core":      "Prancha e abdominal crunch — 2–3 séries ao final de qualquer treino.",
+    "Biceps":    "Já vem de costas — verifique se suas remadas estão sendo contadas.",
+    "Triceps":   "Já vem do supino — verifique se seus exercícios compostos estão sendo contados.",
+  };
+
+  const detectChronicLowVolume = () => {
+    const today = todayISO();
+    const insights = [];
+    for (const grupo of MUSCLE_ORDER) {
+      const lm = MUSCLE_LANDMARKS[grupo];
+      if (!lm) continue;
+      let weeksBelow = 0;
+      for (let w = 0; w < 4; w++) {
+        const wEnd   = shiftDateStr(today, -(w * 7));
+        const wStart = shiftDateStr(today, -(w * 7 + 6));
+        const wVol = calcMuscleVolume(wStart, wEnd);
+        if ((wVol[grupo] ? wVol[grupo].total : 0) < lm.mev) weeksBelow++;
+      }
+      if (weeksBelow < 3) continue;
+      const suggestion = CHRONIC_LOW_SUGGESTIONS[grupo] ||
+        `Adicione séries diretas de ${grupo} na sua rotina.`;
+      insights.push({
+        nivel: "warning", icone: "⚠",
+        titulo: `${grupo} — abaixo do mínimo por ${weeksBelow} semanas`,
+        resumo: `${weeksBelow} das últimas 4 semanas abaixo de ${lm.mev} séries. ${suggestion}`,
+        detalhe: `<b>${grupo}</b> abaixo do mínimo por ${weeksBelow} semanas seguidas.<br>${suggestion}`,
+        grupo,
+        acao: null, acaoFn: null,
+      });
+    }
+    return insights;
+  };
+
+  // Organiza insights por grupo + gera positivos
+  const buildInsightsByGroup = (currentVol) => {
+    if (!currentVol) {
+      const today = todayISO();
+      currentVol = calcMuscleVolume(shiftDateStr(today, -6), today);
+    }
+    const map = {};
+    MUSCLE_ORDER.forEach(g => { map[g] = []; });
+
+    const allNeg = [
+      ...detectVolumeCyclingNeed(),
+      ...detectPlateaus(),
+      ...detectMuscleImbalance(),
+      ...detectChronicLowVolume(),
+      ...detectRepMonotony(),
+    ];
+    for (const ins of allNeg) {
+      if (ins.grupo && map[ins.grupo]) map[ins.grupo].push(ins);
+    }
+
+    // Chip positivo: volume na faixa ideal e sem alertas
+    for (const grupo of MUSCLE_ORDER) {
+      if (map[grupo].length > 0) continue;
+      const vol = currentVol[grupo] ? currentVol[grupo].total : 0;
+      const lm = MUSCLE_LANDMARKS[grupo];
+      if (!lm || vol === 0) continue;
+      if (vol >= lm.mev && vol < lm.mrv) {
+        map[grupo].push({
+          nivel: "ok", icone: "✅",
+          titulo: "Volume ideal",
+          detalhe: `${grupo} com ${Math.round(vol * 2) / 2} séries esta semana — dentro da faixa ideal (MEV: ${lm.mev}, MRV: ${lm.mrv} séries).`,
+          grupo,
+        });
+      }
+    }
+    return map;
+  };
+
+  window.mgChipToggle = (chip, detailId) => {
+    const detail = document.getElementById(detailId);
+    if (!detail) return;
+    const wasOpen = chip.classList.contains("open");
+    const card = chip.closest(".mg-card");
+    card.querySelectorAll(".mg-chip.open").forEach(c => c.classList.remove("open"));
+    if (wasOpen) {
+      detail.style.display = "none";
+    } else {
+      chip.classList.add("open");
+      detail.innerHTML = (window._mgInsightDetails || {})[chip.dataset.key] || "";
+      detail.style.display = "block";
+    }
+  };
+
   // ══════════ EXERCISE PROGRESSION MODAL ══════════
   const renderExProgChart = (chartData, mode) => {
     const chartEl = $("#exProgChart");
@@ -7148,13 +7479,15 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       });
     }
 
-    // Render: analytics de volume por grupo muscular
+    // Render: analytics de volume por grupo muscular (v2.9.0)
     const renderMuscleVolume = () => {
       const today = todayISO();
       const weekStart = shiftDateStr(today, -6);
       const current = calcMuscleVolume(weekStart, today);
       const avg4    = calcMuscleAvg4weeks();
       const alerts  = calcFrequencyAlert(weekStart, today);
+      const byGroup = buildInsightsByGroup(current);
+      window._mgInsightDetails = {};
       const container = $("#thGrupoContent");
       let html = "";
       for(const grupo of MUSCLE_ORDER) {
@@ -7179,6 +7512,18 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
         const breakdown = v.direct > 0 || v.indirect > 0
           ? `${v.direct} diretos + ${v.indirect} via compostos`
           : "Nenhuma série esta semana";
+        const ins = byGroup[grupo] || [];
+        let chipsHtml = "";
+        if (ins.length > 0) {
+          const detailId = `mg-cd-${grupo}`;
+          const chipItems = ins.map((item, i) => {
+            const key = `${grupo}_${i}`;
+            window._mgInsightDetails[key] = item.detalhe;
+            const cls = item.nivel === "ok" ? "ok" : item.nivel === "warning" ? "w" : "i";
+            return `<span class="mg-chip mg-chip--${cls}" data-key="${key}" onclick="mgChipToggle(this,'${detailId}')">${item.icone} ${item.titulo}</span>`;
+          }).join("");
+          chipsHtml = `<div class="mg-chips">${chipItems}</div><div class="mg-chip-detail" id="mg-cd-${grupo}"></div>`;
+        }
         html += `
           <div class="${cardClass}">
             <div class="mg-header">
@@ -7193,6 +7538,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
               <span>${breakdown}</span>
               <span>${deltaHtml}</span>
             </div>
+            ${chipsHtml}
           </div>`;
       }
       if(alerts.length > 0) {
