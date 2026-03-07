@@ -5,6 +5,25 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.10.0] — 2026-03-06
+
+### Corrigido
+- [fix] **Exercícios de perna divididos em Quad e Posterior no EXERCISE_DB** — anteriormente todos estavam em `"🦵 Pernas"` e a separação era via `QUAD_IDS`/`POST_IDS`. Exercícios custom nunca tinham seus IDs nessas listas e sempre iam para Quad. Agora o EXERCISE_DB tem `"🦵 Quad"` e `"🦵 Posterior"` com os exercícios já classificados.
+- [fix] **`resolvePrimaryGroup()` simplificado** — grupos vêm direto do EXERCISE_DB; retrocompat: custom antigos com `"🦵 Pernas"` mapeiam para Quad.
+- [fix] **`EX_SECONDARY` para glúteos** — hip thrust, stiff romeno e elevação pélvica agora listam `"🦵 Posterior"` como secundário.
+- [fix] **Custom antigos com "🦵 Pernas" aparecem na aba Quad** — retrocompatibilidade no filtro do seletor.
+- [fix] **Exercícios custom não contabilizados no analytics** — `exById()` preserva grupo real em vez de sobrescrever com `CUSTOM_EX_GROUP`.
+- [fix] **Edição de exercício custom inclui grupos secundários** — `openExSelCustomRename()` exibe chips pré-marcados e salva `secundarios`.
+
+### Melhorado
+- [improve] **Estilo do input de rename** — background, borda, focus accent e touch target 40px.
+
+### Notas
+- sw.js: bump para `kcalix-v14`.
+- Retrocompatibilidade total: treinos e exercícios salvos funcionam sem migração.
+
+---
+
 ## [v2.9.2] — 2026-03-06
 
 ### Corrigido

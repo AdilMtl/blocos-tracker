@@ -3282,14 +3282,17 @@ tr:active { background: var(--surface2); }
       {id:"remada_cavalinho",nome:"Remada cavalinho"},{id:"remada_baixa",nome:"Remada baixa (cabo)"},
       {id:"pulldown",nome:"Pulldown (corda)"},{id:"barra_fixa",nome:"Barra fixa"},{id:"remada_maquina",nome:"Remada máquina"}
     ],
-    "🦵 Pernas": [
+    "🦵 Quad": [
       {id:"agachamento_livre",nome:"Agachamento livre (barra)"},{id:"agachamento_smith",nome:"Agachamento Smith"},
       {id:"leg_press",nome:"Leg press 45°"},{id:"leg_press_horiz",nome:"Leg press horizontal"},
-      {id:"cadeira_extensora",nome:"Cadeira extensora"},{id:"cadeira_flexora",nome:"Cadeira flexora"},
-      {id:"mesa_flexora",nome:"Mesa flexora"},{id:"stiff",nome:"Stiff (barra/halter)"},
-      {id:"hack_squat",nome:"Hack squat"},{id:"passada",nome:"Passada / Avanço"},
-      {id:"panturrilha_pe",nome:"Panturrilha em pé"},{id:"panturrilha_sentado",nome:"Panturrilha sentado"},
-      {id:"abdutora",nome:"Cadeira abdutora"},{id:"adutora",nome:"Cadeira adutora"},{id:"bulgaro",nome:"Agachamento búlgaro"}
+      {id:"cadeira_extensora",nome:"Cadeira extensora"},{id:"hack_squat",nome:"Hack squat"},
+      {id:"passada",nome:"Passada / Avanço"},{id:"bulgaro",nome:"Agachamento búlgaro"},
+      {id:"abdutora",nome:"Cadeira abdutora"},{id:"adutora",nome:"Cadeira adutora"},
+      {id:"panturrilha_pe",nome:"Panturrilha em pé"},{id:"panturrilha_sentado",nome:"Panturrilha sentado"}
+    ],
+    "🦵 Posterior": [
+      {id:"cadeira_flexora",nome:"Cadeira flexora"},{id:"mesa_flexora",nome:"Mesa flexora"},
+      {id:"stiff",nome:"Stiff (barra/halter)"}
     ],
     "🍑 Glúteos": [
       {id:"hip_thrust_barra",nome:"Hip thrust (barra)"},{id:"hip_thrust_maquina",nome:"Hip thrust máquina"},
@@ -3351,13 +3354,13 @@ tr:active { background: var(--surface2); }
     cadeira_flexora:       [],
     mesa_flexora:          [],
     stiff:                 ["🍑 Glúteos"],
-    hip_thrust_barra:      ["🦵 Pernas"],
-    hip_thrust_maquina:    ["🦵 Pernas"],
+    hip_thrust_barra:      ["🦵 Posterior"],
+    hip_thrust_maquina:    ["🦵 Posterior"],
     gluteo_maquina:        [],
     gluteo_cabo:           [],
-    elevacao_pelvica:      ["🦵 Pernas"],
-    stiff_romeno:          ["🦵 Pernas"],
-    agachamento_sumo:      ["🦵 Pernas"],
+    elevacao_pelvica:      ["🦵 Posterior"],
+    stiff_romeno:          ["🦵 Posterior"],
+    agachamento_sumo:      ["🦵 Quad"],
     desenv_halter:         ["💪 Tríceps"],
     desenv_barra:          ["💪 Tríceps"],
     desenv_maquina:        ["💪 Tríceps"],
@@ -6102,14 +6105,12 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     return null;
   };
 
-  // Grupo analytics de um exercício (separa Pernas em Quad/Posterior)
+  // Grupo analytics de um exercício
   const resolvePrimaryGroup = (exInfo) => {
     if(!exInfo) return null;
     const g = exInfo.grupo;
-    if(g === "🦵 Pernas") {
-      if(POST_IDS.includes(exInfo.id)) return "🦵 Posterior";
-      return "🦵 Quad";
-    }
+    // Retrocompatibilidade: exercícios custom antigos salvos como "🦵 Pernas" → Quad por padrão
+    if(g === "🦵 Pernas") return "🦵 Quad";
     return MUSCLE_ORDER.find(m => m === g) || null;
   };
 
@@ -6124,8 +6125,11 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
   const renderSecChips = (excludeGrupo) => {
     const wrap = $("#cexSecChips");
     wrap.innerHTML = "";
+    // Se o principal for Quad ou Posterior, exclui toda a família de pernas dos chips
+    const legFamily = ["🦵 Pernas", "🦵 Quad", "🦵 Posterior"];
+    const excludeFamily = legFamily.includes(excludeGrupo) ? legFamily : [excludeGrupo];
     Object.keys(EXERCISE_DB).forEach(g => {
-      if(g === excludeGrupo) return;
+      if(excludeFamily.includes(g)) return;
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "sec-chip";
@@ -6386,7 +6390,13 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     if(exSelectorCat === CUSTOM_EX_GROUP) {
       exs = customExercises.filter(e => !e.arquivado);
     } else {
-      const customForGrp = customExercises.filter(e => !e.arquivado && e.grupo === exSelectorCat);
+      // Custom com grupo "🦵 Pernas" (salvos antes da v2.9.2) aparecem na aba Quad por retrocompatibilidade
+      const customForGrp = customExercises.filter(e => {
+        if(e.arquivado) return false;
+        if(e.grupo === exSelectorCat) return true;
+        if(exSelectorCat === "🦵 Quad" && e.grupo === "🦵 Pernas") return true;
+        return false;
+      });
       exs = [...(EXERCISE_DB[exSelectorCat] || []), ...customForGrp];
     }
 
