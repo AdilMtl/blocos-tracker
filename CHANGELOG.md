@@ -5,6 +5,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.9.1] — 2026-03-06
+
+### Corrigido
+- [fix] **Insights não disparavam para usuários novos** — `detectVolumeCyclingNeed` (Gatilho A) e `detectChronicLowVolume` contavam semanas vazias (antes do usuário começar a usar o app) como dados negativos, impedindo que os limiares fossem atingidos. Agora apenas semanas com pelo menos um treino registrado são contadas ("semanas ativas"). Gatilho A aguarda 6 semanas ativas (conforme spec); `detectChronicLowVolume` aguarda 3 semanas ativas.
+- [fix] **`detectMuscleImbalance` nunca disparava** — os pares de desequilíbrio muscular (`["Peito", "Costas"]` etc.) não incluíam os prefixos de emoji usados como chaves no objeto de volume (`"🏋️ Peito"`, `"🦅 Costas"`, etc.), causando falha silenciosa na comparação. Corrigido para usar as chaves completas com emoji.
+- [fix] **Sugestões específicas de `detectChronicLowVolume` nunca apareciam** — `CHRONIC_LOW_SUGGESTIONS` tinha chaves sem emoji (`"Posterior"`, `"Gluteos"`) que não batiam com as chaves reais de `MUSCLE_ORDER`. Corrigido com as chaves corretas (`"🦵 Posterior"`, `"🍑 Glúteos"`, etc.).
+
+### Notas
+- Todos os limiares originais mantidos (sem extrapolação ou escalonamento) — a lógica simplesmente ignora semanas sem dados.
+- sw.js: `kcalix-v13` (bump feito em v2.9.0).
+
+---
+
 ## [v2.8.2] — 2026-03-05
 
 ### Corrigido
