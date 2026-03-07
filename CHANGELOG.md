@@ -5,6 +5,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.9.2] — 2026-03-06
+
+### Corrigido
+- [fix] **Exercícios custom não contabilizados no analytics de volume** — `exById()` sobrescrevia o campo `grupo` real do exercício (ex: `"🦅 Costas"`) com `CUSTOM_EX_GROUP` (`"⭐ Meus exercícios"`), fazendo `resolvePrimaryGroup()` retornar `null` e não somar nenhuma série. Corrigido para preservar o grupo real salvo no localStorage.
+- [fix] **Edição de exercício custom sem grupos secundários** — `openExSelCustomRename()` só permitia renomear; agora exibe também chips de grupos secundários pré-marcados com os valores salvos. Ao confirmar, persiste nome + secundarios no localStorage.
+
+### Melhorado
+- [improve] **Estilo do input de rename** — campo de texto agora tem background `var(--surface2)`, borda `var(--line)`, focus em roxo `var(--accent)` e botões com touch target correto (40px).
+
+### Notas
+- Schema retrocompatível: exercícios sem `secundarios` tratados como array vazio.
+- sw.js: mantém `kcalix-v13` (sem mudança de cache necessária).
+
+---
+
 ## [v2.9.1] — 2026-03-06
 
 ### Corrigido
