@@ -221,13 +221,193 @@ Exemplos: "Como esteve seu sono nos últimos dias?" / "Teve algo que explique as
 
 ---
 
+## Base de conhecimento (arquivos para upload no Gem)
+
+Além do system prompt acima, faça upload destes documentos na seção **Knowledge** do Gem. Eles orientam o coach com protocolos detalhados sem precisar estar no system prompt.
+
+---
+
+### Documento 1: `protocolo-cut.md`
+
+Gere via NotebookLM com os vídeos do Lucas Campos usando o prompt:
+
+> "Resuma em formato de protocolo clínico os princípios de Lucas Campos sobre emagrecimento com preservação muscular. Inclua: déficit calórico recomendado (% e kcal), taxa de perda de peso segura, meta de proteína por kg, critérios para ajustar o plano, sinais de catabolismo e quando usar volume cycling. Formato: markdown com valores numéricos específicos."
+
+Estrutura esperada:
+
+```markdown
+# Protocolo de Cut — Emagrecimento com Preservação Muscular
+
+## Déficit calórico
+- Moderado: 20-25% abaixo do TDEE (sustentável, preserva mais músculo)
+- Agressivo: > 25% (apenas com supervisão, curto prazo)
+- Regra prática: déficit de 300-500 kcal/dia para naturais
+
+## Taxa de perda de peso
+- Ideal: 0.5-1% do peso corporal por semana
+- Máximo seguro: 1kg/semana (risco de catabolismo acima disso)
+- Mínimo esperado: 0.3kg/semana (abaixo disso por 2 semanas = ajustar)
+
+## Proteína em cutting
+- Meta: 2.0-2.4g/kg de peso corporal
+- Aumentar para 2.4-2.7g/kg em déficits mais agressivos
+- Distribuir em pelo menos 4 refeições
+
+## Critérios de ajuste do plano
+- Peso estável > 14 dias: reduzir 100-150 kcal de carboidrato
+- Perda > 1kg/semana por 2 semanas: aumentar 100-150 kcal
+- Força caindo > 10% em exercícios chave: reverter déficit temporariamente
+
+## Sinais de catabolismo
+- Força caindo + peso caindo rápido + fadiga persistente
+- Recuperação ruim entre treinos
+- Sono prejudicado
+
+## Volume Cycling em cut
+- Quando usar: volume acima do MAV por 4+ semanas
+- Como fazer: reduzir para 3-4 séries/semana MANTENDO a carga
+- Duração: 1-2 semanas — depois retomar volume normal
+```
+
+---
+
+### Documento 2: `protocolo-bulk.md`
+
+> "Resuma os princípios de Lucas Campos sobre bulk limpo (ganho de massa com mínimo de gordura). Inclua: surplus calórico recomendado, taxa de ganho esperada, meta de proteína, quando reduzir surplus, e como usar a progressão de treino como indicador. Formato: markdown com valores numéricos."
+
+Estrutura esperada:
+
+```markdown
+# Protocolo de Bulk — Ganho de Massa com Mínimo de Gordura
+
+## Surplus calórico
+- Lean bulk: 200-350 kcal acima do TDEE para naturais
+- Evitar surplus > 500 kcal (excesso vai para gordura)
+
+## Taxa de ganho esperada
+- Naturais: 0.5-1kg/mês (iniciantes podem ganhar mais no primeiro ano)
+- Sinal de surplus excessivo: > 1.5kg/mês por 2 meses consecutivos
+
+## Proteína em bulk
+- Meta: 1.8-2.2g/kg (não há benefício comprovado acima de 2.2g/kg em surplus)
+- Focar nos carboidratos para performance e recuperação
+
+## Critérios de ajuste
+- Ganho < 0.3kg/mês por 6 semanas: aumentar 100-200 kcal de carbo
+- Ganho > 1.5kg/mês: reduzir 150-200 kcal
+- Circunferência da cintura aumentando desproporcionalmente: revisar surplus
+
+## Progressão de treino como indicador
+- Principal métrica de um bulk bem feito: carga ou volume aumentando
+- Sem progressão por > 3 semanas: problema de treino, não de comida
+```
+
+---
+
+### Documento 3: `protocolo-recomp.md`
+
+> "Resuma os princípios de Lucas Campos sobre recomposição corporal (perder gordura e ganhar músculo simultaneamente). Inclua: para quem funciona, estratégia calórica, meta de proteína, ciclagem de carboidratos, e métricas corretas para acompanhar. Formato: markdown."
+
+Estrutura esperada:
+
+```markdown
+# Protocolo de Recomp — Recomposição Corporal
+
+## Para quem funciona
+- Iniciantes no treino (qualquer % de gordura)
+- Retorno após pausa longa
+- Pessoas com % gordura > 20% (H) ou > 28% (M)
+
+## Estratégia calórica
+- Manutenção calórica ou pequeno déficit (5-10% abaixo do TDEE)
+- Proteína alta como prioridade: 2.2-2.5g/kg
+
+## Ciclagem de carboidratos
+- Dias de treino: + carboidratos (foco em pré e pós-treino)
+- Dias off: - carboidratos, gordura levemente maior
+- Calorias totais se mantêm próximas
+
+## Métricas corretas
+- PESO NA BALANÇA É ENGANOSO: pode ficar estável por meses
+- Métricas certas: circunferência de cintura, fotos, força nos treinos
+- Prazo realista: 3-6 meses para resultados visíveis
+```
+
+---
+
+### Documento 4: `interpretacao-kcalix-json.md`
+
+Crie você mesmo (não precisa do NotebookLM). Explica ao Gem como interpretar os dados com precisão.
+
+```markdown
+# Guia de interpretação do JSON exportado pelo Kcal.ix
+
+## Campos do profile
+
+| Campo | Significado |
+|---|---|
+| blockSize.pG | Gramas de proteína em 1 bloco P |
+| blockSize.cG | Gramas de carbo em 1 bloco C |
+| blockSize.gG | Gramas de gordura em 1 bloco G |
+| bodyData.activity | Fator TDEE (1.2 = sedentário, 1.375 = leve, 1.55 = moderado, 1.725 = intenso, 1.9 = muito ativo) |
+| bodyData.deficitPct | % de déficit sobre o TDEE (positivo = déficit, negativo = surplus) |
+| bodyData.goalType | Objetivo explícito: cut / bulk / recomp / maintain |
+
+## Identificação do objetivo
+
+Priorize goalType se presente. Se ausente, infira pelo deficitPct:
+- deficitPct > 5%: CUT
+- deficitPct entre -5% e 5%: MANUTENÇÃO
+- deficitPct < -5%: BULK
+Se nenhum dos dois existir, pergunte ao usuário antes de continuar.
+
+## Cálculo do TDEE estimado
+1. BMR via Mifflin-St Jeor (ou Katch-McArdle se bfPct disponível)
+2. TDEE = BMR × activity
+3. Meta calórica = TDEE × (1 - deficitPct/100)
+
+## Como calcular aderência
+aderênciaP (%) = (totalP × blockSize.pG) / goals.pG × 100
+Se adherenceP vier no JSON, use diretamente (já calculado pelo app).
+
+## Como calcular volume muscular
+Para cada semana de treino:
+- Série válida = reps > 0
+- 1,0 série para o grupo em `exercicio.grupo`
+- 0,5 série para cada grupo em `exercicio.secundarios[]`
+Compare o total com MEV/MAV/MRV de cada grupo.
+
+## Como detectar platô de peso
+Critério: variação < 0.5kg nos últimos 14 dias com >= 3 medições e aderência calórica > 80%.
+Se ambas as condições: platô real, não falta de dados.
+
+## Padrão semanal de aderência
+Agrupe dias por day-of-week. Aderência consistentemente < 70% num dia = padrão comportamental.
+
+## Sobre o foodLog
+- Só existe quando o usuário usou o painel de alimentos
+- Inputs manuais somam em nutrition.days mas não geram foodLog
+- Para qualidade alimentar: use foodLog. Para volume total: use nutrition.days
+
+## Check-ins
+- energy/hunger/performance: escala 1–5 (1 = péssimo, 5 = ótimo)
+- Correlacione queda de performance com volume de treino acima do MRV
+- Correlacione fome alta com déficit calórico excessivo
+
+## Unidades
+Peso: kg | Medidas: cm | BF: % | Proteína e carbo: 4 kcal/g | Gordura: 9 kcal/g
+```
+
+---
+
 ## Como usar
 
 1. No app Kcal.ix → aba **Mais** → card **Exportar para IA** → **⬇️ Baixar JSON**
-2. Abra o Gem configurado
+2. Abra o Gem configurado em [gemini.google.com](https://gemini.google.com) → Gems
 3. Faça upload do arquivo `kcalix-YYYY-MM-DD.json`
 4. Escreva a pergunta inicial:
    - `"Analise meus dados dos últimos 30 dias"`
    - `"Estou em cut há 3 semanas. O que devo ajustar?"`
    - `"Quero focar em ganho de massa. Meu plano atual suporta isso?"`
    - `"Quais grupos musculares estão abaixo do mínimo esta semana?"`
+   - `"Como está minha progressão de treino no último mês?"`
