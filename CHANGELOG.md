@@ -5,6 +5,25 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.11.0] — 2026-03-06
+
+### Adicionado
+- [feat] **Coach Modal (📖 Guia de Volume)** — modal educativo com 5 páginas baseado nos protocolos Lucas Campos: Fundamentos (séries válidas, MEV/MAV/MRV, tabela por grupo), Progressão (3 formas de progredir, platô), Volume Cycling (diferença do deload, metáfora do posto), Equilíbrio Muscular (pares antagonistas, Regra da Prioridade), Por Grupo (guia detalhado com landmarks, exercícios e dica para cada grupo). Acessível pelo botão 📖 no header da aba de treino.
+
+### Melhorado
+- [improve] **Tags de grupos musculares nos exercícios** — cada exercício na lista agora exibe o grupo primário (roxo) e grupos secundários (cinza) abaixo do nome, sempre visíveis sem precisar expandir o card.
+- [improve] **Botões 📊 e 📖 sempre visíveis no header** — Histórico e Guia saíram do fundo da aba para o card-header, acessíveis sem scroll. Formato circular 40×40px.
+- [improve] **Seção "📋 Rotinas" recolhível** — templates começam colapsados por padrão (▸/▾), com preview dos primeiros exercícios de cada rotina visível nos botões.
+- [improve] **Visual do header de treino** — subtítulo compacto, "Salvar ▶" mais limpo, alinhamento centralizado.
+- [improve] **Summary com emojis** — labels: 🔁 Séries · 🏋️ Volume kg · ❤️ Cardio min · 🔥 kcal est.
+- [improve] **Label "📝 Observação do treino"** com emoji.
+
+### Notas
+- sw.js: bump para `kcalix-v15`.
+- Sem mudança de schema no localStorage.
+
+---
+
 ## [v2.10.0] — 2026-03-06
 
 ### Corrigido

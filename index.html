@@ -170,6 +170,18 @@ body::after {
   min-height: 36px;
   border-radius: var(--radius-xs);
 }
+.btn.icon-btn {
+  width: 40px; height: 40px; min-height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 16px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--surface2);
+  border-color: var(--line);
+  color: var(--text2);
+  flex-shrink: 0;
+}
+.btn.icon-btn:active { transform: scale(.88); opacity: .8; }
 .btn.danger-ghost {
   background: transparent;
   border-color: rgba(248,113,113,.2);
@@ -1342,19 +1354,33 @@ tr:active { background: var(--surface2); }
 }
 
 /* ════════════════════ EXERCISE / TREINO ════════════════════ */
-.tmpl-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.tmpl-section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 4px 8px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  border-radius: var(--radius-xs);
+  margin-bottom: 0;
+}
+.tmpl-section-header:active { opacity: .7; }
+.tmpl-section-label { font-size: 12px; font-weight: 700; color: var(--text2); letter-spacing: .01em; }
+.tmpl-section-chevron { font-size: 12px; color: var(--text3); }
+.tmpl-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; margin-top: 6px; }
+.tmpl-grid.collapsed { display: none; }
 .tmpl-btn {
   position: relative;
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 9px 36px 9px 12px; border-radius: var(--radius-sm);
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 38px 10px 12px; border-radius: var(--radius-sm);
   border: 1px solid var(--line); background: var(--surface2);
   color: var(--text); font-family: var(--font); font-size: 13px;
-  font-weight: 600; cursor: pointer; min-height: 40px;
+  font-weight: 600; cursor: pointer; min-height: 44px;
   transition: all .15s; -webkit-tap-highlight-color: transparent;
+  text-align: left;
 }
 .tmpl-btn:active { transform: scale(.96); }
 .tmpl-btn.active { border-color: rgba(124,92,255,.4); background: linear-gradient(135deg,rgba(124,92,255,.3),rgba(124,92,255,.1)); }
 .tmpl-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.tmpl-btn-label { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; min-width: 0; }
+.tmpl-btn-name { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.tmpl-preview { font-size: 9px; color: var(--text3); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
 .tmpl-btn .tmpl-edit {
   position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
   width: 24px; height: 24px; border-radius: 50%;
@@ -1381,7 +1407,11 @@ tr:active { background: var(--surface2); }
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 12px; cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
+.eih-name-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ex-item-header .eih-name { font-size: 13px; font-weight: 700; }
+.eih-grupos { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 1px; }
+.eih-grupo-primary { font-size: 9px; font-weight: 700; color: var(--accent); background: rgba(124,92,255,.1); border: 1px solid rgba(124,92,255,.2); border-radius: 10px; padding: 1px 6px; white-space: nowrap; }
+.eih-grupo-sec { font-size: 9px; font-weight: 600; color: var(--text3); background: var(--surface2); border: 1px solid var(--line); border-radius: 10px; padding: 1px 6px; white-space: nowrap; }
 .ex-item-header .eih-badge {
   font-size: 10px; color: var(--text3); font-weight: 600;
   background: var(--surface2); padding: 3px 8px; border-radius: 999px;
@@ -1443,11 +1473,11 @@ tr:active { background: var(--surface2); }
   margin-top: 10px;
 }
 .ws-box {
-  text-align: center; padding: 6px 2px;
+  text-align: center; padding: 8px 2px;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-xs);
 }
-.ws-box .ws-val { font-size: 15px; font-weight: 800; }
-.ws-box .ws-lbl { font-size: 8px; font-weight: 700; text-transform: uppercase; color: var(--text3); margin-top: 1px; }
+.ws-box .ws-val { font-size: 16px; font-weight: 800; }
+.ws-box .ws-lbl { font-size: 9px; font-weight: 600; color: var(--text3); margin-top: 2px; line-height: 1.3; }
 
 /* template editor items */
 .tmpl-ex-item {
@@ -1499,13 +1529,14 @@ tr:active { background: var(--surface2); }
 .delta-down { color: var(--bad); font-weight: 800; }
 .delta-same { color: var(--text3); font-weight: 600; }
 /* exercise header with chart button */
-.eih-left { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+.eih-left { display: flex; align-items: flex-start; gap: 6px; flex: 1; min-width: 0; }
 .eih-chart-btn {
   width: 28px; height: 28px; border-radius: 50%;
   border: 1px solid var(--line); background: var(--surface2);
   color: var(--text3); font-size: 12px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; -webkit-tap-highlight-color: transparent;
+  margin-top: 1px;
 }
 .eih-chart-btn:active { background: var(--surface3); }
 .eih-del-btn {
@@ -1570,6 +1601,32 @@ tr:active { background: var(--surface2); }
 .mg-chip--i  { background:rgba(139,92,246,.12);color:var(--accent); }
 .mg-chip.open { opacity:.7; }
 .mg-chip-detail { display:none;font-size:11px;color:var(--text3);line-height:1.5;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06); }
+/* Coach Guide Modal */
+.coach-tabs { display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px; }
+.coach-tab-btn { padding:6px 12px;border-radius:20px;border:1px solid var(--line);font-size:12px;font-weight:600;background:transparent;color:var(--text2);cursor:pointer;font-family:var(--font);-webkit-tap-highlight-color:transparent; }
+.coach-tab-btn.active { background:var(--accent);color:#fff;border-color:var(--accent); }
+.coach-section { margin-bottom:20px; }
+.coach-headline { font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px; }
+.coach-body { font-size:13px;color:var(--text2);line-height:1.6; }
+.coach-body p { margin:0 0 10px; }
+.coach-body ul { margin:0 0 10px;padding-left:18px; }
+.coach-body li { margin-bottom:4px; }
+.coach-quote { border-left:3px solid var(--accent);padding:8px 12px;margin:12px 0;font-size:13px;font-style:italic;color:var(--text2);background:var(--surface2);border-radius:0 var(--radius-xs) var(--radius-xs) 0; }
+.coach-table { width:100%;border-collapse:collapse;font-size:12px;margin-top:8px; }
+.coach-table th { text-align:left;color:var(--text3);font-weight:600;padding:4px 8px;border-bottom:1px solid var(--line); }
+.coach-table td { padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2); }
+.coach-table td:first-child { font-weight:700;color:var(--text); }
+.coach-grupo-btns { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px; }
+.coach-grupo-btn { padding:6px 14px;border-radius:20px;border:1px solid var(--line);font-size:12px;font-weight:600;background:transparent;color:var(--text2);cursor:pointer;font-family:var(--font);-webkit-tap-highlight-color:transparent; }
+.coach-grupo-btn.active { background:var(--surface2);border-color:var(--accent);color:var(--text); }
+.coach-grupo-detail { background:var(--surface2);border-radius:var(--radius-sm);padding:12px;margin-top:4px; }
+.coach-grupo-detail h4 { font-size:13px;font-weight:700;color:var(--text);margin:0 0 8px; }
+.coach-grupo-detail .cgd-landmarks { display:flex;gap:10px;margin-bottom:10px; }
+.cgd-lm { text-align:center;flex:1;background:var(--surface);border-radius:var(--radius-xs);padding:6px 4px; }
+.cgd-lm-val { font-size:16px;font-weight:800;color:var(--text); }
+.cgd-lm-lbl { font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-top:1px; }
+.coach-badge-row { display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px; }
+.coach-badge { font-size:10px;font-weight:700;color:var(--text3);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:2px 8px; }
 /* swap + add exercise during workout */
 .eih-swap-btn { background:transparent;border:none;color:var(--text3);font-size:13px;line-height:1;cursor:pointer;padding:0 5px;flex-shrink:0;-webkit-tap-highlight-color:transparent; }
 .eih-swap-btn:active { color:var(--accent); }
@@ -2547,19 +2604,24 @@ tr:active { background: var(--surface2); }
   <!-- ═══════════════ VIEW: TREINO ═══════════════ -->
   <div id="viewTreino" class="view">
     <div class="card">
-      <div class="card-header" style="flex-wrap:wrap; gap:8px;">
-        <div class="ch-info">
+      <div class="card-header" style="align-items:center;">
+        <div class="ch-info" style="flex:1;">
           <b>🏋️ Treino</b>
-          <span>Registre séries, reps, carga. Acompanhe progressão.</span>
+          <span>Séries · reps · carga · progressão</span>
         </div>
-        <div class="btn-group">
-          <button class="btn sm primary" id="btnSaveTreino" type="button">Salvar treino</button>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <button class="btn sm icon-btn" id="btnTreinoHist" type="button" title="Histórico">📊</button>
+          <button class="btn sm icon-btn" id="btnCoachGuide" type="button" title="Guia de Volume">📖</button>
+          <button class="btn sm primary" id="btnSaveTreino" type="button" style="padding:0 14px;">Salvar ▶</button>
         </div>
       </div>
       <div class="card-body">
         <!-- Templates -->
-        <div class="hint" style="margin-bottom:6px;">Escolha o treino do dia:</div>
-        <div class="tmpl-grid" id="tmplGrid"></div>
+        <div class="tmpl-section-header collapsed" id="tmplSectionHeader">
+          <span class="tmpl-section-label">📋 Rotinas</span>
+          <span class="tmpl-section-chevron">▸</span>
+        </div>
+        <div class="tmpl-grid collapsed" id="tmplGrid"></div>
 
         <!-- Exercise list -->
         <div class="ex-list" id="exList"></div>
@@ -2616,21 +2678,18 @@ tr:active { background: var(--surface2); }
 
         <!-- Notes -->
         <div class="form-row">
-          <label>Observação do treino</label>
+          <label>📝 Observação do treino</label>
           <input id="treinoNote" placeholder="Como foi o treino, dores, energia..." />
         </div>
 
-        <!-- Summary + Actions -->
+        <!-- Summary -->
         <div class="workout-summary" id="workoutSummary">
-          <div class="ws-box"><div class="ws-val" id="wsSeries">0</div><div class="ws-lbl">Séries</div></div>
-          <div class="ws-box"><div class="ws-val" id="wsVolume">0</div><div class="ws-lbl">Volume (kg)</div></div>
-          <div class="ws-box"><div class="ws-val" id="wsCardio">0</div><div class="ws-lbl">Cardio (min)</div></div>
+          <div class="ws-box"><div class="ws-val" id="wsSeries">0</div><div class="ws-lbl">🔁 Séries</div></div>
+          <div class="ws-box"><div class="ws-val" id="wsVolume">0</div><div class="ws-lbl">🏋️ Volume kg</div></div>
+          <div class="ws-box"><div class="ws-val" id="wsCardio">0</div><div class="ws-lbl">❤️ Cardio min</div></div>
           <div class="ws-box"><div class="ws-val" id="wsKcal">0</div><div class="ws-lbl">🔥 kcal est.</div></div>
         </div>
 
-        <div class="btn-group" style="margin-top:10px;">
-          <button class="btn sm ghost" id="btnTreinoHist" type="button" style="flex:1;">📊 Histórico</button>
-        </div>
       </div>
     </div>
   </div>
@@ -3009,6 +3068,21 @@ tr:active { background: var(--surface2); }
   </div>
   <div class="modal-body">
     <div class="hist-list" id="histList"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ COACH GUIDE MODAL ═══════════════ -->
+<div class="modal-overlay" id="coachOverlay" style="z-index:330;"></div>
+<div class="modal-sheet modal-full" id="coachModal" style="z-index:331;">
+  <div class="modal-handle"></div>
+  <div class="modal-header">
+    <b>❓ Guia de Volume</b>
+    <button class="modal-close" id="coachClose" type="button">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="coach-tabs" id="coachTabs"></div>
+    <div id="coachContent"></div>
+    <div style="height:40px;"></div>
   </div>
 </div>
 
@@ -6205,17 +6279,33 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
   const toggleEx = (idx) => { openExIdx = openExIdx === idx ? null : idx; renderExList(); };
 
   // ─── Templates grid (with inline edit) ───
+  let tmplGridCollapsed = true;
+
   const renderTmplGrid = () => {
     const grid = $("#tmplGrid");
     grid.innerHTML = "";
+    // sync collapsed state
+    grid.classList.toggle("collapsed", tmplGridCollapsed);
+    const hdr = $("#tmplSectionHeader");
+    if(hdr) {
+      const chevron = hdr.querySelector(".tmpl-section-chevron");
+      if(chevron) chevron.textContent = tmplGridCollapsed ? "▸" : "▾";
+    }
+
     for(const tmpl of userTemplates) {
       const btn = document.createElement("button");
       btn.className = `tmpl-btn ${activeTmplId === tmpl.id ? "active" : ""}`;
       const label = tmpl.nome.includes("—") ? tmpl.nome.split("—")[0].trim() : tmpl.nome;
-      btn.innerHTML = `<span class="tmpl-dot" style="background:${tmpl.cor}"></span>${label}<span class="tmpl-edit">✏️</span>`;
+      // preview: first 3 exercise names
+      const exIds = tmpl.exercicios || [];
+      const previewNames = exIds.slice(0, 3).map(id => { const ex = exById(id); return ex ? ex.nome.split(" ")[0] : ""; }).filter(Boolean);
+      const previewMore = exIds.length > 3 ? ` +${exIds.length - 3}` : "";
+      const previewHTML = previewNames.length > 0
+        ? `<span class="tmpl-preview">${previewNames.join(" · ")}${previewMore}</span>`
+        : "";
+      btn.innerHTML = `<span class="tmpl-dot" style="background:${tmpl.cor}"></span><span class="tmpl-btn-label"><span class="tmpl-btn-name">${label}</span>${previewHTML}</span><span class="tmpl-edit">✏️</span>`;
       ((t) => {
         btn.addEventListener("click", (e) => {
-          // If edit icon was clicked, open editor instead
           if(e.target.classList.contains("tmpl-edit")) { openTmplEditor(t.id); return; }
           applyTemplate(t.id);
         });
@@ -6266,11 +6356,17 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
         }
         prevHTML = `<div class="prev-ref">últ: ${lastMax}kg ${arrow}</div>`;
       }
+      const secondaries = exInfo ? getSecondary(exInfo) : [];
+      const grupoLabel = exInfo ? exInfo.grupo : "";
+      const grupoTagHTML = grupoLabel ? `<span class="eih-grupo-primary">${grupoLabel}</span>${secondaries.map(s => `<span class="eih-grupo-sec">${s}</span>`).join("")}` : "";
       el.innerHTML = `
         <div class="ex-item-header">
           <div class="eih-left">
             <button class="eih-chart-btn" type="button" title="Progressão">📊</button>
-            <span class="eih-name">${nome}</span>
+            <div class="eih-name-wrap">
+              <span class="eih-name">${nome}</span>
+              ${grupoTagHTML ? `<div class="eih-grupos">${grupoTagHTML}</div>` : ""}
+            </div>
           </div>
           ${prevHTML ? `<span style="margin-right:4px;">${prevHTML}</span>` : ""}
           ${volHTML}
@@ -8315,6 +8411,237 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     $("#habitHistBody").innerHTML = rows || '<p style="color:var(--text3);text-align:center;margin-top:24px">Sem dados ainda</p>';
   }
 
+  // ══════════ COACH GUIDE MODAL ══════════
+  const COACH_PAGES = [
+    { id: "fundamentos", label: "Fundamentos" },
+    { id: "progressao",  label: "Progressão" },
+    { id: "cycling",     label: "Volume Cycling" },
+    { id: "equilibrio",  label: "Equilíbrio" },
+    { id: "porgrupo",    label: "Por grupo" },
+  ];
+
+  const COACH_GRUPOS = [
+    { key: "Peito",     emoji: "💪", mev: 10, mav: 15, mrv: 22, freq: "2x/semana",
+      exercicios: ["Supino reto", "Supino inclinado", "Crossover", "Peck deck"],
+      dica: "Volume indireto de tríceps e ombros já conta — some tudo antes de adicionar mais séries." },
+    { key: "Costas",    emoji: "🔙", mev: 10, mav: 15, mrv: 22, freq: "2x/semana",
+      exercicios: ["Puxada frontal", "Remada curvada", "Remada unilateral", "Barra fixa"],
+      dica: "Cada série de costas traz 0,5 série de bíceps de brinde — verifique o total antes de adicionar roscas." },
+    { key: "Quad",      emoji: "🦵", mev:  8, mav: 14, mrv: 22, freq: "1–2x/semana",
+      exercicios: ["Agachamento", "Leg press", "Cadeira extensora", "Hack squat"],
+      dica: "Pernas no início do treino — quando mais descansado, maior a qualidade das séries." },
+    { key: "Posterior", emoji: "🦵", mev:  6, mav: 12, mrv: 20, freq: "1–2x/semana",
+      exercicios: ["Mesa flexora", "Stiff", "Cadeira flexora", "Stiff romeno"],
+      dica: "O grupo mais negligenciado das pernas. Stiff tem o maior retorno por série." },
+    { key: "Gluteos",   emoji: "🍑", mev: 15, mav: 20, mrv: 23, freq: "2–3x/semana",
+      exercicios: ["Hip thrust", "Stiff romeno", "Elevação pélvica", "Glúteo no cabo"],
+      dica: "MEV de 15 séries — mais alto que qualquer outro grupo. Volume baixo não funciona para glúteos." },
+    { key: "Ombros",    emoji: "🏔", mev:  6, mav: 12, mrv: 20, freq: "2x/semana",
+      exercicios: ["Elevação lateral", "Desenvolvimento", "Face pull", "Crucifixo inverso"],
+      dica: "Elevação lateral é o exercício mais eficiente por série para o deltóide medial." },
+    { key: "Biceps",    emoji: "💪", mev:  6, mav: 12, mrv: 20, freq: "2x/semana",
+      exercicios: ["Rosca direta", "Rosca alternada", "Rosca martelo", "Rosca scott"],
+      dica: "Muito volume já vem de costas (0,5× por série). Some tudo antes de adicionar roscas isoladas." },
+    { key: "Triceps",   emoji: "💪", mev:  6, mav: 12, mrv: 20, freq: "2x/semana",
+      exercicios: ["Tríceps pulley", "Tríceps testa", "Paralelas", "Tríceps francês"],
+      dica: "Muito volume já vem do peito e ombros. Some tudo antes de adicionar mais isolados." },
+    { key: "Core",      emoji: "🔥", mev:  4, mav: 10, mrv: 16, freq: "2–3x/semana",
+      exercicios: ["Prancha", "Abdominal crunch", "Roda abdominal", "Rotação russa"],
+      dica: "Core recupera rápido — pode treinar ao final de qualquer sessão sem prejuízo." },
+  ];
+
+  const COACH_CONTENT = {
+    fundamentos: () => `
+      <div class="coach-section">
+        <div class="coach-headline">O que conta como uma série válida?</div>
+        <div class="coach-body">
+          <p>Uma série válida é aquela feita <strong>perto da falha</strong> — quando você chega no limite do que consegue executar com boa técnica. No app, qualquer série com reps preenchidas é contada.</p>
+          <p>O que importa não é o peso, nem o número de repetições. É a <em>proximidade à falha</em>. Qualquer faixa entre 5 e 30 reps funciona para hipertrofia.</p>
+        </div>
+      </div>
+      <div class="coach-section">
+        <div class="coach-headline">MEV, MAV e MRV — o que significam?</div>
+        <div class="coach-body">
+          <ul>
+            <li><strong>MEV (Mínimo Efetivo):</strong> menos que isso e o músculo não cresce.</li>
+            <li><strong>MAV (Máximo Adaptativo):</strong> faixa onde o ganho é máximo — o ideal.</li>
+            <li><strong>MRV (Máximo Recuperável):</strong> acima disso, a fadiga supera o ganho.</li>
+          </ul>
+        </div>
+        <table class="coach-table">
+          <thead><tr><th>Grupo</th><th>MEV</th><th>MAV</th><th>MRV</th></tr></thead>
+          <tbody>${COACH_GRUPOS.map(g => `<tr><td>${g.key}</td><td>${g.mev}</td><td>${g.mav}</td><td>${g.mrv}</td></tr>`).join("")}</tbody>
+        </table>
+      </div>
+      <div class="coach-section">
+        <div class="coach-headline">Por que contar séries e não kg × reps?</div>
+        <div class="coach-body">
+          <p>Contar tonelagem (kg × reps) favorece exercícios pesados e distorce a comparação entre grupos. Séries perto da falha são o padrão da literatura científica — é o que o app usa.</p>
+        </div>
+      </div>
+      <div class="coach-section">
+        <div class="coach-headline">Como as abas do histórico se complementam</div>
+        <div class="coach-body">
+          <ul>
+            <li><strong>Por grupo:</strong> mostra se você está treinando o suficiente (mapa do volume)</li>
+            <li><strong>Por equipamento:</strong> mostra se esse treino está produzindo resultado (progressão de carga)</li>
+          </ul>
+          <p>Volume ok + carga subindo = tudo certo.<br>Volume ok + carga parada = problema de qualidade ou recuperação.<br>Volume baixo + carga parada = provavelmente falta de estímulo.<br>Volume alto + carga caindo = sinal de fadiga — hora de ciclar o volume.</p>
+        </div>
+      </div>`,
+
+    progressao: () => `
+      <div class="coach-section">
+        <div class="coach-headline">3 formas de progredir</div>
+        <div class="coach-body">
+          <ul>
+            <li><strong>Carga:</strong> aumentar o peso na barra</li>
+            <li><strong>Reps:</strong> fazer mais repetições com o mesmo peso</li>
+            <li><strong>Volume:</strong> adicionar mais séries por semana</li>
+          </ul>
+          <p>Para iniciantes, progressão quase toda sessão é normal. Para avançados, progressão a cada 2–3 semanas já é excelente.</p>
+        </div>
+        <div class="coach-quote">"Quanto mais treinado você é, menos treinável você é." — Lucas Campos</div>
+      </div>
+      <div class="coach-section">
+        <div class="coach-headline">O que é um platô e como resolver</div>
+        <div class="coach-body">
+          <p>Platô = nenhuma progressão de carga ou reps por 2–3 semanas.</p>
+        </div>
+        <div class="coach-quote">"Seu corpo se acostumou com o desafio atual. É como ler as mesmas 10 páginas de um livro várias vezes — você não vai aprender nada novo até virar a página e aumentar o desafio."</div>
+        <div class="coach-body">
+          <p>Como sair do platô:</p>
+          <ul>
+            <li>Tente adicionar 1–2 kg ou 1–2 reps na próxima sessão</li>
+            <li>Mude a faixa de reps (ex: de 8–10 para 12–15)</li>
+            <li>Faça um ciclo de volume (ver aba "Volume Cycling")</li>
+          </ul>
+        </div>
+      </div>`,
+
+    cycling: () => `
+      <div class="coach-section">
+        <div class="coach-headline">Por que NÃO é deload — é Volume Cycling</div>
+        <div class="coach-body">
+          <p>Deload tradicional = reduzir tudo (carga + volume). Lucas Campos não usa isso.</p>
+          <p><strong>Volume Cycling = reduzir DRASTICAMENTE o volume, mas MANTER a carga.</strong></p>
+        </div>
+        <div class="coach-quote">"Pense no seu treino como uma viagem de carro: de vez em quando precisamos parar no posto — não para abandonar a viagem, mas para garantir que o motor não quebre e possamos ir mais longe."</div>
+      </div>
+      <div class="coach-section">
+        <div class="coach-headline">Como fazer</div>
+        <div class="coach-body">
+          <ul>
+            <li>Reduza para <strong>3–4 séries/semana</strong> no grupo que precisa ciclar</li>
+            <li><strong>Mantenha a carga</strong> — não reduza o peso</li>
+            <li>Duração: <strong>1–2 semanas</strong></li>
+            <li>Depois: retome o volume normal</li>
+          </ul>
+          <p>O músculo "ressensibiliza" — você vai notar melhor resposta depois do ciclo.</p>
+        </div>
+      </div>
+      <div class="coach-section">
+        <div class="coach-headline">Quando o app sugere ciclagem</div>
+        <div class="coach-body">
+          <ul>
+            <li>Volume acima do MAV por 4+ semanas consecutivas</li>
+            <li>Queda de carga em 2+ exercícios do mesmo grupo na mesma semana</li>
+          </ul>
+          <p>Esses sinais aparecem como chips nos cards de grupo muscular (aba "Por grupo" no histórico).</p>
+        </div>
+      </div>`,
+
+    equilibrio: () => `
+      <div class="coach-section">
+        <div class="coach-headline">Treino equilibrado</div>
+        <div class="coach-quote">"Treinar o corpo de forma desigual é como construir uma casa com paredes fortes e um teto fraco. Para ter um shape bonito e saudável, precisamos distribuir o trabalho de forma que nenhuma parte fique sobrecarregada ou esquecida."</div>
+      </div>
+      <div class="coach-section">
+        <div class="coach-headline">Pares antagonistas</div>
+        <div class="coach-body">
+          <p>O app monitora 3 pares críticos:</p>
+          <ul>
+            <li><strong>Peito ↔ Costas</strong></li>
+            <li><strong>Quad ↔ Posterior de coxa</strong></li>
+            <li><strong>Bíceps ↔ Tríceps</strong></li>
+          </ul>
+          <p>Alerta quando um grupo tem mais de 2,5× o volume do outro E o menor está abaixo do MEV.</p>
+        </div>
+      </div>
+      <div class="coach-section">
+        <div class="coach-headline">Regra da Prioridade</div>
+        <div class="coach-body">
+          <p>Não é obrigatório treinar cada par igualmente — quem tem glúteos como prioridade vai treinar mais glúteos. Isso é normal.</p>
+          <p>O problema é quando o grupo menor fica <strong>abaixo do MEV</strong>. Nesse caso, não é questão de preferência — é déficit de estímulo que pode limitar o próprio desenvolvimento do grupo maior e prejudicar a postura.</p>
+          <p><strong>O app nunca diz "treine menos X". Sempre "Y precisa de mais atenção".</strong></p>
+        </div>
+      </div>
+      <div class="coach-section">
+        <div class="coach-headline">Volume indireto (compostos)</div>
+        <div class="coach-body">
+          <p>Exercícios compostos estimulam múltiplos grupos:</p>
+          <ul>
+            <li>Supino → Peito (1×) + Tríceps e Ombros (0,5× cada)</li>
+            <li>Puxada/Remada → Costas (1×) + Bíceps (0,5×)</li>
+            <li>Agachamento → Quad (1×) + Glúteos e Posterior (0,5× cada)</li>
+          </ul>
+          <p>O app já considera isso na contagem de séries dos cards.</p>
+        </div>
+      </div>`,
+
+    porgrupo: (grupoKey) => {
+      const g = COACH_GRUPOS.find(x => x.key === grupoKey) || COACH_GRUPOS[0];
+      return `
+      <div class="coach-grupo-btns" id="coachGrupoBtns">
+        ${COACH_GRUPOS.map(gr => `<button class="coach-grupo-btn${gr.key === g.key ? " active" : ""}" type="button" onclick="renderCoachPage('porgrupo','${gr.key}')">${gr.emoji} ${gr.key}</button>`).join("")}
+      </div>
+      <div class="coach-grupo-detail">
+        <h4>${g.emoji} ${g.key}</h4>
+        <div class="cgd-landmarks">
+          <div class="cgd-lm"><div class="cgd-lm-val">${g.mev}</div><div class="cgd-lm-lbl">MEV</div></div>
+          <div class="cgd-lm"><div class="cgd-lm-val">${g.mav}</div><div class="cgd-lm-lbl">MAV</div></div>
+          <div class="cgd-lm"><div class="cgd-lm-val">${g.mrv}</div><div class="cgd-lm-lbl">MRV</div></div>
+        </div>
+        <div style="font-size:11px;color:var(--text3);font-weight:700;margin-bottom:6px;">Frequência ideal: ${g.freq}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:4px;">Exercícios de maior retorno:</div>
+        <div class="coach-badge-row">${g.exercicios.map(e => `<span class="coach-badge">${e}</span>`).join("")}</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);">💡 ${g.dica}</div>
+      </div>`;
+    },
+  };
+
+  let coachActivePage = "fundamentos";
+
+  window.renderCoachPage = (pageId, grupoKey) => {
+    coachActivePage = pageId;
+    const content = $("#coachContent");
+    const fn = COACH_CONTENT[pageId];
+    content.innerHTML = fn ? (pageId === "porgrupo" ? fn(grupoKey || COACH_GRUPOS[0].key) : fn()) : "";
+    // update tab active state
+    $("#coachTabs").querySelectorAll(".coach-tab-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.page === pageId);
+    });
+  };
+
+  const renderCoachTabs = () => {
+    $("#coachTabs").innerHTML = COACH_PAGES.map(p =>
+      `<button class="coach-tab-btn${p.id === coachActivePage ? " active" : ""}" data-page="${p.id}" type="button" onclick="renderCoachPage('${p.id}')">${p.label}</button>`
+    ).join("");
+  };
+
+  const openCoachModal = (grupoInicial) => {
+    coachActivePage = grupoInicial ? "porgrupo" : "fundamentos";
+    renderCoachTabs();
+    renderCoachPage(coachActivePage, grupoInicial);
+    $("#coachOverlay").classList.add("open");
+    $("#coachModal").classList.add("open");
+  };
+
+  const closeCoachModal = () => {
+    $("#coachOverlay").classList.remove("open");
+    $("#coachModal").classList.remove("open");
+  };
+
   // ══════════ INIT ══════════
   try {
     datePick.value = todayISO();
@@ -8432,6 +8759,13 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     $("#tmplHistOverlay").addEventListener("click", closeTmplHistModal);
     $("#tmplHistClose").addEventListener("click", closeTmplHistModal);
     $("#btnTreinoHist").addEventListener("click", openTmplHistModal);
+    $("#btnCoachGuide").addEventListener("click", () => openCoachModal());
+    $("#coachClose").addEventListener("click", closeCoachModal);
+    $("#coachOverlay").addEventListener("click", closeCoachModal);
+    $("#tmplSectionHeader").addEventListener("click", () => {
+      tmplGridCollapsed = !tmplGridCollapsed;
+      renderTmplGrid();
+    });
 
     // histórico semanal modal
     $("#btnWeekHist").addEventListener("click", openWeekHistModal);
