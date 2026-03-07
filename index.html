@@ -5524,19 +5524,11 @@ Os valores exatos de X estão em profile.blockSize do JSON.
   },
   "workouts": {
     "templates": [ { "id": "treino_a", "nome": "Treino A", "exercicios": ["supino_reto"] } ],
-    "customExercises": [ { "id": "custom_123", "nome": "Agachamento livre", "grupo": "🦵 Quad", "secundarios": ["🍑 Glúteos"] } ],
     "days": [
       {
         "date": "YYYY-MM-DD",
         "templateNome": "Treino A",
-        "exercicios": [
-          {
-            "nome": "Supino Reto",
-            "grupo": "💪 Peito",
-            "secundarios": ["💪 Tríceps", "🏔 Ombros"],
-            "series": [ { "reps": "10", "carga": "65" } ]
-          }
-        ],
+        "exercicios": [ { "nome": "supino_reto", "series": [ { "reps": "10", "carga": "65" } ] } ],
         "cardio": [ { "tipo": "bicicleta", "minutos": 20, "kcal": 140 } ],
         "totalKcalTreino": 140,
         "nota": "obs livre"
@@ -5553,13 +5545,6 @@ Os valores exatos de X estão em profile.blockSize do JSON.
 - **adherence**: % da meta atingida no dia (100 = bateu a meta, 80 = faltou 20%)
 - Dias sem registro não aparecem nas listas
 - O foodLog só existe nos dias em que o usuário selecionou alimentos pelo painel — inputs manuais não geram foodLog mas ainda somam nos totais de nutrition.days
-
-## Volume muscular por grupo
-Cada exercício exportado tem `grupo` (primário, conta 1 série) e `secundarios` (contam 0,5 série cada). Para calcular volume semanal por grupo muscular:
-- Some 1 série para cada série válida (reps > 0) do exercício onde `grupo === "💪 Peito"` (por exemplo)
-- Some 0,5 série para cada série válida de exercícios onde `"💪 Peito"` aparece em `secundarios`
-- Referências de volume (séries/semana): MEV ~10, MAV ~15, MRV ~22 para a maioria dos grupos; glúteos MEV=15, MAV=20, MRV=23
-- Use esses dados para identificar grupos negligenciados (abaixo do MEV) ou sobrecarregados (acima do MRV)
 
 ## Categorias de alimentos no app
 Pães/Cereais/Raízes, Carnes & Proteínas, Proteicos & Laticínios, Legumes & Vegetais, Oleaginosas, Doces & Snacks, Fast-food, Bebidas, Frutas.
@@ -5619,15 +5604,10 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, day]) => {
         const tmpl = templates.find(t => t.id === day.templateId);
-        const exercicios = (day.exercicios || []).map(e => {
-          const info = exById(e.exercicioId);
-          return {
-            nome: info?.nome || e.exercicioId,
-            grupo: info?.grupo || null,
-            secundarios: info ? getSecondary(info) : [],
-            series: (e.series || []).map(s => ({ reps: s.reps, carga: s.carga }))
-          };
-        });
+        const exercicios = (day.exercicios || []).map(e => ({
+          nome: exById(e.exercicioId)?.nome || e.exercicioId,
+          series: (e.series || []).map(s => ({ reps: s.reps, carga: s.carga }))
+        }));
         const cardio = (day.cardio || []).map(c => ({
           tipo: c.tipo, minutos: c.minutos,
           kcal: Math.round((c.minutos || 0) * (c.kcalPerMin || 7))
@@ -5677,7 +5657,7 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       },
       workouts: {
         templates: templates.map(t => ({ id: t.id, nome: t.nome, exercicios: t.exercicios || [] })),
-        customExercises: customExercises.filter(e => !e.arquivado).map(e => ({ id: e.id, nome: e.nome, grupo: e.grupo || "", secundarios: e.secundarios || [] })),
+        customExercises: customExercises.filter(e => !e.arquivado).map(e => ({ id: e.id, nome: e.nome, grupo: e.grupo || "" })),
         days: treinoDays
       }
     };
