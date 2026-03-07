@@ -1538,9 +1538,10 @@ tr:active { background: var(--surface2); }
 /* custom exercise tag + rename */
 .tei-custom-tag { font-size:9px;font-weight:700;color:var(--accent);background:rgba(124,92,255,.12);border:1px solid rgba(124,92,255,.25);border-radius:4px;padding:1px 5px;flex-shrink:0; }
 .tei-rename-btn { background:transparent;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0 4px;flex-shrink:0; }
-.tei-rename-row { display:flex;gap:6px;align-items:center;padding:4px 0; }
-.tei-rename-row input { flex:1;font-size:16px; }
-.tei-rename-row button { font-size:12px;padding:0 10px;min-height:32px; }
+.tei-rename-row { display:flex;gap:8px;align-items:center;padding:8px 0; }
+.tei-rename-row input { flex:1;font-size:16px;background:var(--surface2);border:1px solid var(--line);border-radius:var(--radius-xs);padding:10px 12px;color:var(--text);outline:none; }
+.tei-rename-row input:focus { border-color:var(--accent); }
+.tei-rename-row button { font-size:14px;padding:0 14px;min-height:40px; }
 .custom-ex-create-btn { width:100%;background:transparent;border:1px dashed rgba(124,92,255,.4);color:var(--accent);font-size:13px;font-weight:700;padding:10px;border-radius:var(--radius-xs);cursor:pointer;margin-top:8px; }
 .custom-ex-create-btn:active { background:rgba(124,92,255,.1); }
 .sec-chip { padding:4px 10px;border-radius:20px;border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--text2);background:transparent;cursor:pointer;transition:background 0.15s,color 0.15s; }
@@ -6095,7 +6096,9 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     }
     // Custom (incluindo arquivados — para exibir no histórico)
     const cust = customExercises.find(e => e.id === id);
-    if(cust) return { ...cust, grupo: CUSTOM_EX_GROUP };
+    // Preserva o grupo real (ex: "🦅 Costas") para que resolvePrimaryGroup funcione.
+    // CUSTOM_EX_GROUP é usado apenas para exibição na tab/seletor.
+    if(cust) return { ...cust };
     return null;
   };
 
@@ -6485,6 +6488,8 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
   const openExSelCustomRename = (exObj) => {
     const gridEl = $("#exSelGrid");
     gridEl.innerHTML = "";
+
+    // Nome
     const row = document.createElement("div");
     row.className = "tei-rename-row";
     row.innerHTML = `
@@ -6493,16 +6498,49 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
       <button class="btn" id="exSelRenameCancel" type="button">✕</button>
     `;
     gridEl.appendChild(row);
+
+    // Grupo principal (só leitura)
+    const grupoLabel = document.createElement("div");
+    grupoLabel.style.cssText = "font-size:13px;color:var(--text3);margin:10px 0 4px;";
+    grupoLabel.textContent = `Grupo principal: ${exObj.grupo || "—"}`;
+    gridEl.appendChild(grupoLabel);
+
+    // Chips de grupos secundários
+    const secLabel = document.createElement("div");
+    secLabel.style.cssText = "font-size:13px;color:var(--text3);margin:8px 0 4px;";
+    secLabel.textContent = "Grupos secundários:";
+    gridEl.appendChild(secLabel);
+
+    const chipsWrap = document.createElement("div");
+    chipsWrap.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;";
+    const savedSec = exObj.secundarios || [];
+    Object.keys(EXERCISE_DB).forEach(g => {
+      if(g === exObj.grupo) return;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "sec-chip" + (savedSec.includes(g) ? " active" : "");
+      btn.textContent = g;
+      btn.dataset.grupo = g;
+      btn.addEventListener("click", () => btn.classList.toggle("active"));
+      chipsWrap.appendChild(btn);
+    });
+    gridEl.appendChild(chipsWrap);
+
     const input = row.querySelector("#exSelRenameInput");
     input.focus(); input.select();
+
     row.querySelector("#exSelRenameConfirm").addEventListener("click", () => {
       const newName = (input.value || "").trim();
       if(!newName) return;
+      const secundarios = [...chipsWrap.querySelectorAll(".sec-chip.active")].map(b => b.dataset.grupo);
       const idx = customExercises.findIndex(e => e.id === exObj.id);
-      if(idx >= 0) customExercises[idx].nome = newName;
+      if(idx >= 0) {
+        customExercises[idx].nome = newName;
+        customExercises[idx].secundarios = secundarios;
+      }
       saveCustomExercises();
       renderExSelectorCatalog(exSelectorCat);
-      showToast("Renomeado ✅");
+      showToast("Salvo ✅");
     });
     row.querySelector("#exSelRenameCancel").addEventListener("click", () => renderExSelectorCatalog(exSelectorCat));
   };
