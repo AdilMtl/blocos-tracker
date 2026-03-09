@@ -2468,6 +2468,26 @@ tr:active { background: var(--surface2); }
       </div>
     </div>
 
+    <!-- ── Card: Migrar para o Kcalix ── -->
+    <div class="card" style="margin-top:12px;">
+      <div class="card-header">
+        <div class="ch-info">
+          <b>🔄 Migrar para o Kcalix</b>
+          <span>Exporte seus dados para a versão nova do app.</span>
+        </div>
+      </div>
+      <div class="card-body" style="padding:12px 16px 16px;">
+        <p style="font-size:13px;color:var(--text2);margin:0 0 12px;">
+          Exporte todos os seus dados (diário, treinos, medições, hábitos)
+          para importar na versão nova do app.
+        </p>
+        <button class="btn sm primary" id="btnExportKcalix" type="button">
+          ⬇️ Exportar dados completos
+        </button>
+        <div id="kcalixExportStatus" style="font-size:12px;color:var(--good);margin-top:8px;min-height:16px;"></div>
+      </div>
+    </div>
+
     <!-- ── Card 2: Configurações ── -->
     <div class="card">
       <div class="card-header">
@@ -5298,6 +5318,176 @@ tr:active { background: var(--surface2); }
     a.href = url; a.download = `medicoes-export-${todayISO()}.json`;
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
+  }
+
+  function exportKcalixFull() {
+    // ── 1. Carregar todos os stores ──────────────────────────────────────────
+    const s        = loadJSON(SETTINGS_KEY, DEFAULT_SETTINGS);
+    const c        = loadJSON(CALC_KEY,     DEFAULT_CALC);
+    const diary    = loadJSON(STORAGE_KEY,  { days: {} });
+    const foodLog  = loadJSON(FOOD_LOG_KEY, { days: {} });
+    const treino   = loadJSON(TREINO_KEY,   { days: {} });
+    const tmpls    = loadJSON(TREINO_TMPL_KEY, DEFAULT_TEMPLATES);
+    const customEx = loadJSON(CUSTOM_EX_KEY,   { exercises: [] });
+    const measure  = loadJSON(MEASURE_KEY,     { days: {} });
+    const habitsRaw= loadJSON(HABITS_KEY,      {});
+    const cFoods   = loadJSON(CUSTOM_FOODS_KEY,{ foods: [] });
+
+    // ── 2. Tamanhos de bloco e kcal/bloco ────────────────────────────────────
+    const bP = s.blocks?.pG        ?? 25;
+    const bC = s.blocks?.cG        ?? 25;
+    const bG = s.blocks?.gG        ?? 10;
+    const kP = s.kcalPerBlock?.p   ?? 100;
+    const kC = s.kcalPerBlock?.c   ?? 100;
+    const kG = s.kcalPerBlock?.g   ?? 90;
+
+    // ── 3. Converter diário: blocos → gramas ─────────────────────────────────
+    const diaryOut = {};
+    for (const [date, day] of Object.entries(diary.days ?? {})) {
+      const mealsOut = {};
+      let totP = 0, totC = 0, totG = 0, totKcal = 0;
+
+      for (const mealId of ['cafe','lanche1','almoco','lanche2','jantar','ceia']) {
+        const m = day.meals?.[mealId] ?? { p: 0, c: 0, g: 0 };
+        const blocsP = m.p ?? 0;
+        const blocsC = m.c ?? 0;
+        const blocsG = m.g ?? 0;
+
+        const p    = Math.round(blocsP * bP * 10) / 10;
+        const carb = Math.round(blocsC * bC * 10) / 10;
+        const fat  = Math.round(blocsG * bG * 10) / 10;
+        const kcal = Math.round(blocsP * kP + blocsC * kC + blocsG * kG);
+
+        const items = (foodLog.days?.[date] ?? [])
+          .filter(e => e.mealId === mealId)
+          .map(e => ({
+            foodId:   e.foodId  ?? '',
+            nome:     e.nome    ?? '',
+            qty:      e.qty     ?? 1,
+            porcaoG:  100,
+            p:        e.pG      ?? 0,
+            c:        e.cG      ?? 0,
+            g:        e.gG      ?? 0,
+            kcal:     e.kcal    ?? 0,
+            at:       e.at      ?? new Date(date).toISOString()
+          }));
+
+        mealsOut[mealId] = { p, c: carb, g: fat, kcal, items };
+        totP    += blocsP * bP;
+        totC    += blocsC * bC;
+        totG    += blocsG * bG;
+        totKcal += blocsP * kP + blocsC * kC + blocsG * kG;
+      }
+
+      const kcalTreino = treino.days?.[date]?.kcal ?? 0;
+
+      diaryOut[date] = {
+        meals: mealsOut,
+        totals: {
+          p:    Math.round(totP    * 10) / 10,
+          c:    Math.round(totC    * 10) / 10,
+          g:    Math.round(totG    * 10) / 10,
+          kcal: Math.round(totKcal)
+        },
+        kcalTreino
+      };
+    }
+
+    // ── 4. Treinos — exportar direto ─────────────────────────────────────────
+    const workoutsOut = treino.days ?? {};
+
+    // ── 5. Templates — garantir campos obrigatórios ──────────────────────────
+    const templatesOut = (Array.isArray(tmpls) ? tmpls : []).map(t => ({
+      id:        t.id        ?? ('treino_' + Date.now()),
+      nome:      t.nome      ?? 'Treino',
+      cor:       t.cor       ?? '#7c5cff',
+      exercicios:t.exercicios ?? [],
+      cardio:    t.cardio    ?? { tipo: '', min: 0 }
+    }));
+
+    // ── 6. Exercícios personalizados — excluir arquivados ────────────────────
+    const customExOut = (customEx.exercises ?? [])
+      .filter(e => !e.arquivado)
+      .map(e => ({
+        id:          e.id    ?? '',
+        nome:        e.nome  ?? '',
+        grupo:       e.grupo ?? '',
+        secundarios: []
+      }));
+
+    // ── 7. Medições corporais — exportar direto ──────────────────────────────
+    const bodyOut = measure.days ?? {};
+
+    // ── 8. Hábitos — formato direto { "YYYY-MM-DD": { ... } } ───────────────
+    const habitsOut = habitsRaw ?? {};
+
+    // ── 9. Alimentos personalizados ──────────────────────────────────────────
+    const customFoodsOut = (cFoods.foods ?? []).map(f => ({
+      id:      f.id      ?? '',
+      nome:    f.nome    ?? '',
+      porcao:  f.porcao  ?? '100g',
+      porcaoG: f.porcaoG ?? 100,
+      p:       f.p       ?? 0,
+      c:       f.c       ?? 0,
+      g:       f.g       ?? 0,
+      kcal:    f.kcal    ?? 0
+    }));
+
+    // ── 10. Settings ─────────────────────────────────────────────────────────
+    const settingsOut = {
+      sex:            c.sex            ?? 'male',
+      age:            c.age            ?? 25,
+      weightKg:       c.weightKg       ?? 70,
+      heightCm:       c.heightCm       ?? 170,
+      goal:           c.goalType       ?? 'maintain',
+      activityFactor: c.activity       ?? 1.55,
+      bmr:            0,
+      tdee:           0,
+      kcalTarget:     s.goals?.kcal    ?? 0,
+      pTarget:        s.goals?.pG      ?? 0,
+      cTarget:        s.goals?.cG      ?? 0,
+      gTarget:        s.goals?.gG      ?? 0,
+      pKg:            c.pKg            ?? undefined,
+      cKg:            c.cKg            ?? undefined,
+      minFatKg:       c.minFatKg       ?? undefined,
+      def:            c.deficitPct     ?? undefined,
+      fixedKcal:      c.fixedKcal      ?? undefined,
+      blocks:         { pG: bP, cG: bC, gG: bG },
+      kcalPerBlock:   { p: kP, c: kC, g: kG },
+      skinfolds:      c.skinfolds      ?? undefined
+    };
+
+    // ── 11. Montar objeto final ───────────────────────────────────────────────
+    const out = {
+      _version:    1,
+      _exportedAt: new Date().toISOString(),
+      _app:        'blocos-tracker',
+      settings:    settingsOut,
+      diary:       diaryOut,
+      workouts:    workoutsOut,
+      templates:   templatesOut,
+      customExercises: customExOut,
+      body:        bodyOut,
+      habits:      habitsOut,
+      customFoods: customFoodsOut
+    };
+
+    // ── 12. Download ──────────────────────────────────────────────────────────
+    const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `kcalix-export-${todayISO()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    const el = $('#kcalixExportStatus');
+    if (el) {
+      el.textContent = '✓ Arquivo baixado com sucesso';
+      setTimeout(() => { el.textContent = ''; }, 4000);
+    }
   }
 
   function lastNDates(n){
@@ -8979,6 +9169,9 @@ Use sempre dados reais do JSON (cite datas, valores, nomes de alimentos). Respon
     // ai export
     $("#btnExportAI").addEventListener("click", exportAIJson);
     $("#btnCopyAIPrompt").addEventListener("click", copyAIPrompt);
+
+    // kcalix migration export
+    $("#btnExportKcalix").addEventListener("click", exportKcalixFull);
 
     $("#btnSendToSettings").addEventListener("click", () => {
       const r = calcAll();
