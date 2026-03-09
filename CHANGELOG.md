@@ -5,6 +5,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.12.0] — 2026-03-09
+
+### Adicionado
+- [feat] **Exportador de migração para o Kcalix** — botão "⬇️ Exportar dados completos" na aba Mais (card "🔄 Migrar para o Kcalix", acima de Configurações). Gera `kcalix-export-YYYY-MM-DD.json` com todos os dados do usuário: diário (blocos convertidos para gramas), treinos, rotinas/templates, exercícios custom, medições corporais, hábitos e alimentos custom. Formato compatível com o importador do Kcalix (React + Supabase).
+
+### Notas
+- Sem mudança de schema no localStorage.
+- Sem bump de CACHE_NAME (sem alteração de assets estáticos).
+
+---
+
 ## [v2.11.0] — 2026-03-06
 
 ### Adicionado
