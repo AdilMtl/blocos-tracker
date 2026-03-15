@@ -5,6 +5,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ---
 
+## [v2.13.0] — 2026-03-14
+
+### Adicionado
+- [feat] **Check-ins no exportador de migração** — campo `checkins` adicionado ao JSON gerado por `exportKcalixFull()`. Agora o export inclui todo o histórico de check-ins de progresso do usuário, compatível com o importador do Kcalix (`migrationTransform.ts` / step 9).
+
+### Notas
+- Sem mudança de schema no localStorage.
+- Sem bump de CACHE_NAME (sem alteração de assets estáticos).
+
+---
+
 ## [v2.12.0] — 2026-03-09
 
 ### Adicionado
